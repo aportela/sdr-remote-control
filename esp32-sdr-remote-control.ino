@@ -5,6 +5,13 @@
 #include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
 #include <SPI.h>
 
+// Ai Esp32 Rotary Encoder by Igor Antolic
+// https://github.com/igorantolic/ai-esp32-rotary-encoder
+#include "AiEsp32RotaryEncoder.h"
+
+
+#include "Arduino.h"
+
 #include "ts2000.h"
 
 #define TFT_CS 5
@@ -25,10 +32,12 @@
 
 #define ROTARY_ENCODER_A 34
 #define ROTARY_ENCODER_B 35
+#define ROTARY_ENCODER_SWITCH_BUTTON 25
+#define ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define ROTARY_ENCODER_STEPS 4 // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
 #define CURRENT_VERSION "0.1"
 
-volatile bool rotaryEncoderChanged = false;
 int lastRotaryEncoderAValue = LOW;
 
 bool connected = true;
@@ -36,6 +45,14 @@ const char* frames[] = { "|", "/", "-", "\\" };
 int8_t currentFrame = -1;
 #define MAX_FRAMES 4
 
+uint16_t freqChangeHzStepSize = 12500; // Hz
+
+AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
+
+void IRAM_ATTR readEncoderISR()
+{
+    rotaryEncoder.readEncoder_ISR();
+}
 
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
@@ -58,29 +75,21 @@ void initSerial(void) {
 }
 
 bool currentVFOFrequencyChanged = true;
-volatile uint64_t currentVFOFrequency = 145625000;
+volatile uint64_t currentVFOFrequency = 200145;
 
-void IRAM_ATTR handleEncoder() {
-  static bool lastAState = false;
-  static bool lastBState = false;
-  bool currentAState = digitalRead(ROTARY_ENCODER_A);
-  bool currentBState = digitalRead(ROTARY_ENCODER_B);
-  if (currentAState != lastAState) {
-    if (currentBState == currentAState) {
-      currentVFOFrequency--;
-    } else {
-      currentVFOFrequency++;
-    }
-    currentVFOFrequencyChanged = true;
-  }
-  lastAState = currentAState;
-  lastBState = currentBState;
-}
 
 void initRotaryEncoder(void) {
+  /*
   pinMode(ROTARY_ENCODER_A, INPUT_PULLUP);
   pinMode(ROTARY_ENCODER_B, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_A), handleEncoder, CHANGE);
+  */
+  rotaryEncoder.begin();
+	rotaryEncoder.setup(readEncoderISR);
+  rotaryEncoder.setBoundaries(0, 999999, false);
+  rotaryEncoder.setAcceleration(500);
+  //rotaryEncoder.disableAcceleration();
+  rotaryEncoder.setEncoderValue(currentVFOFrequency);
 }
 
 void setup() {
@@ -204,6 +213,8 @@ void refreshVFOMode(uint8_t mode) {
 void refreshVFOFreq(uint64_t frequency) {
   tft.setTextSize(3);
   char formattedFrequency[16];
+  char nformattedFrequency[12];
+  /*
   sprintf(
     formattedFrequency,
     "%03lld.%03lld.%03lld.%03lld",
@@ -212,6 +223,19 @@ void refreshVFOFreq(uint64_t frequency) {
     (frequency % 1000000) / 1000,
     frequency % 1000
   );
+  */
+  // test if this method is more optimized than div operators
+  int resultIndex = 0;
+  sprintf(nformattedFrequency, "%012llu", frequency);
+  for (int i = 0; i < 12; ++i) {
+    formattedFrequency[resultIndex++] = nformattedFrequency[i];  
+    if ((i + 1) % 3 == 0 && i < 11) {
+      formattedFrequency[resultIndex++] = '.';
+    }
+  }
+
+  formattedFrequency[resultIndex] = '\0';
+
   tft.setCursor(35, 30);
   tft.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   tft.print(formattedFrequency);
@@ -240,6 +264,10 @@ void loop() {
   if (!connected) {
     tryConnection();
   } else {
+    if (rotaryEncoder.encoderChanged()) {
+      currentVFOFrequency = rotaryEncoder.readEncoder();
+      currentVFOFrequencyChanged = true;
+    }
     showMainScreen();
   }
   delay(10);
