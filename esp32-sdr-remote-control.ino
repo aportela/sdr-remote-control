@@ -12,6 +12,7 @@
 #include "Arduino.h"
 
 #include "ts2000.h"
+#include "transceiver.h"
 
 #define TFT_CS 5
 #define TFT_RST 4
@@ -36,6 +37,8 @@
 #define ROTARY_ENCODER_STEPS 4 // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
 #define CURRENT_VERSION "0.1"
+
+sdrRemoteTransceiver trans;
 
 int lastRotaryEncoderAValue = LOW;
 
