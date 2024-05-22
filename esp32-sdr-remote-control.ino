@@ -9,7 +9,6 @@
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
 #include "AiEsp32RotaryEncoder.h"
 
-
 #include "Arduino.h"
 
 #include "ts2000.h"
@@ -42,6 +41,35 @@ int lastRotaryEncoderAValue = LOW;
 
 bool connected = true;
 const char* frames[] = { "|", "/", "-", "\\" };
+
+const char* modes[] = { 
+  "DSB", 
+  "LSB", 
+  "USB", 
+  "CWU", 
+  "FM", 
+  "SAM", 
+  "", 
+  "CWL", 
+  "WFM", 
+  "BFM", 
+  "???"
+};
+
+const uint16_t defaultModeSteps[] = {
+  12500, // DSB: 12.5  Khz
+  10,    // LSB: 10 Hz
+  10,    // USB: 10 Hz
+  1,     // CWU: 1  Hz
+  5000,  // FM: 
+  5000,  // SAM: 
+  0,     // NOT USED
+  1,     // CWL: 1  Hz
+  50000, // WFM: 0.5 MHz
+  50000, // BFM: 0.5 MHz
+  0,     // INVALID MODE
+};
+
 int8_t currentFrame = -1;
 #define MAX_FRAMES 4
 
@@ -77,25 +105,19 @@ void initSerial(void) {
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
-
 void initRotaryEncoder(void) {
-  /*
-  pinMode(ROTARY_ENCODER_A, INPUT_PULLUP);
-  pinMode(ROTARY_ENCODER_B, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(ROTARY_ENCODER_A), handleEncoder, CHANGE);
-  */
   rotaryEncoder.begin();
 	rotaryEncoder.setup(readEncoderISR);
-  rotaryEncoder.setBoundaries(0, 999999, false);
-  rotaryEncoder.setAcceleration(500);
-  //rotaryEncoder.disableAcceleration();
-  rotaryEncoder.setEncoderValue(currentVFOFrequency);
+  rotaryEncoder.setBoundaries(0, 999, true);
+  //rotaryEncoder.setAcceleration(500);
+  rotaryEncoder.disableAcceleration();
+  rotaryEncoder.setEncoderValue(0);
 }
 
 void setup() {
   initSerial();
-  initRotaryEncoder();
   initDisplay();
+  initRotaryEncoder();
 }
 
 void showConnectScreen(void) {
@@ -264,8 +286,18 @@ void loop() {
   if (!connected) {
     tryConnection();
   } else {
+    /*
     if (rotaryEncoder.encoderChanged()) {
       currentVFOFrequency = rotaryEncoder.readEncoder();
+      currentVFOFrequencyChanged = true;
+    }
+    */
+    int16_t encoderDelta = rotaryEncoder.encoderChanged();
+    if (encoderDelta > 0) {
+      currentVFOFrequency++;
+      currentVFOFrequencyChanged = true;
+    } else if (encoderDelta < 0) {
+      currentVFOFrequency--;
       currentVFOFrequencyChanged = true;
     }
     showMainScreen();
