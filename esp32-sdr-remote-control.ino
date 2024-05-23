@@ -72,14 +72,13 @@ void IRAM_ATTR readEncoderISR() {
 
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
-Display display;
+Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &tft);
 
 void initDisplay(void) {
   tft.init(DISPLAY_HEIGHT, DISPLAY_WIDTH);
   tft.setRotation(1);
   tft.setTextWrap(false);
   tft.fillScreen(ST77XX_BLACK);
-  display.init(DISPLAY_WIDTH, DISPLAY_HEIGHT, &tft);
 }
 
 void initSerial(void) {

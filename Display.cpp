@@ -2,7 +2,7 @@
 
 const char* Display::connectionScreenSpriteFrames[4] = { "|", "/", "-", "\\" };
 
-void Display::init(uint8_t width, uint8_t height, Adafruit_ST7789* display) {
+Display::Display(uint8_t width, uint8_t height, Adafruit_ST7789* display) {
   this->width = width;
   this->height = height;
   this->screen = display;

@@ -6,7 +6,7 @@
 
 class Display {
 public:
-  void init(uint8_t width, uint8_t height, Adafruit_ST7789* display);
+  Display(uint8_t width, uint8_t height, Adafruit_ST7789* display);
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion);
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
