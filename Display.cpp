@@ -127,3 +127,71 @@ void Display::refreshVFOFreq(Adafruit_ST7789* display, uint64_t frequency) {
   display->setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   display->print(formattedFrequency);
 }
+
+#define SMETER_PARTS 42
+#define SMETER_PART_WIDTH 4
+#define SMETER_PART_SPACE_WIDTH 2
+#define SMETER_PARTH_HEIGHT 18
+#define SMETER_PARTH_HEIGHT_SEPARATOR 20
+#define SMETER_PARTH_BG_COLOR 0x8410
+
+void Display::createDigitalSMeter(Adafruit_ST7789* display) {
+  randomSeed(analogRead(0));
+  display->setTextSize(2);
+  display->setTextColor(ST77XX_WHITE);
+  display->setCursor(36, 70);
+  display->print("1 3 5 7 9");
+  display->setCursor(165, 70);
+  display->print("+20 +40 +60");
+  display->setCursor(6, 98);
+  display->print("S");
+  display->setCursor(292, 98);
+  display->print("dB");
+  display->drawFastVLine(23, 94, 22, ST77XX_WHITE);
+  display->drawFastVLine(284, 94, 22, ST77XX_WHITE);
+  display->drawFastHLine(23, 116, 262, ST77XX_WHITE);
+
+  for (int i = 0; i <= SMETER_PARTS; i++) {
+    int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+    if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42) {
+      display->fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
+    } else {
+      display->fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
+    }
+  }
+}
+
+void Display::refreshRNDDigitalSMeter(Adafruit_ST7789* display) {
+  this->oldSignal = this->currentSignal;
+  int newSignal = random(1, 42);
+  if (newSignal >= this->oldSignal) {
+    this->currentSignal = newSignal;
+    //peakSignal = newSignal;
+  } else if (newSignal < oldSignal) {
+    this->currentSignal = oldSignal - 1;
+  }
+  if (this->currentSignal < 0) {
+    this->currentSignal = 0;
+  } else if (this->currentSignal > 42) {
+    this->currentSignal = 42;
+  }
+  for (int i = 0; i <= SMETER_PARTS; i++) {
+    if (i < currentSignal) {
+      int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42) {
+          display->fillRect(x, 94, SMETER_PART_WIDTH, 22, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        } else {
+          display->fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        }
+    } else {
+      if (oldSignal > i) {
+        int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42) {
+          display->fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
+        } else {
+          display->fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
+        }
+      }
+    }
+  }
+}

@@ -12,11 +12,15 @@ public:
   void refreshActiveVFO(Adafruit_ST7789* display, uint8_t number);
   void refreshVFOMode(Adafruit_ST7789* display, uint8_t mode);
   void refreshVFOFreq(Adafruit_ST7789* display, uint64_t frequency);
+  void createDigitalSMeter(Adafruit_ST7789* display);
+  void refreshRNDDigitalSMeter(Adafruit_ST7789* display);
 private:
   uint8_t width;
-  uint8_t height;
+  uint8_t height;  
   static const char* connectionScreenSpriteFrames[4];
   int8_t connectionScreenSpriteCurrentFrame = -1;
+  uint8_t oldSignal;
+  uint8_t currentSignal = 0;
 #define CONNECTION_SCREEN_SPRITE_FRAME_COUNT = 4
 };
 

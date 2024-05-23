@@ -141,6 +141,7 @@ uint8_t activeVFO = 0;
 bool VFOModeChanged = true;
 uint8_t VFOMode = 4;
 
+bool smeterCreated = false;
 void showMainScreen(void) {
   if (transmitStatusChanged) {
     display.refreshTransmitStatus(&tft, isTransmitting);
@@ -158,6 +159,11 @@ void showMainScreen(void) {
     display.refreshVFOFreq(&tft, currentVFOFrequency);
     currentVFOFrequencyChanged = false;
   }
+  if (! smeterCreated) {
+    display.createDigitalSMeter(&tft);
+    smeterCreated = true;
+  }
+  display.refreshRNDDigitalSMeter(&tft);
 }
 
 static bool buttonDown = false;
