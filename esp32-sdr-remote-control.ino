@@ -79,7 +79,7 @@ void initDisplay(void) {
   tft.setRotation(1);
   tft.setTextWrap(false);
   tft.fillScreen(ST77XX_BLACK);
-  display.init(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+  display.init(DISPLAY_WIDTH, DISPLAY_HEIGHT, &tft);
 }
 
 void initSerial(void) {
@@ -111,7 +111,7 @@ void setup() {
 }
 
 void tryConnection(void) {
-  display.showConnectScreen(&tft, SERIAL_BAUD_RATE, CURRENT_VERSION);
+  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
   Serial.flush();
   delay(SERIAL_FLUSH_WAIT);
   Serial.printf("%s%s", TS2K_CMD_POWER_STATUS, TS2K_CMD_TERMINATOR);
@@ -143,26 +143,26 @@ uint8_t VFOMode = 4;
 bool smeterCreated = false;
 void showMainScreen(void) {
   if (transmitStatusChanged) {
-    display.refreshTransmitStatus(&tft, isTransmitting);
+    display.refreshTransmitStatus(isTransmitting);
     transmitStatusChanged = false;
   }
   if (activeVFOChanged) {
-    display.refreshActiveVFO(&tft, activeVFO);
+    display.refreshActiveVFO(activeVFO);
     activeVFOChanged = false;
   }
   if (VFOModeChanged) {
-    display.refreshVFOMode(&tft, VFOMode);
+    display.refreshVFOMode(VFOMode);
     VFOModeChanged = false;
   }
   if (currentVFOFrequencyChanged) {
-    display.refreshVFOFreq(&tft, currentVFOFrequency);
+    display.refreshVFOFreq(currentVFOFrequency);
     currentVFOFrequencyChanged = false;
   }
-  if (! smeterCreated) {
-    display.createDigitalSMeter(&tft);
+  if (!smeterCreated) {
+    display.createDigitalSMeter();
     smeterCreated = true;
   }
-  display.refreshRNDDigitalSMeter(&tft, random(1, 42));
+  display.refreshRNDDigitalSMeter(random(1, 42));
 }
 
 static bool buttonDown = false;
