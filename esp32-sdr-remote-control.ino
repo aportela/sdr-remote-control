@@ -23,8 +23,9 @@
 #define TFT_MOSI 23
 #define TFT_SCLK 18
 
-#define DISPLAY_WIDTH 320
-#define DISPLAY_HEIGHT 240
+#define DISPLAY_WIDTH 240
+#define DISPLAY_HEIGHT 320
+#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
 
 #define DISPLAY_INACTIVE_COLOR 0x0841
 
@@ -70,16 +71,7 @@ void IRAM_ATTR readEncoderISR() {
   rotaryEncoder.readEncoder_ISR();
 }
 
-Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
-
-Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &tft);
-
-void initDisplay(void) {
-  tft.init(DISPLAY_HEIGHT, DISPLAY_WIDTH);
-  tft.setRotation(1);
-  tft.setTextWrap(false);
-  tft.fillScreen(ST77XX_BLACK);
-}
+Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
 void initSerial(void) {
   Serial.setDebugOutput(false);
@@ -105,7 +97,6 @@ void initRotaryEncoder(void) {
 
 void setup() {
   initSerial();
-  initDisplay();
   initRotaryEncoder();
 }
 
@@ -120,9 +111,9 @@ void tryConnection(void) {
     if (receivedData == TS2K_CMD_POWER_STATUS_RESPONSE_ON) {
       Serial.flush();
       delay(SERIAL_FLUSH_WAIT);
-      tft.fillScreen(ST77XX_BLACK);
-      tft.setCursor(10, 50);
-      tft.printf("MAIN");
+      //tft.fillScreen(ST77XX_BLACK);
+      //tft.setCursor(10, 50);
+      //tft.printf("MAIN");
       connected = true;
       break;
     }
@@ -185,9 +176,9 @@ void loop() {
       spanChanged = true;
     }
     if (spanChanged) {
-      tft.setCursor(35, 0);
-      tft.drawFastHLine(0, 56, 320, ST77XX_BLACK);
-      tft.drawFastHLine(spanPositions[spanPosition], 56, 18, ST77XX_WHITE);
+      //tft.setCursor(35, 0);
+      //tft.drawFastHLine(0, 56, 320, ST77XX_BLACK);
+      //tft.drawFastHLine(spanPositions[spanPosition], 56, 18, ST77XX_WHITE);
       spanPosition++;
       if (spanPosition > 11) {
         spanPosition = 0;

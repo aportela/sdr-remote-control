@@ -6,7 +6,7 @@
 
 class Display {
 public:
-  Display(uint8_t width, uint8_t height, Adafruit_ST7789* display);
+  Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion);
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
@@ -15,9 +15,9 @@ public:
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
 private:
-  uint8_t width;
-  uint8_t height;  
-  Adafruit_ST7789* screen;
+  uint16_t width;
+  uint16_t height;
+  Adafruit_ST7789 screen;
   static const char* connectionScreenSpriteFrames[4];
   int8_t connectionScreenSpriteCurrentFrame = -1;
   uint8_t oldSignal;
