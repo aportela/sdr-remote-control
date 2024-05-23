@@ -12,6 +12,7 @@
 #include "Arduino.h"
 
 #include "ts2000.h"
+#include "TS2KProtocol.h"
 #include "Display.h"
 
 //#include "transceiver.h"
