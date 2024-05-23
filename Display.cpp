@@ -177,7 +177,7 @@ void Display::refreshRNDDigitalSMeter(Adafruit_ST7789* display, int newSignal) {
   for (int i = 0; i <= SMETER_PARTS; i++) {
     if (i < currentSignal) {
       int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
-        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42) {
+        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
           display->fillRect(x, 94, SMETER_PART_WIDTH, 22, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
         } else {
           display->fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
@@ -185,7 +185,7 @@ void Display::refreshRNDDigitalSMeter(Adafruit_ST7789* display, int newSignal) {
     } else {
       if (oldSignal > i) {
         int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
-        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42) {
+        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
           display->fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
         } else {
           display->fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
