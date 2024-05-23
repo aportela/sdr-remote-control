@@ -11,7 +11,6 @@
 
 #include "Arduino.h"
 
-#include "ts2000.h"
 #include "TS2KProtocol.h"
 #include "Display.h"
 
@@ -104,11 +103,11 @@ void tryConnection(void) {
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
   Serial.flush();
   delay(SERIAL_FLUSH_WAIT);
-  Serial.printf("%s%s", TS2K_CMD_POWER_STATUS, TS2K_CMD_TERMINATOR);
+  Serial.print("PS;");
   delay(SERIAL_WAIT_AFTER_SEND_CMD);
   while (Serial.available() > 0 && !connected) {
     String receivedData = Serial.readStringUntil(';');
-    if (receivedData == TS2K_CMD_POWER_STATUS_RESPONSE_ON) {
+    if (receivedData == "PS1;") {
       Serial.flush();
       delay(SERIAL_FLUSH_WAIT);
       //tft.fillScreen(ST77XX_BLACK);
