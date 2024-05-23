@@ -8,24 +8,29 @@
 #define TRX_CFLAG_ACTIVE_VFO_INDEX 0x02
 #define TRX_CFLAG_ACTIVE_VFO_MODE 0x04
 #define TRX_CFLAG_ACTIVE_VFO_FREQUENCY 0x08
+#define TRX_CFLAG_SMETER 0x16
 
-#ifdef TS2K_SDR_RADIO_CONSOLE
+typedef enum {
+  TRX_PS_OFF = 0,
+  TRX_PS_ON = 1
+} TRxPowerStatus;
 
 // SDR Radio Console (by Simon Brown / G4ELI) Serial CAT https://www.sdr-radio.com/SerialPort
 typedef enum {
-  DSB = 0,
-  LSB = 1,
-  USB = 2,
+  VFO_MD_DSB = 0,
+  VFO_MD_LSB = 1,
+  VFO_MD_USB = 2,
   // CW upper sideband
-  CW_U = 3,
-  FM = 4,
+  VFO_MD_CW_U = 3,
+  VFO_MD_FM = 4,
   // synchronous AM, includes ECSS
-  SAM = 5,
-  RESERVED = 6,
+  VFO_MD_SAM = 5,
+  VFO_MD_RESERVED = 6,
   // CW lower sideband
-  CW_L = 7,
-  WFM = 8,
-  BFM = 9
+  VFO_MD_CW_L = 7,
+  VFO_MD_WFM = 8,
+  VFO_MD_BFM = 9,
+  VFO_MODE_ERROR = 10
 } VFOMode_;
 
 const char* VFOModeNames[] = {
@@ -38,44 +43,19 @@ const char* VFOModeNames[] = {
   "",
   "CWL",
   "WFM",
-  "BFM"
+  "BFM",
+  "???"
 };
-
-#else
-
-// TS-2000 (from Kenwood TS-2000 manual)
-typedef enum {
-  LSB = 1,
-  USB = 2,
-  CW = 3,
-  FM = 4,
-  AM = 5,
-  FSK = 6,
-  CR_R = 7,
-  RESERVED = 8,
-  FSK_R = 9
-} VFOMode_;
-
-const char* VFOModeNames[] = {
-  "LSB",
-  "USB",
-  "CW",
-  "FM",
-  "AM",
-  "FSK",
-  "CRR",
-  "",
-  "FSKR"
-};
-
-#endif
 
 typedef struct {
+  TRxPowerStatus powerStatus;
   char currentVFOFrequencyAsString[12];
   uint64_t currentVFOFrequencyAsInt;
-  //VFOMode currentVFOMode;
+  VFOMode_ currentVFOMode;
   uint8_t changed;
   uint64_t currentHzStep;
+  uint8_t SMeter;
+  uint8_t volume;
 } sdrRemoteTransceiver;
 
 void initSDRRemoteTransceiver(sdrRemoteTransceiver* trx);

@@ -16,8 +16,6 @@
 
 //#include "transceiver.h"
 
-#define TS2K_SDR_RADIO_CONSOLE
-
 #define TFT_CS 5
 #define TFT_RST 4
 #define TFT_DC 2
