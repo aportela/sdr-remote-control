@@ -7,12 +7,13 @@
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
-#include "AiEsp32RotaryEncoder.h"
+#include <AiEsp32RotaryEncoder.h>
 
 #include "Arduino.h"
 
 #include "ts2000.h"
 #include "Display.h"
+
 //#include "transceiver.h"
 
 #define TS2K_SDR_RADIO_CONSOLE
@@ -45,8 +46,6 @@
 
 //initSDRRemoteTransceiver(trans);
 //setCurrentHzStep(&trans, 10);
-
-int lastRotaryEncoderAValue = LOW;
 
 bool connected = true;
 
