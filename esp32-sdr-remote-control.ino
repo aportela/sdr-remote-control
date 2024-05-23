@@ -163,7 +163,7 @@ void showMainScreen(void) {
     display.createDigitalSMeter(&tft);
     smeterCreated = true;
   }
-  display.refreshRNDDigitalSMeter(&tft);
+  display.refreshRNDDigitalSMeter(&tft, random(1, 42));
 }
 
 static bool buttonDown = false;

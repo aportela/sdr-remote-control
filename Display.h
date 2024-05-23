@@ -13,7 +13,7 @@ public:
   void refreshVFOMode(Adafruit_ST7789* display, uint8_t mode);
   void refreshVFOFreq(Adafruit_ST7789* display, uint64_t frequency);
   void createDigitalSMeter(Adafruit_ST7789* display);
-  void refreshRNDDigitalSMeter(Adafruit_ST7789* display);
+  void refreshRNDDigitalSMeter(Adafruit_ST7789* display, int newSignal);
 private:
   uint8_t width;
   uint8_t height;  

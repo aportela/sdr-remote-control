@@ -161,9 +161,8 @@ void Display::createDigitalSMeter(Adafruit_ST7789* display) {
   }
 }
 
-void Display::refreshRNDDigitalSMeter(Adafruit_ST7789* display) {
+void Display::refreshRNDDigitalSMeter(Adafruit_ST7789* display, int newSignal) {
   this->oldSignal = this->currentSignal;
-  int newSignal = random(1, 42);
   if (newSignal >= this->oldSignal) {
     this->currentSignal = newSignal;
     //peakSignal = newSignal;
