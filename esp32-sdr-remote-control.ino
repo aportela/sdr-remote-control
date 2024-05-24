@@ -149,13 +149,17 @@ void showMainScreen(void) {
     display.createDigitalSMeter();
     smeterCreated = true;
   }
-  display.refreshRNDDigitalSMeter(random(1, 42));
+  display.refreshRNDDigitalSMeter(random(0, 44));
 }
 
 static bool buttonDown = false;
 static bool spanChanged = false;
 unsigned int spanPosition = 11;
 const unsigned int spanPositions[] = { 32, 50, 68, 104, 122, 140, 176, 194, 212, 248, 266, 284 };
+
+unsigned long previousMillis = 0;
+// max screen refresh / second
+const long interval = 16; // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
 void loop() {
   if (!connected) {
     tryConnection();
@@ -191,7 +195,11 @@ void loop() {
         currentVFOFrequencyChanged = true;
       }
     }
-    showMainScreen();
+    unsigned long currentMillis = millis();
+     if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      showMainScreen();
+     }
   }
   delay(10);
 }
