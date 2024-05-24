@@ -97,7 +97,7 @@ bool ts2kIsModeCommandResponse(char* commandResponse) {
 ts2kMode ts2kParseModeCommandResponse(char* commandResponse) {
   ts2kMode mode;
   if (sscanf(commandResponse, "MD%u", &mode) == 1) {
-    return mode < 9 ? mode: TS2K_MODE_ERROR;
+    return mode < 9 ? mode : TS2K_MODE_ERROR;
   } else {
     return TS2K_MD_RESERVED;
   }
@@ -113,9 +113,39 @@ void ts2kReadCommandSignalMeterLevel(char* command) {
   strcpy(command, "SM0;");
 }
 
+// verify command type
+bool ts2kIsSignalMeterLevelCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 4 && strncmp(commandResponse, "SM", 2) == 0;
+}
+
+// parse & return signal meter level command response as unsigned integer (16)
+uint16_t ts2kParseSignalMeterLevelCommandResponse(char* commandResponse) {
+  uint16_t level;
+  if (sscanf(commandResponse, "SM%u", &level) == 1) {
+    return level;
+  } else {
+    return 0;
+  }
+}
+
 // get current filter high value (Hz)
 void ts2kReadCommandFilterHighHz(char* command) {
   strcpy(command, "SH;");
+}
+
+// verify command type
+bool ts2kIsFilterHighCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 7 && strncmp(commandResponse, "SH", 2) == 0;
+}
+
+// parse & return filter high command response as unsigned integer (32)
+uint32_t ts2kParseFilterHighCommandResponse(char* commandResponse) {
+  uint16_t hz;
+  if (sscanf(commandResponse, "SH%u", &hz) == 1) {
+    return hz;
+  } else {
+    return 0;
+  }
 }
 
 // set current filter high value (Hz)
@@ -126,6 +156,21 @@ void ts2kWriteCommandFilterHighHz(char* command, uint32_t hz) {
 // get current filter low value (Hz)
 void ts2kReadCommandFilterLowHz(char* command) {
   strcpy(command, "SL;");
+}
+
+// verify command type
+bool ts2kIsFilterLowCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 7 && strncmp(commandResponse, "SL", 2) == 0;
+}
+
+// parse & return filter low command response as unsigned integer (32)
+uint32_t ts2kParseFilterLowCommandResponse(char* commandResponse) {
+  uint16_t hz;
+  if (sscanf(commandResponse, "SL%u", &hz) == 1) {
+    return hz;
+  } else {
+    return 0;
+  }
 }
 
 // set current filter low value (Hz)

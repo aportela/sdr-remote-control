@@ -74,14 +74,32 @@ void ts2kWriteCommandMode(char* command, ts2kMode mode);
 // get current signal meter level
 void ts2kReadCommandSignalMeterLevel(char* command);
 
+// verify command type
+bool ts2kIsSignalMeterLevelCommandResponse(char* commandResponse);
+
+// parse & return signal meter level command response as unsigned integer (16)
+uint16_t ts2kParseSignalMeterLevelCommandResponse(char* commandResponse);
+
 // get current filter high value (Hz)
 void ts2kReadCommandFilterHighHz(char* command);
+
+// verify command type
+bool ts2kIsFilterHighCommandResponse(char* commandResponse);
+
+// parse & return filter high command response as unsigned integer (32)
+uint32_t ts2kParseFilterHighCommandResponse(char* commandResponse);
 
 // set current filter high value (Hz)
 void ts2kWriteCommandFilterHighHz(char* command, uint32_t hz);
 
 // get current filter low value (Hz)
 void ts2kReadCommandFilterLowHz(char* command);
+
+// verify command type
+bool ts2kIsFilterLowCommandResponse(char* commandResponse);
+
+// parse & return filter low command response as unsigned integer (32)
+uint32_t ts2kParseFilterLowCommandResponse(char* commandResponse);
 
 // set current filter low value (Hz)
 void ts2kWriteCommandFilterLowHz(char* command, uint32_t hz);
