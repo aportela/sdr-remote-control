@@ -174,7 +174,7 @@ void Display::refreshRNDDigitalSMeter(int newSignal) {
   } else if (this->currentSignal > 42) {
     this->currentSignal = 42;
   }
-  for (int i = 0; i <= SMETER_PARTS; i++) {
+  for (int i = this->oldSignal; i <= SMETER_PARTS; i++) {
     if (i < currentSignal) {
       int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
       if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
