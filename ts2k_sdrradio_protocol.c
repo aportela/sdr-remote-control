@@ -46,7 +46,7 @@ bool ts2kIsAFGainCommandResponse(char* commandResponse) {
 // parse & return AF gain command response as unsigned integer
 uint8_t ts2kParseAGFGainCommandResponse(char* commandResponse) {
   uint8_t volume;
-  if (sscanf(commandResponse, "AG%d", &volume) == 1) {
+  if (sscanf(commandResponse, "AG%u", &volume) == 1) {
     return volume;
   } else {
     return 0;
@@ -68,7 +68,7 @@ bool ts2kIsFrequencyCommandResponse(char* commandResponse) {
   return strlen(commandResponse) == 13 && strncmp(commandResponse, "FA", 2) == 0;
 }
 
-// parse & return read current frequency command response as unsigned integer (64)
+// parse & return frequency command response as unsigned integer (64)
 uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse) {
   uint64_t frequency;
   if (sscanf(commandResponse, "FA%llu", &frequency) == 1) {
@@ -86,6 +86,21 @@ void ts2kWriteCommandFrequency(char* command, uint64_t frequency) {
 // get current mode
 void ts2kReadCommandMode(char* command) {
   strcpy(command, "MD;");
+}
+
+// verify command type
+bool ts2kIsModeCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 3 && strncmp(commandResponse, "MD", 2) == 0;
+}
+
+// parse & return read current frequency command response as uts2kMode enum
+ts2kMode ts2kParseModeCommandResponse(char* commandResponse) {
+  ts2kMode mode;
+  if (sscanf(commandResponse, "MD%u", &mode) == 1) {
+    return mode < 9 ? mode: TS2K_MODE_ERROR;
+  } else {
+    return TS2K_MD_RESERVED;
+  }
 }
 
 // set current mode

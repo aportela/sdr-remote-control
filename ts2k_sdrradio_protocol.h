@@ -53,7 +53,7 @@ void ts2kReadCommandFrequency(char* command);
 // verify command type
 bool ts2kIsFrequencyCommandResponse(char* commandResponse);
 
-// parse & return read current frequency command response as unsigned integer (64)
+// parse & return frequency command response as unsigned integer (64)
 uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse);
 
 // set current frequency (Hz)
@@ -61,6 +61,12 @@ void ts2kWriteCommandFrequency(char* command, uint64_t frequency);
 
 // get current mode
 void ts2kReadCommandMode(char* command);
+
+// verify command type
+bool ts2kIsModeCommandResponse(char* commandResponse);
+
+// parse & return read current frequency command response as uts2kMode enum
+ts2kMode ts2kParseModeCommandResponse(char* commandResponse);
 
 // set current mode
 void ts2kWriteCommandMode(char* command, ts2kMode mode);
