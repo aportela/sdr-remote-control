@@ -63,9 +63,19 @@ void ts2kReadCommandFrequency(char* command) {
   strcpy(command, "FA;");
 }
 
+// verify command type
+bool ts2kIsFrequencyCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 13 && strncmp(commandResponse, "FA", 2) == 0;
+}
+
 // parse & return read current frequency command response as unsigned integer (64)
 uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse) {
-  return 0;
+  uint64_t frequency;
+  if (sscanf(commandResponse, "FA%llu", &frequency) == 1) {
+    return frequency;
+  } else {
+    return 0;
+  }
 }
 
 // set current frequency (Hz)
