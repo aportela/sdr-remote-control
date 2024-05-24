@@ -27,7 +27,7 @@ typedef enum {
 } ts2kMode;
 
 // get power status
-void ts2kReadCommandGetPowerStatus(char* command);
+void ts2kReadCommandPowerStatus(char* command);
 
 // verify command type
 bool ts2kIsPowerStatusCommandResponse(char* commandResponse);
@@ -36,7 +36,7 @@ bool ts2kIsPowerStatusCommandResponse(char* commandResponse);
 bool ts2kParsePowerStatusCommandResponse(char* commandResponse);
 
 // get AF gain (volume)
-void ts2kReadCommandGetAFGain(char* command);
+void ts2kReadCommandAFGain(char* command);
 
 // verify command type
 bool ts2kIsAFGainCommandResponse(char* commandResponse);
@@ -45,36 +45,39 @@ bool ts2kIsAFGainCommandResponse(char* commandResponse);
 uint8_t ts2kParseAGFGainCommandResponse(char* commandResponse);
 
 // set AF gain (volume)
-void ts2kWriteCommandSetAFGain(char* command, uint8_t volume);
+void ts2kWriteCommandAFGain(char* command, uint8_t volume);
 
 // get current frequency (Hz)
-void ts2kReadCommandGetFrequency(char* command);
+void ts2kReadCommandFrequency(char* command);
+
+// verify command type
+bool ts2kIsFrequencyCommandResponse(char* commandResponse);
 
 // parse & return read current frequency command response as unsigned integer (64)
 uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse);
 
 // set current frequency (Hz)
-void ts2kWriteCommandSetFrequency(char* command, uint64_t frequency);
+void ts2kWriteCommandFrequency(char* command, uint64_t frequency);
 
 // get current mode
-void ts2kReadCommandGetMode(char* command);
+void ts2kReadCommandMode(char* command);
 
 // set current mode
-void ts2kWriteCommandSetMode(char* command, ts2kMode mode);
+void ts2kWriteCommandMode(char* command, ts2kMode mode);
 
 // get current signal meter level
-void ts2kReadCommandGetSignalMeterLevel(char* command);
+void ts2kReadCommandSignalMeterLevel(char* command);
 
 // get current filter high value (Hz)
-void ts2kReadCommandGetFilterHighHz(char* command);
+void ts2kReadCommandFilterHighHz(char* command);
 
 // set current filter high value (Hz)
-void ts2kWriteCommandSetFilterHighHz(char* command, uint32_t hz);
+void ts2kWriteCommandFilterHighHz(char* command, uint32_t hz);
 
 // get current filter low value (Hz)
-void ts2kReadCommandGetFilterLowHz(char* command);
+void ts2kReadCommandFilterLowHz(char* command);
 
 // set current filter low value (Hz)
-void ts2kWriteCommandSetFilterLowHz(char* command, uint32_t hz);
+void ts2kWriteCommandFilterLowHz(char* command, uint32_t hz);
 
 #endif
