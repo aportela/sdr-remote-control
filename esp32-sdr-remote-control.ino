@@ -11,9 +11,8 @@
 
 #include "Arduino.h"
 
-#include "TS2KProtocol.h"
+#include "ts2k_sdrradio_protocol.h"
 #include "Display.h"
-
 //#include "transceiver.h"
 
 #define TFT_CS 5
@@ -42,9 +41,8 @@
 #define CURRENT_VERSION 0.01
 
 //sdrRemoteTransceiver trans;
-
-//initSDRRemoteTransceiver(trans);
-//setCurrentHzStep(&trans, 10);
+//initSDRRemoteTransceiver(&trans);
+//setCurrentHzStep(&trans, 1);
 
 bool connected = true;
 
