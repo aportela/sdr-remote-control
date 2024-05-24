@@ -25,28 +25,40 @@ typedef enum {
   TS2K_MODE_ERROR = 10
 } ts2kMode;
 
+// get power status
+void ts2kReadCommandGetPowerStatus(char* command);
+
 // get AF gain (volume)
 void ts2kReadCommandGetAFGain(char* command);
 
 // set AF gain (volume)
 void ts2kWriteCommandSetAFGain(char* command, uint8_t volume);
 
+// get current frequency (Hz)
 void ts2kReadCommandGetFrequency(char* command);
 
+// set current frequency (Hz)
 void ts2kWriteCommandSetFrequency(char* command, uint64_t frequency);
 
+// get current mode
 void ts2kReadCommandGetMode(char* command);
 
+// set current mode
 void ts2kWriteCommandSetMode(char* command, ts2kMode mode);
 
+// get current signal meter level
 void ts2kReadCommandGetSignalMeterLevel(char* command);
 
+// get current filter high value (Hz)
 void ts2kReadCommandGetFilterHighHz(char* command);
 
+// set current filter high value (Hz)
 void ts2kWriteCommandSetFilterHighHz(char* command, uint32_t hz);
 
+// get current filter low value (Hz)
 void ts2kReadCommandGetFilterLowHz(char* command);
 
+// set current filter low value (Hz)
 void ts2kWriteCommandSetFilterLowHz(char* command, uint32_t hz);
 
 #endif
