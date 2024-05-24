@@ -23,19 +23,49 @@ void ts2kReadCommandGetPowerStatus(char* command) {
   strcpy(command, "PS;");
 }
 
+// verify command type
+bool ts2kIsPowerStatusCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 3 && strncmp(commandResponse, "PS", 2) == 0;
+}
+
+// check if power status command response is "ON"
+bool ts2kParsePowerStatusCommandResponse(char* commandResponse) {
+  return strcmp(commandResponse, "PS1") == 0;
+}
+
 // get AF gain (volume)
 void ts2kReadCommandGetAFGain(char* command) {
   strcpy(command, "AG0;");
 }
 
+// verify command type
+bool ts2kIsAFGainCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 5 && strncmp(commandResponse, "AG", 2) == 0;
+}
+
+// parse & return AF gain command response as unsigned integer
+uint8_t ts2kParseAGFGainCommandResponse(char* commandResponse) {
+  uint8_t volume;
+  if (sscanf(commandResponse, "AG%d", &volume) == 1) {
+    return volume;
+  } else {
+    return 0;
+  }
+}
+
 // set AF gain (volume)
 void ts2kWriteCommandSetAFGain(char* command, uint8_t volume) {
-  sprintf(command, "AG0%02d;", volume < 100 ? volume : 100);
+  sprintf(command, "AG0%03d;", volume < 100 ? volume : 100);
 }
 
 // get current frequency (Hz)
 void ts2kReadCommandGetFrequency(char* command) {
   strcpy(command, "FA;");
+}
+
+// parse & return read current frequency command response as unsigned integer (64)
+uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse) {
+  return 0;
 }
 
 // set current frequency (Hz)

@@ -2,6 +2,7 @@
 #define SDR_REMOTE_CONTROL_TS2K_SDRRADIO_PROTOCOL_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,14 +29,29 @@ typedef enum {
 // get power status
 void ts2kReadCommandGetPowerStatus(char* command);
 
+// verify command type
+bool ts2kIsPowerStatusCommandResponse(char* commandResponse);
+
+// check if power status command response is "ON"
+bool ts2kParsePowerStatusCommandResponse(char* commandResponse);
+
 // get AF gain (volume)
 void ts2kReadCommandGetAFGain(char* command);
+
+// verify command type
+bool ts2kIsAFGainCommandResponse(char* commandResponse);
+
+// parse & return AF gain command response as unsigned integer (8)
+uint8_t ts2kParseAGFGainCommandResponse(char* commandResponse);
 
 // set AF gain (volume)
 void ts2kWriteCommandSetAFGain(char* command, uint8_t volume);
 
 // get current frequency (Hz)
 void ts2kReadCommandGetFrequency(char* command);
+
+// parse & return read current frequency command response as unsigned integer (64)
+uint64_t ts2kParseFrequencyCommandResponse(char* commandResponse);
 
 // set current frequency (Hz)
 void ts2kWriteCommandSetFrequency(char* command, uint64_t frequency);
