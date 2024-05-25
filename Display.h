@@ -22,6 +22,8 @@ private:
   int8_t connectionScreenSpriteCurrentFrame = -1;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
+  uint8_t peakSignal = 0;
+  long lastPeakChange;
 #define CONNECTION_SCREEN_SPRITE_FRAME_COUNT = 4
 };
 

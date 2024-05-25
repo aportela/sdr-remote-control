@@ -163,32 +163,122 @@ void Display::createDigitalSMeter() {
 
 void Display::refreshRNDDigitalSMeter(int newSignal) {
   this->oldSignal = this->currentSignal;
-  if (newSignal >= this->oldSignal) {
-    this->currentSignal = newSignal;
-    //peakSignal = newSignal;
-  } else if (newSignal < oldSignal) {
-    this->currentSignal = oldSignal - 1;
-  }
-  if (this->currentSignal < 0) {
-    this->currentSignal = 0;
-  } else if (this->currentSignal > 42) {
-    this->currentSignal = 42;
-  }
-  for (int i = 0; i <= SMETER_PARTS; i++) {
-    if (i < currentSignal) {
+  // signal changed
+  if (this->oldSignal != newSignal) {
+    if (newSignal >= this->oldSignal) {
+      // signal increased
+      this->currentSignal = newSignal;
+      if (newSignal > this->oldSignal) {
+        this->peakSignal = newSignal;
+        this->lastPeakChange = millis();
+      }
+    } else if (newSignal < this->oldSignal) {
+      //this->peakSignal = this->oldSignal;
+      long current = millis();
+      if (current - this->lastPeakChange > 200) {
+        this->peakSignal--;
+        this->lastPeakChange = current;
+      }
+      this->currentSignal = this->oldSignal - 1;
+    }
+    if (this->currentSignal < 0) {
+      this->currentSignal = 0;
+    } else if (this->currentSignal > 42) {
+      this->currentSignal = 42;
+    }
+    int start = 0;
+    if (this->oldSignal < this->currentSignal) {
+      start = this->oldSignal;
+    } else if (this->oldSignal > this->currentSignal) {
+      start = this->currentSignal;
+    } else {
+      start = 0;
+    }
+    if (this->peakSignal < 0) {
+      this->peakSignal = 0;
+    }
+
+    /*
+    this->screen.setCursor(20, 160);
+    this->screen.setTextSize(2);
+    this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+    this->screen.printf("Current: %u", this->currentSignal);
+    this->screen.setCursor(20, 180);
+    this->screen.setTextSize(2);
+    this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+    this->screen.printf("Old: %u", this->oldSignal);
+
+    this->screen.setCursor(20, 200);
+    this->screen.setTextSize(2);
+    this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+    this->screen.printf("Peak: %u", this->peakSignal);
+    */
+
+    // BG
+    for (int i = start; i <= SMETER_PARTS; i++) {
       int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
       if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
-        this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
       } else {
-        this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
       }
-    } else {
-      if (oldSignal > i) {
+    }
+
+    // PEAK
+    for (int i = 0; i <= SMETER_PARTS; i++) {
+      if (i == this->peakSignal) {
         int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+        // set more height on marked values
         if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
-          this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
+          this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, ST77XX_WHITE);
         } else {
-          this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
+          this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, ST77XX_WHITE);
+        }
+      }
+    }
+
+    // SIGNAL
+    for (int i = 0; i <= SMETER_PARTS; i++) {
+      // real value draw
+      if (i < this->currentSignal) {
+        int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+        // set more height on marked values
+        if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
+          this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        } else {
+          this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, i <= 18 ? ST77XX_GREEN : ST77XX_RED);
+        }
+      }
+    }
+  } else {
+    if (this->peakSignal > this->currentSignal) {
+      long current = millis();
+      if (current - this->lastPeakChange > 200) {
+        this->peakSignal--;
+        if (this->peakSignal > 0) {
+          this->peakSignal--;
+          this->lastPeakChange = current;
+
+          for (int i = this->peakSignal + 1; i <= SMETER_PARTS; i++) {
+            int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+            if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
+              this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
+            } else {
+              this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
+            }
+          }
+
+          for (int i = 0; i <= SMETER_PARTS; i++) {
+            if (i == this->peakSignal) {
+              int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+              // set more height on marked values
+              if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42) {
+                this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, ST77XX_WHITE);
+              } else {
+                this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, ST77XX_WHITE);
+              }
+            }
+          }
         }
       }
     }

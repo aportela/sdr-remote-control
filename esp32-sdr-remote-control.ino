@@ -84,6 +84,8 @@ void initSerial(void) {
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
+volatile uint64_t currentSMeterLevel = 0;
+
 void initRotaryEncoder(void) {
   rotaryEncoder.begin();
   rotaryEncoder.setup(readEncoderISR);
@@ -149,7 +151,8 @@ void showMainScreen(void) {
     display.createDigitalSMeter();
     smeterCreated = true;
   }
-  display.refreshRNDDigitalSMeter(random(0, 44));
+  display.refreshRNDDigitalSMeter(random(0, 42));
+  //display.refreshRNDDigitalSMeter(currentSMeterLevel);
 }
 
 static bool buttonDown = false;
@@ -188,9 +191,19 @@ void loop() {
     } else {
       int16_t encoderDelta = rotaryEncoder.encoderChanged();
       if (encoderDelta > 0) {
+        /*
+        if (currentSMeterLevel < 42) {
+          currentSMeterLevel++;
+        }
+        */
         currentVFOFrequency++;
         currentVFOFrequencyChanged = true;
       } else if (encoderDelta < 0) {
+        /*
+        if (currentSMeterLevel > 0) {
+          currentSMeterLevel--;
+        }
+        */
         currentVFOFrequency--;
         currentVFOFrequencyChanged = true;
       }
