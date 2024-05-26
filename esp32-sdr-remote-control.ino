@@ -38,6 +38,12 @@
 #define ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
 #define ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
+
+#define BIG_ROTARY_ENCODER_A 25
+#define BIG_ROTARY_ENCODER_B 26
+#define BIG_ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define BIG_ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
+
 #define CURRENT_VERSION 0.01
 
 //sdrRemoteTransceiver trans;
@@ -63,9 +69,14 @@ const char* modes[] = {
 uint16_t freqChangeHzStepSize = 12500;  // Hz
 
 AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder bigRotaryEncoder = AiEsp32RotaryEncoder(BIG_ROTARY_ENCODER_A, BIG_ROTARY_ENCODER_B, -1, BIG_ROTARY_ENCODER_VCC_PIN, BIG_ROTARY_ENCODER_STEPS);
 
 void IRAM_ATTR readEncoderISR() {
   rotaryEncoder.readEncoder_ISR();
+}
+
+void IRAM_ATTR readBigEncoderISR() {
+  bigRotaryEncoder.readEncoder_ISR();
 }
 
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
@@ -92,6 +103,12 @@ void initRotaryEncoder(void) {
   rotaryEncoder.setBoundaries(0, 999, true);
   rotaryEncoder.disableAcceleration();
   rotaryEncoder.setEncoderValue(0);
+
+  bigRotaryEncoder.begin();
+  bigRotaryEncoder.setup(readBigEncoderISR);
+  bigRotaryEncoder.setBoundaries(0, 999, true);
+  bigRotaryEncoder.disableAcceleration();
+  bigRotaryEncoder.setEncoderValue(0);
 }
 
 void setup() {
@@ -204,6 +221,15 @@ void loop() {
           currentSMeterLevel--;
         }
         */
+        currentVFOFrequency--;
+        currentVFOFrequencyChanged = true;
+      }
+
+      int16_t encoderDelta2 = bigRotaryEncoder.encoderChanged();
+      if (encoderDelta2 > 0) {
+        currentVFOFrequency++;
+        currentVFOFrequencyChanged = true;
+      } else if (encoderDelta2 < 0) {
         currentVFOFrequency--;
         currentVFOFrequencyChanged = true;
       }
