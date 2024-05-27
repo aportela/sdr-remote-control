@@ -97,6 +97,8 @@ volatile uint64_t currentVFOFrequency = 200145;
 
 volatile uint64_t currentSMeterLevel = 0;
 
+sdrRemoteTransceiver trx;
+
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
   selectFocusRotaryEncoder.setup(readEncoderISR);
@@ -114,6 +116,7 @@ void initRotaryEncoders(void) {
 void setup() {
   initSerial();
   initRotaryEncoders();
+  //initSDRRemoteTransceiver(&trx);
 }
 
 void tryConnection(void) {
@@ -140,6 +143,7 @@ bool transmitStatusChanged = true;
 bool isTransmitting = false;
 
 bool activeVFOChanged = true;
+
 uint8_t activeVFO = 0;
 
 bool VFOModeChanged = true;
@@ -175,38 +179,46 @@ void mainVFORotaryEncoderLoop(void) {
   int16_t delta = mainVFORotaryEncoder.encoderChanged();
   if (delta > 0) {
     int32_t newEncoderValue = mainVFORotaryEncoder.readEncoder();
+    int32_t hzIncrement = 0;
     if (newEncoderValue > 5030) {
       display.debugBottomStr("++++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
-      currentVFOFrequency += 1000;
+      hzIncrement = 1000;
     } else if (newEncoderValue > 5025) {
       display.debugBottomStr("+++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
-      currentVFOFrequency += 100;
+      hzIncrement = 100;
     } else if (newEncoderValue > 5015) {
       display.debugBottomStr("++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
-      currentVFOFrequency += 10;
+      hzIncrement = 100;
     } else {
       display.debugBottomStr("+", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
-      currentVFOFrequency += 1;
+      hzIncrement = 1;
     }
-    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
+    currentVFOFrequency += hzIncrement;
     currentVFOFrequencyChanged = true;
+    trx.VFO[trx.activeVFOIndex].frequency+= hzIncrement;
+    trx.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   } else if (delta < 0) {
     int32_t newEncoderValue = mainVFORotaryEncoder.readEncoder();
+    int32_t hzDecrement = 0;
     if (newEncoderValue < 4970) {
       display.debugBottomStr("----", newEncoderValue + 5000);
-      currentVFOFrequency -= 1000;
+      hzDecrement = 1000;
     } else if (newEncoderValue < 4975) {
       display.debugBottomStr("---", newEncoderValue + 5000);
-      currentVFOFrequency -= 100;
+      hzDecrement = 100;
     } else if (newEncoderValue < 4985) {
       display.debugBottomStr("--", newEncoderValue + 5000);
-      currentVFOFrequency -= 10;
+      hzDecrement= 10;
     } else {
       display.debugBottomStr("-", newEncoderValue + 5000);
-      currentVFOFrequency -= 1;
+      hzDecrement= 1;
     }
-    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
+    currentVFOFrequency -= hzDecrement;
     currentVFOFrequencyChanged = true;
+    trx.VFO[trx.activeVFOIndex].frequency-= hzDecrement;
+    trx.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   }
 }
 
