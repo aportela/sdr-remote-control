@@ -284,3 +284,11 @@ void Display::refreshRNDDigitalSMeter(int newSignal) {
     }
   }
 }
+
+void Display::debugBottomStr(char* str, uint64_t value){
+  this->screen.setCursor(0, 220);
+  this->screen.setTextSize(2);
+  this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+  this->screen.printf("%s: %8llu", str, value);
+}
+

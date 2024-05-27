@@ -14,6 +14,7 @@ public:
   void refreshVFOFreq(uint64_t frequency);
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
+  void debugBottomStr(char* str, uint64_t value);
 private:
   uint16_t width;
   uint16_t height;
