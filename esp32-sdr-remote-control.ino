@@ -3,7 +3,7 @@
 */
 #include <Adafruit_GFX.h>     // Core graphics library
 #include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
-//#include <SPI.h>
+// #include <SPI.h>
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
@@ -13,7 +13,6 @@
 
 #include "ts2k_sdrradio_protocol.h"
 #include "Display.h"
-//#include "transceiver.h"
 
 #define TFT_CS 5
 #define TFT_RST 4
@@ -38,21 +37,16 @@
 #define ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
 #define ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
-
-#define BIG_ROTARY_ENCODER_A 25
-#define BIG_ROTARY_ENCODER_B 26
+#define BIG_ROTARY_ENCODER_A 26
+#define BIG_ROTARY_ENCODER_B 25
 #define BIG_ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
 #define BIG_ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
 #define CURRENT_VERSION 0.01
 
-//sdrRemoteTransceiver trans;
-//initSDRRemoteTransceiver(&trans);
-//setCurrentHzStep(&trans, 1);
-
 bool connected = true;
 
-const char* modes[] = {
+const char *modes[] = {
   "DSB",
   "LSB",
   "USB",
@@ -106,9 +100,9 @@ void initRotaryEncoder(void) {
 
   bigRotaryEncoder.begin();
   bigRotaryEncoder.setup(readBigEncoderISR);
-  bigRotaryEncoder.setBoundaries(0, 999, true);
-  bigRotaryEncoder.disableAcceleration();
-  bigRotaryEncoder.setEncoderValue(0);
+  bigRotaryEncoder.setBoundaries(0, 9999, true);
+  bigRotaryEncoder.setAcceleration(100);
+  bigRotaryEncoder.setEncoderValue(5000);
 }
 
 void setup() {
@@ -127,9 +121,9 @@ void tryConnection(void) {
     if (receivedData == "PS1;") {
       Serial.flush();
       delay(SERIAL_FLUSH_WAIT);
-      //tft.fillScreen(ST77XX_BLACK);
-      //tft.setCursor(10, 50);
-      //tft.printf("MAIN");
+      // tft.fillScreen(ST77XX_BLACK);
+      // tft.setCursor(10, 50);
+      // tft.printf("MAIN");
       connected = true;
       break;
     }
@@ -141,7 +135,6 @@ bool isTransmitting = false;
 
 bool activeVFOChanged = true;
 uint8_t activeVFO = 0;
-
 
 bool VFOModeChanged = true;
 uint8_t VFOMode = 4;
@@ -169,7 +162,7 @@ void showMainScreen(void) {
     smeterCreated = true;
   }
   display.refreshRNDDigitalSMeter(random(0, 42));
-  //display.refreshRNDDigitalSMeter(currentSMeterLevel);
+  // display.refreshRNDDigitalSMeter(currentSMeterLevel);
 }
 
 static bool buttonDown = false;
@@ -178,8 +171,10 @@ unsigned int spanPosition = 11;
 const unsigned int spanPositions[] = { 32, 50, 68, 104, 122, 140, 176, 194, 212, 248, 266, 284 };
 
 unsigned long previousMillis = 0;
+unsigned long previousMillisEncoderAcceleration = 0;
 // max screen refresh / second
-const long interval = 16; // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
+const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
+int32_t oldBigEncoderValue = 0;
 void loop() {
   if (!connected) {
     tryConnection();
@@ -197,9 +192,9 @@ void loop() {
       spanChanged = true;
     }
     if (spanChanged) {
-      //tft.setCursor(35, 0);
-      //tft.drawFastHLine(0, 56, 320, ST77XX_BLACK);
-      //tft.drawFastHLine(spanPositions[spanPosition], 56, 18, ST77XX_WHITE);
+      // tft.setCursor(35, 0);
+      // tft.drawFastHLine(0, 56, 320, ST77XX_BLACK);
+      // tft.drawFastHLine(spanPositions[spanPosition], 56, 18, ST77XX_WHITE);
       spanPosition++;
       if (spanPosition > 11) {
         spanPosition = 0;
@@ -227,18 +222,46 @@ void loop() {
 
       int16_t encoderDelta2 = bigRotaryEncoder.encoderChanged();
       if (encoderDelta2 > 0) {
-        currentVFOFrequency++;
+        int32_t newEncoderValue = bigRotaryEncoder.readEncoder();
+        if (newEncoderValue > 5030) {
+          display.debugBottomStr("++++", newEncoderValue - 5000);
+          currentVFOFrequency += 1000;
+        } else if (newEncoderValue > 5025) {
+          display.debugBottomStr("+++", newEncoderValue - 5000);
+          currentVFOFrequency += 100;
+        } else if (newEncoderValue > 5015) {
+          display.debugBottomStr("++", newEncoderValue - 5000);
+          currentVFOFrequency += 10;
+        } else {
+          display.debugBottomStr("+", newEncoderValue - 5000);
+          currentVFOFrequency += 1;
+        }
+        bigRotaryEncoder.setEncoderValue(5000);
         currentVFOFrequencyChanged = true;
       } else if (encoderDelta2 < 0) {
-        currentVFOFrequency--;
+        int32_t newEncoderValue = bigRotaryEncoder.readEncoder();
+        if (newEncoderValue < 4970) {
+          display.debugBottomStr("----", newEncoderValue + 5000);
+          currentVFOFrequency -= 1000;
+        } else if (newEncoderValue < 4975) {
+          display.debugBottomStr("---", newEncoderValue + 5000);
+          currentVFOFrequency -= 100;
+        } else if (newEncoderValue < 4985) {
+          display.debugBottomStr("--", newEncoderValue + 5000);
+          currentVFOFrequency -= 10;
+        } else {
+          display.debugBottomStr("-", newEncoderValue + 5000);
+          currentVFOFrequency -= 1;
+        }
+        bigRotaryEncoder.setEncoderValue(5000);
         currentVFOFrequencyChanged = true;
       }
     }
     unsigned long currentMillis = millis();
-     if (currentMillis - previousMillis >= interval) {
+    if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
       showMainScreen();
-     }
+    }
   }
   delay(10);
 }
