@@ -33,6 +33,32 @@ bool ts2kParsePowerStatusCommandResponse(char* commandResponse) {
   return strcmp(commandResponse, "PS1") == 0;
 }
 
+
+// get audio mute status
+void ts2kReadCommandAudioMute(char* command) {
+  strcpy(command, "MU;");
+}
+
+// verify command type
+bool ts2kIsAudioMuteCommandResponse(char* commandResponse) {
+  return strlen(commandResponse) == 3 && strncmp(commandResponse, "MU", 2) == 0;
+}
+
+// parse & return audio mute status command response as unsigned integer (8)
+uint8_t ts2kParseAudioMuteCommandResponse(char* commandResponse) {
+  uint8_t status;
+  if (sscanf(commandResponse, "MU%u", &status) == 1) {
+    return status;
+  } else {
+    return 0;
+  }
+}
+
+// set audio mute status
+void ts2kWriteCommandAudioMute(char* command, uint8_t status) {
+  sprintf(command, "MU%01d;", status == 1 ? 1 : 0);
+}
+
 // get AF gain (volume)
 void ts2kReadCommandAFGain(char* command) {
   strcpy(command, "AG0;");

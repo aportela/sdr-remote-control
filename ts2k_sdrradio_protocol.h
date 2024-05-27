@@ -35,6 +35,18 @@ bool ts2kIsPowerStatusCommandResponse(char* commandResponse);
 // check if power status command response is "ON"
 bool ts2kParsePowerStatusCommandResponse(char* commandResponse);
 
+// get audio mute status
+void ts2kReadCommandAudioMute(char* command);
+
+// verify command type
+bool ts2kIsAudioMuteCommandResponse(char* commandResponse);
+
+// parse & return audio mute status command response as unsigned integer (8)
+uint8_t ts2kParseAudioMuteCommandResponse(char* commandResponse);
+
+// set audio mute status
+void ts2kWriteCommandAudioMute(char* command, uint8_t status);
+
 // get AF gain (volume)
 void ts2kReadCommandAFGain(char* command);
 
