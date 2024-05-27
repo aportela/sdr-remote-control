@@ -37,15 +37,15 @@
 #define ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
 #define ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
-#define BIG_ROTARY_ENCODER_A 26
-#define BIG_ROTARY_ENCODER_B 25
-#define BIG_ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
-#define BIG_ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
+#define MAIN_VFO_ROTARY_ENCODER_PIN_A 26
+#define MAIN_VFO_ROTARY_ENCODER_PIN_B 25
+#define MAIN_VFO_ROTARY_ENCODER_VCC_PIN -1  // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define MAIN_VFO_ROTARY_ENCODER_STEPS 4     // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
-#define BIG_ROTARY_ENCODER_MIN_VALUE 0
-#define BIG_ROTARY_ENCODER_MAX_VALUE 9999
-#define BIG_ROTARY_ENCODER_ACCELERATION_VALUE 100
-#define BIG_ROTARY_ENCODER_CENTER_VALUE 5000
+#define MAIN_VFO_ROTARY_ENCODER_MIN_VALUE 0
+#define MAIN_VFO_ROTARY_ENCODER_MAX_VALUE 9999
+#define MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE 5000
+#define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
 
 #define CURRENT_VERSION 0.01
 
@@ -67,15 +67,15 @@ const char *modes[] = {
 
 uint16_t freqChangeHzStepSize = 12500;  // Hz
 
-AiEsp32RotaryEncoder rotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
-AiEsp32RotaryEncoder bigRotaryEncoder = AiEsp32RotaryEncoder(BIG_ROTARY_ENCODER_A, BIG_ROTARY_ENCODER_B, -1, BIG_ROTARY_ENCODER_VCC_PIN, BIG_ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder selectFocusRotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder mainVFORotaryEncoder = AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, -1, MAIN_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_ROTARY_ENCODER_STEPS);
 
 void IRAM_ATTR readEncoderISR() {
-  rotaryEncoder.readEncoder_ISR();
+  selectFocusRotaryEncoder.readEncoder_ISR();
 }
 
 void IRAM_ATTR readBigEncoderISR() {
-  bigRotaryEncoder.readEncoder_ISR();
+  mainVFORotaryEncoder.readEncoder_ISR();
 }
 
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
@@ -96,23 +96,23 @@ volatile uint64_t currentVFOFrequency = 200145;
 
 volatile uint64_t currentSMeterLevel = 0;
 
-void initRotaryEncoder(void) {
-  rotaryEncoder.begin();
-  rotaryEncoder.setup(readEncoderISR);
-  rotaryEncoder.setBoundaries(0, 999, true);
-  rotaryEncoder.disableAcceleration();
-  rotaryEncoder.setEncoderValue(0);
+void initRotaryEncoders(void) {
+  selectFocusRotaryEncoder.begin();
+  selectFocusRotaryEncoder.setup(readEncoderISR);
+  selectFocusRotaryEncoder.setBoundaries(0, 99, true);
+  selectFocusRotaryEncoder.disableAcceleration();
+  selectFocusRotaryEncoder.setEncoderValue(50);
 
-  bigRotaryEncoder.begin();
-  bigRotaryEncoder.setup(readBigEncoderISR);
-  bigRotaryEncoder.setBoundaries(BIG_ROTARY_ENCODER_MIN_VALUE, BIG_ROTARY_ENCODER_MAX_VALUE, true);
-  bigRotaryEncoder.setAcceleration(BIG_ROTARY_ENCODER_ACCELERATION_VALUE);
-  bigRotaryEncoder.setEncoderValue(BIG_ROTARY_ENCODER_CENTER_VALUE);
+  mainVFORotaryEncoder.begin();
+  mainVFORotaryEncoder.setup(readBigEncoderISR);
+  mainVFORotaryEncoder.setBoundaries(MAIN_VFO_ROTARY_ENCODER_MIN_VALUE, MAIN_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+  mainVFORotaryEncoder.setAcceleration(MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
+  mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
 }
 
 void setup() {
   initSerial();
-  initRotaryEncoder();
+  initRotaryEncoders();
 }
 
 void tryConnection(void) {
@@ -171,26 +171,26 @@ void showMainScreen(void) {
 }
 
 void mainVFORotaryEncoderLoop(void) {
-  int16_t delta = bigRotaryEncoder.encoderChanged();
+  int16_t delta = mainVFORotaryEncoder.encoderChanged();
   if (delta > 0) {
-    int32_t newEncoderValue = bigRotaryEncoder.readEncoder();
+    int32_t newEncoderValue = mainVFORotaryEncoder.readEncoder();
     if (newEncoderValue > 5030) {
-      display.debugBottomStr("++++", newEncoderValue - BIG_ROTARY_ENCODER_CENTER_VALUE);
+      display.debugBottomStr("++++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       currentVFOFrequency += 1000;
     } else if (newEncoderValue > 5025) {
-      display.debugBottomStr("+++", newEncoderValue - BIG_ROTARY_ENCODER_CENTER_VALUE);
+      display.debugBottomStr("+++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       currentVFOFrequency += 100;
     } else if (newEncoderValue > 5015) {
-      display.debugBottomStr("++", newEncoderValue - BIG_ROTARY_ENCODER_CENTER_VALUE);
+      display.debugBottomStr("++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       currentVFOFrequency += 10;
     } else {
-      display.debugBottomStr("+", newEncoderValue - BIG_ROTARY_ENCODER_CENTER_VALUE);
+      display.debugBottomStr("+", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       currentVFOFrequency += 1;
     }
-    bigRotaryEncoder.setEncoderValue(BIG_ROTARY_ENCODER_CENTER_VALUE);
+    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
     currentVFOFrequencyChanged = true;
   } else if (delta < 0) {
-    int32_t newEncoderValue = bigRotaryEncoder.readEncoder();
+    int32_t newEncoderValue = mainVFORotaryEncoder.readEncoder();
     if (newEncoderValue < 4970) {
       display.debugBottomStr("----", newEncoderValue + 5000);
       currentVFOFrequency -= 1000;
@@ -204,7 +204,7 @@ void mainVFORotaryEncoderLoop(void) {
       display.debugBottomStr("-", newEncoderValue + 5000);
       currentVFOFrequency -= 1;
     }
-    bigRotaryEncoder.setEncoderValue(BIG_ROTARY_ENCODER_CENTER_VALUE);
+    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
     currentVFOFrequencyChanged = true;
   }
 }
@@ -222,12 +222,12 @@ void loop() {
     tryConnection();
   } else {
     /*
-    if (rotaryEncoder.encoderChanged()) {
-      currentVFOFrequency = rotaryEncoder.readEncoder();
+    if (selectFocusRotaryEncoder.encoderChanged()) {
+      currentVFOFrequency = selectFocusRotaryEncoder.readEncoder();
       currentVFOFrequencyChanged = true;
     }
     */
-    if (rotaryEncoder.isEncoderButtonDown()) {
+    if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
     } else if (buttonDown) {
       buttonDown = false;
@@ -243,7 +243,7 @@ void loop() {
       }
       spanChanged = false;
     } else {
-      int16_t encoderDelta = rotaryEncoder.encoderChanged();
+      int16_t encoderDelta = selectFocusRotaryEncoder.encoderChanged();
       if (encoderDelta > 0) {
         /*
         if (currentSMeterLevel < 42) {
