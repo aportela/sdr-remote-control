@@ -1,5 +1,19 @@
 #include "sdr_remote_transceiver.h"
 
+const char *TRXVFOModeNames[] = {
+  "DSB",
+  "LSB",
+  "USB",
+  "CWU",
+  "FM",
+  "SAM",
+  "",
+  "CWL",
+  "WFM",
+  "BFM",
+  "???"
+};
+
 // init default values
 void initSDRRemoteTransceiver(sdrRemoteTransceiver *trx) {
   if (trx != NULL) {

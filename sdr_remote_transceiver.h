@@ -45,19 +45,7 @@ typedef enum {
   TRX_VFO_MODE_ERROR = 10
 } TRXVFOMode;
 
-const char *TRXVFOModeNames[] = {
-  "DSB",
-  "LSB",
-  "USB",
-  "CWU",
-  "FM",
-  "SAM",
-  "",
-  "CWL",
-  "WFM",
-  "BFM",
-  "???"
-};
+extern const char *TRXVFOModeNames[];
 
 typedef struct
 {
