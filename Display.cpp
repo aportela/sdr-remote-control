@@ -41,11 +41,18 @@ void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
     }
     if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX) {
       trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+      this->refreshActiveVFO(trx->activeVFOIndex);
+      // on vfo index changes, refresh also current VFO mode, current VFO frequency & current VFO step
+      trx->changed |= TRX_CFLAG_ACTIVE_VFO_MODE | TRX_CFLAG_ACTIVE_VFO_FREQUENCY | TRX_CFLAG_ACTIVE_VFO_STEP;
     }
     if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE) {
       trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
+      this->refreshVFOMode(trx->VFO[trx->activeVFOIndex].mode);
+      // on current vfo mode changes, refresh also current VFO step size
+      trx->changed |= TRX_CFLAG_ACTIVE_VFO_STEP;
     }
     if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY) {
+      this->refreshVFOFreq(trx->VFO[trx->activeVFOIndex].frequency);
       trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     }
     if (trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP) {
@@ -66,6 +73,8 @@ void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
     if (trx->changed & TRX_CFLAG_FILTER_HIGH) {
       trx->changed &= ~TRX_CFLAG_FILTER_HIGH;
     }
+    // clear previous changed flags after refreshing
+    trx->changed = 0;
   }
 }
 
