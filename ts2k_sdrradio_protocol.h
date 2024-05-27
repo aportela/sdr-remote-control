@@ -9,6 +9,23 @@
 
 #define TS2K_MAX_CMD_LENGTH 31
 
+/*
+  SDRRADIO PROTOCOL vs Original Kenwood TS-2000 protocol DIFFs
+
+  WARNING
+  As read on https://www.sdr-radio.com/SerialPort SDR Radio implementation changed some parts of TS-2000 protocol
+
+  # AF Gain / volume (command "AG")
+
+  SDR Radio TS-2000 protocol volume range is 0...100
+  Original Kenwood TS-2000 protocol volume range is 000...255
+
+  # DSP Filter High/Low (command "SH"/"SL")
+  
+  SDR Radio TS-2000 protocol value (hz) range is 0...99999
+  Original Kenwood TS-2000 protocol value (custom) depends current mode 00...11 (each one has fixed hz corresponding values) 
+*/
+
 typedef enum {
   TS2K_MD_DSB = 0,
   TS2K_MD_LSB = 1,

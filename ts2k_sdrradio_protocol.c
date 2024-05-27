@@ -14,8 +14,7 @@
   # DSP Filter High/Low (command "SH"/"SL")
   
   SDR Radio TS-2000 protocol value (hz) range is 0...99999
-  Original Kenwood TS-2000 protocol value (custom) depends current mode 00...11 (each one has fixed hz corresponding values)
-  
+  Original Kenwood TS-2000 protocol value (custom) depends current mode 00...11 (each one has fixed hz corresponding values) 
 */
 
 // get power status
