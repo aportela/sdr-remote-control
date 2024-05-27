@@ -34,6 +34,41 @@ void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   }
 }
 
+void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
+  if (trx != NULL && trx->changed) {
+    if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_STATUS) {
+      trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_STATUS;
+    }
+    if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX) {
+      trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+    }
+    if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE) {
+      trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
+    }
+    if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY) {
+      trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    }
+    if (trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP) {
+      trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
+    }
+    if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL) {
+      trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
+    }
+    if (trx->changed & TRX_CFLAG_AUDIO_MUTE) {
+      trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
+    }
+    if (trx->changed & TRX_CFLAG_AF_GAIN) {
+      trx->changed &= ~TRX_CFLAG_AF_GAIN;
+    }
+    if (trx->changed & TRX_CFLAG_FILTER_LOW) {
+      trx->changed &= ~TRX_CFLAG_FILTER_LOW;
+    }
+    if (trx->changed & TRX_CFLAG_FILTER_HIGH) {
+      trx->changed &= ~TRX_CFLAG_FILTER_HIGH;
+    }
+  }
+}
+
 void Display::refreshTransmitStatus(bool isTransmitting) {
   if (isTransmitting) {
     this->screen.drawRect(0, 0, 29, 20, ST77XX_RED);
@@ -285,10 +320,9 @@ void Display::refreshRNDDigitalSMeter(int newSignal) {
   }
 }
 
-void Display::debugBottomStr(char* str, uint64_t value){
+void Display::debugBottomStr(char* str, uint64_t value) {
   this->screen.setCursor(0, 220);
   this->screen.setTextSize(2);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.printf("%s: %8llu", str, value);
 }
-

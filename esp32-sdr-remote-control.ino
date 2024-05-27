@@ -13,6 +13,7 @@
 
 #include "ts2k_sdrradio_protocol.h"
 #include "Display.h"
+#include "sdr_remote_transceiver.h"
 
 #define TFT_CS 5
 #define TFT_RST 4

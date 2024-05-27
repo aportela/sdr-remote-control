@@ -4,10 +4,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 
+#include "sdr_remote_transceiver.h"
+
 class Display {
 public:
   Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion);
+  void refreshMainScreen(sdrRemoteTransceiver* trx);
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(uint8_t mode);
