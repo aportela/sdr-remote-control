@@ -10,9 +10,9 @@
 #include <AiEsp32RotaryEncoder.h>
 
 #include "Arduino.h"
-
-#include "ts2k_sdrradio_protocol.h"
+#include "SerialConnection.h"
 #include "Display.h"
+#include "ts2k_sdrradio_protocol.h"
 #include "sdr_remote_transceiver.h"
 
 #define TFT_CS 5
@@ -27,7 +27,7 @@
 
 #define DISPLAY_INACTIVE_COLOR 0x0841
 
-#define SERIAL_BAUD_RATE 115200
+#define SERIAL_BAUD_RATE 57600
 #define SERIAL_TIMEOUT 2000
 #define SERIAL_FLUSH_WAIT 10
 #define SERIAL_WAIT_AFTER_SEND_CMD 10
@@ -99,6 +99,8 @@ volatile uint64_t currentSMeterLevel = 0;
 
 sdrRemoteTransceiver trx;
 
+SerialConnection serialConnection(SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
+
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
   selectFocusRotaryEncoder.setup(readEncoderISR);
@@ -117,26 +119,7 @@ void setup() {
   initSerial();
   initRotaryEncoders();
   //initSDRRemoteTransceiver(&trx);
-}
-
-void tryConnection(void) {
-  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
-  Serial.flush();
-  delay(SERIAL_FLUSH_WAIT);
-  Serial.print("PS;");
-  delay(SERIAL_WAIT_AFTER_SEND_CMD);
-  while (Serial.available() > 0 && !connected) {
-    String receivedData = Serial.readStringUntil(';');
-    if (receivedData == "PS1;") {
-      Serial.flush();
-      delay(SERIAL_FLUSH_WAIT);
-      // tft.fillScreen(ST77XX_BLACK);
-      // tft.setCursor(10, 50);
-      // tft.printf("MAIN");
-      connected = true;
-      break;
-    }
-  }
+  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION, false);
 }
 
 bool transmitStatusChanged = true;
@@ -195,7 +178,7 @@ void mainVFORotaryEncoderLoop(void) {
     }
     currentVFOFrequency += hzIncrement;
     currentVFOFrequencyChanged = true;
-    trx.VFO[trx.activeVFOIndex].frequency+= hzIncrement;
+    trx.VFO[trx.activeVFOIndex].frequency += hzIncrement;
     trx.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   } else if (delta < 0) {
@@ -209,14 +192,14 @@ void mainVFORotaryEncoderLoop(void) {
       hzDecrement = 100;
     } else if (newEncoderValue < 4985) {
       display.debugBottomStr("--", newEncoderValue + 5000);
-      hzDecrement= 10;
+      hzDecrement = 10;
     } else {
       display.debugBottomStr("-", newEncoderValue + 5000);
-      hzDecrement= 1;
+      hzDecrement = 1;
     }
     currentVFOFrequency -= hzDecrement;
     currentVFOFrequencyChanged = true;
-    trx.VFO[trx.activeVFOIndex].frequency-= hzDecrement;
+    trx.VFO[trx.activeVFOIndex].frequency -= hzDecrement;
     trx.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   }
@@ -230,16 +213,26 @@ const unsigned int spanPositions[] = { 32, 50, 68, 104, 122, 140, 176, 194, 212,
 unsigned long previousMillis = 0;
 // max screen refresh / second
 const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
+
+unsigned long lastSerialActivityMillis = 0;
+
 void loop() {
-  if (!connected) {
-    tryConnection();
+  if (trx.powerStatus == TRX_PS_OFF) {
+    display.animateConnectScreen();
+    // clear screen & drawn default connect screen at start (ONLY)
+    if (serialConnection.tryConnection()) {
+      trx.powerStatus = TRX_PS_ON;      
+      display.clearScreen(ST77XX_BLACK);
+    }        
   } else {
+    display.debugBottomStr("Loop connected", millis());
+    delay(1000);
+    String cmd = serialConnection.loop();
+    display.debugBottomStr2(cmd, millis());
+    delay(5000);
+    trx.powerStatus = TRX_PS_OFF;
+    //showMainScreen();
     /*
-    if (selectFocusRotaryEncoder.encoderChanged()) {
-      currentVFOFrequency = selectFocusRotaryEncoder.readEncoder();
-      currentVFOFrequencyChanged = true;
-    }
-    */
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
     } else if (buttonDown) {
@@ -258,30 +251,25 @@ void loop() {
     } else {
       int16_t encoderDelta = selectFocusRotaryEncoder.encoderChanged();
       if (encoderDelta > 0) {
-        /*
-        if (currentSMeterLevel < 42) {
-          currentSMeterLevel++;
-        }
-        */
         currentVFOFrequency++;
         currentVFOFrequencyChanged = true;
       } else if (encoderDelta < 0) {
-        /*
-        if (currentSMeterLevel > 0) {
-          currentSMeterLevel--;
-        }
-        */
         currentVFOFrequency--;
         currentVFOFrequencyChanged = true;
       }
-
       mainVFORotaryEncoderLoop();
-    }
-    unsigned long currentMillis = millis();
+      
+      unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
       showMainScreen();
     }
+    */
   }
-  delay(10);
+  /*
+  // TODO: if no "serial activity" detected restart connection
+  if (trx.powerStatus == TRX_PS_ON && millis() - serialConnectionlastRXActivity > 1000) {
+    trx.powerStatus = TRX_PS_OFF;
+  }
+  */
 }
