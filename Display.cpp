@@ -194,6 +194,16 @@ void refreshSignals(void) {
   }
 }
 
+// move canvas one line down
+void moveCanvasDown(GFXcanvas16* canvas) {
+  uint16_t* buffer = canvas->getBuffer();
+  for (int y = canvas->height() - 1; y > 0; y--) {
+    for (int x = 0; x < canvas->width(); x++) {
+      buffer[y * canvas->width() + x] = buffer[(y - 1) * canvas->width() + x];
+    }
+  }
+}
+
 /* 
   new animation block ends
 */
