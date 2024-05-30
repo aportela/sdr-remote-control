@@ -65,7 +65,7 @@ void initSignals(void) {
   uint16_t currentSignalIndex = random(MIN_HZ_STEP_BETWEEN_MORSE_SIGNALS, MAX_HZ_STEP_BETWEEN_MORSE_SIGNALS);
   for (uint16_t i = 0; i < HZ_LIMIT_MORSE_SIGNALS; i++) {
     // set by default that this is a "noise" (not real signal)
-    signalIndexes[i] = 0;    
+    signalIndexes[i] = 0;
     if (i != 0) {
       // when reach next signal index
       if (i == currentSignalIndex) {
@@ -121,9 +121,9 @@ void initSignals(void) {
           signalIndexes[i - 4] = 2;
           signalIndexes[i - 3] = 2;
           signalIndexes[i - 2] = 2;
-          signalIndexes[i - 1] = 2;          
+          signalIndexes[i - 1] = 2;
           // change "noise" to -> "signal" (peak)
-          signalIndexes[i] = 1; 
+          signalIndexes[i] = 1;
           // change "noise" to -> "intermediate signal"
           signalIndexes[i + 1] = 3;
           signalIndexes[i + 2] = 3;
@@ -217,6 +217,7 @@ uint16_t Display::generateBlueGradientColorFromSignal(uint8_t value) {
   return this->screen.color565(r, g, b);
 }
 
+// paint spectrum scope & waterfall animation
 void Display::draw(uint16_t xOffset, uint16_t yOffset) {
   canvasOscilloscope.fillScreen(ST77XX_BLACK);
   for (int16_t i = 0; i < TOTAL_BANDWITH_RESOLUTION; i++) {
@@ -227,17 +228,17 @@ void Display::draw(uint16_t xOffset, uint16_t yOffset) {
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
           canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val, ST77XX_WHITE);
           canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(signalsData[i]));
-        } else {          
+        } else {
           uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val + 1, y_val - 1, generateBlueGradientColorFromSignal(32));
           canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(noiseData[i]));
         }
       } else {
         uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
-          canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
-          canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(noiseData[i]));
+        canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
+        canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val + 1, y_val - 1, generateBlueGradientColorFromSignal(32));
+        canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(noiseData[i]));
       }
     } else {
       uint16_t y_val = map(signalsData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
@@ -246,16 +247,16 @@ void Display::draw(uint16_t xOffset, uint16_t yOffset) {
         case 4:
           // start  signal vertical line
           len = y_val - map(signalsData[i - 1] - 16, 0, 255, 0, OSCILLOSCOPE_HEIGHT);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i - 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i - 1] - 16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
           break;
         case 5:
           //  end signal vertical line
-          len = y_val - map(signalsData[i + 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i + 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
+          len = y_val - map(signalsData[i + 1] - 16, 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i + 1] - 16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
           break;
         default:
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val + 1, y_val - 1, generateBlueGradientColorFromSignal(32));
           break;
       }
       canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(signalsData[i]));
