@@ -25,13 +25,12 @@ private:
   uint16_t width;
   uint16_t height;
   Adafruit_ST7789 screen;
-  static const char* connectionScreenSpriteFrames[4];
-  uint8_t connectionScreenSpriteCurrentFrame = 0;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
   uint8_t peakSignal = 0;
   long lastPeakChange;
-#define CONNECTION_SCREEN_SPRITE_FRAME_COUNT = 4
+  uint16_t generateColor565(uint16_t value);
+  void draw(uint16_t xOffset, uint16_t yOffset);
 };
 
 #endif

@@ -1,7 +1,5 @@
 #include "Display.h"
 
-const char* Display::connectionScreenSpriteFrames[4] = { "|", "/", "-", "\\" };
-
 /* 
   new animation block begins
 */
@@ -205,7 +203,7 @@ void moveCanvasDown(GFXcanvas16* canvas) {
 }
 
 // generate "blue gradient" from range 0..255
-uint16_t generateColor565(uint16_t value) {
+uint16_t Display::generateColor565(uint16_t value) {
   uint8_t r, g, b;
   if (value <= 71) {
     r = 0;
@@ -216,7 +214,56 @@ uint16_t generateColor565(uint16_t value) {
   } else {
     r = g = b = 140 + (value - 192);
   }
-  return tft.color565(r, g, b);
+  return this->screen.color565(r, g, b);
+}
+
+void Display::draw(uint16_t xOffset, uint16_t yOffset) {
+  canvasOscilloscope.fillScreen(ST77XX_BLACK);
+  for (int16_t i = 0; i < TOTAL_BANDWITH_RESOLUTION; i++) {
+    if (i < HZ_LIMIT_MORSE_SIGNALS) {
+      if (signalIndexes[i] == 1) {
+        if (millis() % (i * 3) == 0 || (millis() % (signalsData[i] / 8) == 0)) {  // "intermitent" morse signals
+          uint16_t y_val = map(signalsData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val, ST77XX_WHITE);
+          canvasWaterfall.drawPixel(i, 0, generateColor565(signalsData[i]));
+        } else {          
+          uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
+          canvasWaterfall.drawPixel(i, 0, generateColor565(noiseData[i]));
+        }
+      } else {
+        uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
+          canvasWaterfall.drawPixel(i, 0, generateColor565(noiseData[i]));
+      }
+    } else {
+      uint16_t y_val = map(signalsData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+      uint16_t len = 0;
+      switch (signalIndexes[i]) {
+        case 4:
+          // start  signal vertical line
+          len = y_val - map(signalsData[i - 1] - 16, 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i - 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
+          break;
+        case 5:
+          //  end signal vertical line
+          len = y_val - map(signalsData[i + 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val - map(signalsData[i + 1]-16, 0, 255, 0, OSCILLOSCOPE_HEIGHT), ST77XX_WHITE);
+          break;
+        default:
+          canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
+          break;
+      }
+      canvasWaterfall.drawPixel(i, 0, generateColor565(signalsData[i]));
+    }
+  }
+  this->screen.drawRGBBitmap(xOffset, yOffset, canvasOscilloscope.getBuffer(), OSCILLOSCOPE_WIDTH, OSCILLOSCOPE_HEIGHT);
+  this->screen.drawRGBBitmap(xOffset, yOffset + OSCILLOSCOPE_HEIGHT + 4, canvasWaterfall.getBuffer(), WATERFALL_WIDTH, WATERFALL_HEIGHT);
+  moveCanvasDown(&canvasWaterfall);
 }
 
 /* 
@@ -253,13 +300,14 @@ void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion, b
   this->screen.printf("v%.2f", currentVersion);
   this->screen.setCursor(10, 210);
   this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
-  this->connectionScreenSpriteCurrentFrame = 0;
+  canvasOscilloscope.fillScreen(ST77XX_BLACK);
+  canvasWaterfall.fillScreen(ST77XX_BLACK);
+  initSignals();
 }
 
 void Display::animateConnectScreen(void) {
-  this->screen.setCursor(this->screen.width() / 2, this->screen.height() / 2);
-  this->screen.printf(Display::connectionScreenSpriteFrames[this->connectionScreenSpriteCurrentFrame]);
-  this->connectionScreenSpriteCurrentFrame = (this->connectionScreenSpriteCurrentFrame + 1) % 4;
+  this->draw(80, 100);
+  refreshSignals();
 }
 
 void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {

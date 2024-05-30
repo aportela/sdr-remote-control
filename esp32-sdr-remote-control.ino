@@ -108,6 +108,7 @@ void setup() {
   serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   //initSDRRemoteTransceiver(&trx);
+  randomSeed(analogRead(0) ^ (micros() * esp_random()));  
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION, false);
 }
 
