@@ -2,6 +2,44 @@
 
 const char* Display::connectionScreenSpriteFrames[4] = { "|", "/", "-", "\\" };
 
+/* 
+  new animation block begins
+*/
+
+#define TOTAL_BANDWITH_RESOLUTION 320 / 2
+
+#define MIN_HZ_STEP_BETWEEN_MORSE_SIGNALS 8
+#define MAX_HZ_STEP_BETWEEN_MORSE_SIGNALS 12
+#define HZ_LIMIT_MORSE_SIGNALS 60  // (first 60 = morse, remaining = analog voice)
+
+#define MIN_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS 16
+#define MAX_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS 32
+
+#define STEP_BETWEEN_LSB_SIGNALS 10
+#define DEFAULT_SIGNAL_INIT_VALUE 128
+
+#define MIN_SIGNAL_VALUE 80
+#define MAX_SIGNAL_VALUE 255
+
+#define MIN_NOISE_VALUE 0
+#define MAX_NOISE_VALUE 48
+
+const uint16_t OSCILLOSCOPE_WIDTH = TOTAL_BANDWITH_RESOLUTION;
+const uint16_t OSCILLOSCOPE_HEIGHT = 24;
+
+const uint16_t WATERFALL_WIDTH = TOTAL_BANDWITH_RESOLUTION;
+const uint16_t WATERFALL_HEIGHT = 64;
+
+uint16_t signalsData[TOTAL_BANDWITH_RESOLUTION];
+uint16_t noiseData[TOTAL_BANDWITH_RESOLUTION];
+
+GFXcanvas16 canvasOscilloscope(OSCILLOSCOPE_WIDTH, OSCILLOSCOPE_HEIGHT);
+GFXcanvas16 canvasWaterfall(WATERFALL_WIDTH, WATERFALL_HEIGHT);
+
+/* 
+  new animation block ends
+*/
+
 Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
   this->width = width;
