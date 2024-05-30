@@ -204,6 +204,21 @@ void moveCanvasDown(GFXcanvas16* canvas) {
   }
 }
 
+// generate "blue gradient" from range 0..255
+uint16_t generateColor565(uint16_t value) {
+  uint8_t r, g, b;
+  if (value <= 71) {
+    r = 0;
+    g = 0;
+    b = 50 + value;
+  } else if (value <= 191) {
+    r = g = b = 30 + (value - 72) * 2;
+  } else {
+    r = g = b = 140 + (value - 192);
+  }
+  return tft.color565(r, g, b);
+}
+
 /* 
   new animation block ends
 */
