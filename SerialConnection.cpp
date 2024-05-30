@@ -1,13 +1,14 @@
-#include <HardwareSerial.h>
 
-#include <string.h>
 #include "SerialConnection.h"
 
-SerialConnection::SerialConnection(long speed, long timeout) {
-  Serial.setDebugOutput(false);
-  Serial.setTimeout(timeout);
-  Serial.clearWriteError();
-  Serial.begin(speed);
+#define MILLISECONDS_WAITED_AFTER_FLUSH 5
+#define MILLISECONDS_WAITED_AFTER_SEND 10
+
+SerialConnection::SerialConnection(HardwareSerial* serialPort, long speed, long timeout) : serial(serialPort) {
+  this->serial->setDebugOutput(false);
+  this->serial->setTimeout(timeout);
+  this->serial->clearWriteError();
+  this->serial->begin(speed);
   while (!Serial) {
     yield();
     delay(10);
@@ -15,22 +16,22 @@ SerialConnection::SerialConnection(long speed, long timeout) {
 }
 
 void SerialConnection::flush(void) {
-  Serial.flush();
-  delay(10);
+  this->serial->flush();
+  delay(MILLISECONDS_WAITED_AFTER_FLUSH);
 }
 
 void SerialConnection::send(String str) {
-  Serial.print(str);
-  delay(10);
+  this->serial->print(str);
+  delay(MILLISECONDS_WAITED_AFTER_SEND);
 }
 
 bool SerialConnection::tryConnection(void) {
   this->flush();
   this->send("PS;");
   bool connected = false;
-  while (Serial.available() > 0 && !connected) {
+  while (this->serial->available() > 0 && !connected) {
     this->lastRXActivity = millis();
-    String receivedData = Serial.readStringUntil(';');
+    String receivedData = this->serial->readStringUntil(';');
     if (receivedData == "PS1") {
       this->flush();
       connected = true;
@@ -44,10 +45,9 @@ String SerialConnection::loop(void) {
   this->flush();
   this->send("PS;");
   String receivedData;
-  while (Serial.available() > 0) {
+  while (this->serial->available() > 0) {
     this->lastRXActivity = millis();
-    receivedData = Serial.readStringUntil(';');
+    receivedData = this->serial->readStringUntil(';');
   }
-  delay(100);
   return (receivedData);
 }

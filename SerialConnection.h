@@ -1,9 +1,11 @@
 #ifndef SDR_REMOTE_CONTROL_SERIAL_CONNECTION_H
 #define SDR_REMOTE_CONTROL_SERIAL_CONNECTION_H
 
+#include <Arduino.h>
+
 class SerialConnection {
 public:
-  SerialConnection(long speed, long timeout);
+  SerialConnection(HardwareSerial* serialPort, long speed, long timeout);
 
   bool tryConnection(void);
 
@@ -13,6 +15,7 @@ public:
 
   uint64_t lastRXActivity = 0;
 private:
+  HardwareSerial* serial;
   void flush(void);
 };
 

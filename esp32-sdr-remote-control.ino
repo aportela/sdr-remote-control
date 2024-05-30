@@ -52,7 +52,7 @@
 
 bool connected = true;
 
-const char *modes[] = {
+const char* modes[] = {
   "DSB",
   "LSB",
   "USB",
@@ -81,25 +81,12 @@ void IRAM_ATTR readBigEncoderISR() {
 
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
-void initSerial(void) {
-  Serial.setDebugOutput(false);
-  Serial.setTimeout(SERIAL_TIMEOUT);
-  Serial.clearWriteError();
-  Serial.begin(SERIAL_BAUD_RATE, SERIAL_8N1);
-  while (!Serial) {
-    yield();
-    delay(10);  // wait for serial port to connect. Needed for native USB port only
-  }
-}
-
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
 volatile uint64_t currentSMeterLevel = 0;
 
 sdrRemoteTransceiver trx;
-
-SerialConnection serialConnection(SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
 
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
@@ -115,8 +102,10 @@ void initRotaryEncoders(void) {
   mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
 }
 
+SerialConnection *serialConnection;
+
 void setup() {
-  initSerial();
+  serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   //initSDRRemoteTransceiver(&trx);
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION, false);
@@ -214,24 +203,17 @@ unsigned long previousMillis = 0;
 // max screen refresh / second
 const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
 
-unsigned long lastSerialActivityMillis = 0;
 
 void loop() {
   if (trx.powerStatus == TRX_PS_OFF) {
     display.animateConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
-    if (serialConnection.tryConnection()) {
+    if (serialConnection->tryConnection()) {
       trx.powerStatus = TRX_PS_ON;      
       display.clearScreen(ST77XX_BLACK);
-    }        
+    } 
   } else {
-    display.debugBottomStr("Loop connected", millis());
-    delay(1000);
-    String cmd = serialConnection.loop();
-    display.debugBottomStr2(cmd, millis());
-    delay(5000);
-    trx.powerStatus = TRX_PS_OFF;
-    //showMainScreen();
+    showMainScreen();
     /*
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
