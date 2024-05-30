@@ -15,23 +15,30 @@ Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS
   this->screen.fillScreen(ST77XX_BLACK);
 }
 
-void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
-  if (connectionScreenSpriteCurrentFrame < 0) {
-    this->screen.drawRect(4, 4, 312, 232, ST77XX_WHITE);
-    this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
-    this->screen.setTextSize(2);
-    this->screen.setCursor(18, 10);
-    this->screen.printf("ESP32 SDR Remote Control");
-    this->screen.setCursor(140, 30);
-    this->screen.printf("v%.2f", currentVersion);
-    this->screen.setCursor(10, 210);
-    this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
-    connectionScreenSpriteCurrentFrame = 0;
-  } else if (connectionScreenSpriteCurrentFrame < 4) {
-    this->screen.setCursor(160, 110);
-    this->screen.printf(Display::connectionScreenSpriteFrames[connectionScreenSpriteCurrentFrame]);
-    connectionScreenSpriteCurrentFrame = (connectionScreenSpriteCurrentFrame + 1) % 4;
+void Display::clearScreen(uint8_t color) {
+  this->screen.fillScreen(color);
+}
+
+void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion, bool clearPrevious) {
+  if (clearPrevious) {
+    this->screen.fillScreen(ST77XX_BLACK);
   }
+  this->screen.drawRect(4, 4, 312, 232, ST77XX_WHITE);
+  this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+  this->screen.setTextSize(2);
+  this->screen.setCursor(18, 10);
+  this->screen.printf("ESP32 SDR Remote Control");
+  this->screen.setCursor(140, 30);
+  this->screen.printf("v%.2f", currentVersion);
+  this->screen.setCursor(10, 210);
+  this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
+  this->connectionScreenSpriteCurrentFrame = 0;
+}
+
+void Display::animateConnectScreen(void) {
+  this->screen.setCursor(this->screen.width() / 2, this->screen.height() / 2);
+  this->screen.printf(Display::connectionScreenSpriteFrames[this->connectionScreenSpriteCurrentFrame]);
+  this->connectionScreenSpriteCurrentFrame = (this->connectionScreenSpriteCurrentFrame + 1) % 4;
 }
 
 void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
@@ -330,6 +337,13 @@ void Display::refreshRNDDigitalSMeter(int newSignal) {
 }
 
 void Display::debugBottomStr(char* str, uint64_t value) {
+  this->screen.setCursor(0, 220);
+  this->screen.setTextSize(2);
+  this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+  this->screen.printf("%s: %8llu", str, value);
+}
+
+void Display::debugBottomStr2(String str, uint64_t value) {
   this->screen.setCursor(0, 220);
   this->screen.setTextSize(2);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);

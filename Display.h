@@ -9,7 +9,9 @@
 class Display {
 public:
   Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
-  void showConnectScreen(uint32_t serialBaudRate, float currentVersion);
+  void clearScreen(uint8_t color);
+  void showConnectScreen(uint32_t serialBaudRate, float currentVersion, bool clearPrevious);
+  void animateConnectScreen(void);
   void refreshMainScreen(sdrRemoteTransceiver* trx);
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
@@ -18,12 +20,13 @@ public:
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
   void debugBottomStr(char* str, uint64_t value);
+  void debugBottomStr2(String, uint64_t value);
 private:
   uint16_t width;
   uint16_t height;
   Adafruit_ST7789 screen;
   static const char* connectionScreenSpriteFrames[4];
-  int8_t connectionScreenSpriteCurrentFrame = -1;
+  uint8_t connectionScreenSpriteCurrentFrame = 0;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
   uint8_t peakSignal = 0;
