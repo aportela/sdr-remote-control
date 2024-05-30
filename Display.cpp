@@ -58,6 +58,142 @@ void refreshNoise(void) {
   }
 }
 
+// generate start signals levels
+void initSignals(void) {
+  // re/generate "noise"
+  refreshNoise();
+  // left block are "cw/morse" signals
+  // random spacing between signals
+  uint16_t currentSignalIndex = random(MIN_HZ_STEP_BETWEEN_MORSE_SIGNALS, MAX_HZ_STEP_BETWEEN_MORSE_SIGNALS);
+  for (uint16_t i = 0; i < HZ_LIMIT_MORSE_SIGNALS; i++) {
+    // set by default that this is a "noise" (not real signal)
+    signalIndexes[i] = 0;    
+    if (i != 0) {
+      // when reach next signal index
+      if (i == currentSignalIndex) {
+        // generate signal level
+        signalsData[i] = random(MIN_SIGNAL_VALUE, MAX_SIGNAL_VALUE);
+        // change "noise" to -> "signal"
+        signalIndexes[i] = 1;
+        // generate next signal index
+        currentSignalIndex += random(MIN_HZ_STEP_BETWEEN_MORSE_SIGNALS, MAX_HZ_STEP_BETWEEN_MORSE_SIGNALS);
+      } else {
+        // no signal at this index => get "noise"
+        signalsData[i] = noiseData[i];
+      }
+    } else {
+      // first index (0) => get "noise"
+      signalsData[i] = noiseData[i];
+    }
+  }
+
+  // right block are "analog voice" signals
+  // random spacing between signals
+  currentSignalIndex = HZ_LIMIT_MORSE_SIGNALS + random(MIN_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS, MAX_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS);
+  // generate signal level
+  // TODO: remove random / 2
+  uint8_t currentSignalValue = random(MIN_SIGNAL_VALUE / 2, MAX_SIGNAL_VALUE / 2) + random(MIN_SIGNAL_VALUE / 2, MAX_SIGNAL_VALUE / 2);
+  // set "noise" by default
+  for (uint16_t i = HZ_LIMIT_MORSE_SIGNALS; i < TOTAL_BANDWITH_RESOLUTION; i++) {
+    signalIndexes[i] = 0;
+  }
+
+  for (uint16_t i = HZ_LIMIT_MORSE_SIGNALS; i < TOTAL_BANDWITH_RESOLUTION; i++) {
+    if (i != 0) {
+      // when reach next signal index
+      if (i == currentSignalIndex) {
+        // allow near signal indexes
+        if (i > 4 && i < TOTAL_BANDWITH_RESOLUTION - 4) {
+          // set signal level
+          signalsData[i] = currentSignalValue;
+          // analog voice signal requires more bandwith than "cw/morse" so re-generate also near signal indexes with random values
+          signalsData[i - 1] = constrain(signalsData[i] - random(1, 4), 0, 255);
+          signalsData[i - 2] = constrain(signalsData[i - 1] - random(1, 8), 0, 255);
+          signalsData[i - 3] = constrain(signalsData[i - 2] - random(1, 16), 0, 255);
+          signalsData[i - 4] = constrain(signalsData[i - 3] - random(1, 32), 0, 255);
+          signalsData[i - 5] = constrain(signalsData[i - 4] - random(1, 64), 0, 255);
+          signalsData[i + 1] = constrain(signalsData[i] - random(1, 4), 0, 255);
+          signalsData[i + 2] = constrain(signalsData[i + 1] - random(1, 8), 0, 255);
+          signalsData[i + 3] = constrain(signalsData[i + 2] - random(1, 16), 0, 255);
+          signalsData[i + 4] = constrain(signalsData[i + 3] - random(1, 32), 0, 255);
+          signalsData[i + 5] = constrain(signalsData[i + 4] - random(1, 64), 0, 255);
+          // change "noise" to -> "signal start"
+          signalIndexes[i - 5] = 4;
+          // change "noise" to -> "intermediate signal"
+          signalIndexes[i - 4] = 2;
+          signalIndexes[i - 3] = 2;
+          signalIndexes[i - 2] = 2;
+          signalIndexes[i - 1] = 2;          
+          // change "noise" to -> "signal" (peak)
+          signalIndexes[i] = 1; 
+          // change "noise" to -> "intermediate signal"
+          signalIndexes[i + 1] = 3;
+          signalIndexes[i + 2] = 3;
+          signalIndexes[i + 3] = 3;
+          signalIndexes[i + 4] = 3;
+          // change "noise" to -> "signal end"
+          signalIndexes[i + 5] = 5;
+
+          // generate next signal index
+          currentSignalIndex += random(MIN_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS, MAX_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS);
+          // regenerate signal level
+          // TODO: remove random / 2
+          currentSignalValue = random(MIN_SIGNAL_VALUE / 2, MAX_SIGNAL_VALUE / 2) + random(MIN_SIGNAL_VALUE / 2, MAX_SIGNAL_VALUE / 2);
+        } else {
+          //signalsData[i] = random(MIN_NOISE_VALUE, MAX_NOISE_VALUE);  // "noise" with low signal level
+          signalsData[i] = noiseData[i];
+        }
+      } else {
+        // check (ONLY) for existing noise at this index
+        if (signalIndexes[i] == 0) {
+          // no signal at this index => get "noise"
+          signalsData[i] = noiseData[i];
+        }
+      }
+    } else {
+      // first index (0) => get "noise"
+      signalsData[i] = noiseData[i];
+    }
+  }
+}
+
+// regenerate signals levels
+void refreshSignals(void) {
+  // re/generate "noise"
+  refreshNoise();
+  // left block are "cw/morse" signals
+  for (uint16_t i = 0; i < HZ_LIMIT_MORSE_SIGNALS; i++) {
+    // ignore existing signal and change only to new "noise" level
+    if (signalIndexes[i] == 0) {
+      // no signal at this index => get "noise"
+      signalsData[i] = noiseData[i];
+    }
+  }
+  // right block are "analog voice" signals
+  for (uint16_t i = HZ_LIMIT_MORSE_SIGNALS; i < TOTAL_BANDWITH_RESOLUTION; i++) {
+    // ignore noise, only eval real signals (peak & near data)
+    if (signalIndexes[i] > 0) {
+      // check signal existence on current index
+      if (signalIndexes[i] == 1) {
+        // re-generate near signal indexes with random values
+        signalsData[i - 1] = constrain(signalsData[i] - random(4, 8), 0, 255);
+        signalsData[i - 2] = constrain(signalsData[i - 1] - random(4, 32), 0, 255);
+        signalsData[i - 3] = constrain(signalsData[i - 2] + random(4, 40), 0, 255);
+        signalsData[i - 4] = constrain(signalsData[i - 3] - random(4, 8), 0, 255);
+        signalsData[i - 5] = constrain(signalsData[i - 4] - random(4, 16), 0, 255);
+        signalsData[i + 1] = constrain(signalsData[i] - random(4, 8), 0, 255);
+        signalsData[i + 2] = constrain(signalsData[i + 1] - random(4, 32), 0, 255);
+        signalsData[i + 3] = constrain(signalsData[i + 2] + random(4, 40), 0, 255);
+        signalsData[i + 4] = constrain(signalsData[i + 3] - random(4, 8), 0, 255);
+        signalsData[i + 5] = constrain(signalsData[i + 4] - random(4, 16), 0, 255);
+      }
+    } else {
+      // first index (0) => get "noise"
+      signalsData[i] = noiseData[i];
+    }
+  }
+}
+
 /* 
   new animation block ends
 */
