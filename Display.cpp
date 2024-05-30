@@ -202,8 +202,8 @@ void moveCanvasDown(GFXcanvas16* canvas) {
   }
 }
 
-// generate "blue gradient" from range 0..255
-uint16_t Display::generateColor565(uint16_t value) {
+// generate "blue gradient" from signal (range value 0..255)
+uint16_t Display::generateBlueGradientColorFromSignal(uint8_t value) {
   uint8_t r, g, b;
   if (value <= 71) {
     r = 0;
@@ -226,18 +226,18 @@ void Display::draw(uint16_t xOffset, uint16_t yOffset) {
           uint16_t y_val = map(signalsData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
           canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val, y_val, ST77XX_WHITE);
-          canvasWaterfall.drawPixel(i, 0, generateColor565(signalsData[i]));
+          canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(signalsData[i]));
         } else {          
           uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
-          canvasWaterfall.drawPixel(i, 0, generateColor565(noiseData[i]));
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
+          canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(noiseData[i]));
         }
       } else {
         uint16_t y_val = map(noiseData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
-          canvasWaterfall.drawPixel(i, 0, generateColor565(noiseData[i]));
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
+          canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(noiseData[i]));
       }
     } else {
       uint16_t y_val = map(signalsData[i], 0, 255, 0, OSCILLOSCOPE_HEIGHT);
@@ -255,10 +255,10 @@ void Display::draw(uint16_t xOffset, uint16_t yOffset) {
           break;
         default:
           canvasOscilloscope.drawPixel(i, OSCILLOSCOPE_HEIGHT - y_val, ST77XX_WHITE);
-          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateColor565(32));
+          canvasOscilloscope.drawFastVLine(i, OSCILLOSCOPE_HEIGHT - y_val +1, y_val-1, generateBlueGradientColorFromSignal(32));
           break;
       }
-      canvasWaterfall.drawPixel(i, 0, generateColor565(signalsData[i]));
+      canvasWaterfall.drawPixel(i, 0, generateBlueGradientColorFromSignal(signalsData[i]));
     }
   }
   this->screen.drawRGBBitmap(xOffset, yOffset, canvasOscilloscope.getBuffer(), OSCILLOSCOPE_WIDTH, OSCILLOSCOPE_HEIGHT);

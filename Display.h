@@ -29,7 +29,7 @@ private:
   uint8_t currentSignal = 0;
   uint8_t peakSignal = 0;
   long lastPeakChange;
-  uint16_t generateColor565(uint16_t value);
+  uint16_t generateBlueGradientColorFromSignal(uint8_t value);
   void draw(uint16_t xOffset, uint16_t yOffset);
 };
 
