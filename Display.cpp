@@ -36,6 +36,28 @@ uint16_t noiseData[TOTAL_BANDWITH_RESOLUTION];
 GFXcanvas16 canvasOscilloscope(OSCILLOSCOPE_WIDTH, OSCILLOSCOPE_HEIGHT);
 GFXcanvas16 canvasWaterfall(WATERFALL_WIDTH, WATERFALL_HEIGHT);
 
+uint16_t signalIndexes[TOTAL_BANDWITH_RESOLUTION];
+
+// generate random (bandwith) noise data
+void refreshNoise(void) {
+  const uint8_t MAX_VALUE = 32;
+  const int MIN_PEAK_INTERVAL = 10;
+  const int MAX_PEAK_INTERVAL = 30;
+  for (uint16_t i = 0; i < TOTAL_BANDWITH_RESOLUTION; i++) {
+    int currentValue = random(0, MAX_VALUE);
+    int nextPeak = random(MIN_PEAK_INTERVAL, MAX_PEAK_INTERVAL);
+    if (i % nextPeak == 0) {
+      int peakValue = random(0, MAX_VALUE);
+      int direction = random(0, 2) * 2 - 1;
+      for (int j = i; j < i + nextPeak && j < TOTAL_BANDWITH_RESOLUTION; j++) {
+        noiseData[j] = max(0, min(255, currentValue + direction * abs(currentValue - peakValue) / nextPeak * (j - i)));
+      }
+      currentValue = peakValue;
+      nextPeak = random(MIN_PEAK_INTERVAL, MAX_PEAK_INTERVAL);
+    }
+  }
+}
+
 /* 
   new animation block ends
 */
