@@ -22,6 +22,7 @@ void SerialConnection::flush(void) {
 
 void SerialConnection::send(String str) {
   this->serial->print(str);
+  this->lastTXActivity = millis();
   delay(MILLISECONDS_WAITED_AFTER_SEND);
 }
 
@@ -33,6 +34,7 @@ bool SerialConnection::tryConnection(void) {
     this->lastRXActivity = millis();
     String receivedData = this->serial->readStringUntil(';');
     if (receivedData == "PS1") {
+      this->lastRXValidCommand = millis();
       this->flush();
       connected = true;
       break;

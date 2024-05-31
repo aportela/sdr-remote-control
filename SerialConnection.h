@@ -14,6 +14,8 @@ public:
   String loop(void);
 
   uint64_t lastRXActivity = 0;
+  uint64_t lastRXValidCommand = 0;
+  uint64_t lastTXActivity = 0;
 private:
   HardwareSerial* serial;
   void flush(void);
