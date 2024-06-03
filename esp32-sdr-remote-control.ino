@@ -52,22 +52,6 @@
 
 #define CURRENT_VERSION 0.01
 
-bool connected = true;
-
-const char* modes[] = {
-  "DSB",
-  "LSB",
-  "USB",
-  "CWU",
-  "FM",
-  "SAM",
-  "",
-  "CWL",
-  "WFM",
-  "BFM",
-  "???"
-};
-
 uint16_t freqChangeHzStepSize = 12500;  // Hz
 
 AiEsp32RotaryEncoder selectFocusRotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
@@ -111,7 +95,6 @@ void setup() {
   serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   trx = new Transceiver();
-  //initSDRRemoteTransceiver(&trx);
   //display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
   display.showMainScreen();
 }
@@ -127,32 +110,7 @@ bool VFOModeChanged = true;
 uint8_t VFOMode = 4;
 
 bool smeterCreated = false;
-void showMainScreen(void) {
-  /*
-  if (transmitStatusChanged) {
-    display.refreshTransmitStatus(isTransmitting);
-    transmitStatusChanged = false;
-  }
-  if (activeVFOChanged) {
-    display.refreshActiveVFO(activeVFO);
-    activeVFOChanged = false;
-  }
-  if (VFOModeChanged) {
-    display.refreshVFOMode(VFOMode);
-    VFOModeChanged = false;
-  }
-  if (currentVFOFrequencyChanged) {
-    display.refreshVFOFreq(currentVFOFrequency);
-    currentVFOFrequencyChanged = false;
-  }
-  if (!smeterCreated) {
-    display.createDigitalSMeter();
-    smeterCreated = true;
-  }
-  display.refreshRNDDigitalSMeter(random(0, 42));
-  // display.refreshRNDDigitalSMeter(currentSMeterLevel);
-  */
-}
+
 
 void mainVFORotaryEncoderLoop(void) {
   /*
