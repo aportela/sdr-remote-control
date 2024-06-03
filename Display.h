@@ -21,6 +21,7 @@ public:
 
   void debugBottomStr(char* str, uint64_t value);
   void debugBottomStr2(String, uint64_t value);
+  void refreshFPS(float fps);
 private:
   uint16_t width;
   uint16_t height;

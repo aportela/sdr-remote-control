@@ -67,6 +67,7 @@ void IRAM_ATTR readBigEncoderISR() {
 
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
+
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
@@ -170,8 +171,25 @@ unsigned long previousMillis = 0;
 // max screen refresh / second
 const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fps limit)
 
+uint64_t frameCount = 0;
+uint64_t lastTime = 0;
+float fps = 0;
+
 
 void loop() {
+  uint64_t currentTime = millis();
+  uint64_t elapsedTime = currentTime - lastTime;
+  if (elapsedTime >= 1000) {
+    // Calcula los FPS
+    fps = (float)frameCount / (float)elapsedTime * 1000.0;
+
+    // Reinicia el contador y actualiza el tiempo
+    frameCount = 0;
+    lastTime = currentTime;
+  }
+  frameCount++;
+  display.refreshFPS(fps < 1000 ? fps: 999);
+
   if (trx->powerStatus == TRX_PS_OFF) {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)

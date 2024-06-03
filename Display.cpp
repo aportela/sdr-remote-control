@@ -183,6 +183,14 @@ void Display::refreshVFOMode(TRXVFOMode mode) {
   }
 }
 
+void Display::refreshFPS(float fps) {
+  this->screen.drawRect(231, 0, 88, 20, 0xF85E);
+  this->screen.setTextColor(0xF85E, ST77XX_BLACK);
+  this->screen.setCursor(234, 3);
+  this->screen.setTextSize(2);
+  this->screen.printf("%03u FPS", (int16_t) fps);
+}
+
 void Display::refreshVFOFreq(uint64_t frequency) {
   this->screen.setTextSize(3);
   char formattedFrequency[16];
