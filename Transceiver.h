@@ -45,8 +45,6 @@ typedef enum {
   TRX_VFO_MODE_ERROR = 10
 } TRXVFOMode;
 
-extern const char *TRXVFOModeNames[];
-
 typedef struct
 {
   uint64_t frequency;
@@ -54,8 +52,8 @@ typedef struct
   uint64_t step;  // hz
 } TRXVFO;
 
-typedef struct
-{
+class Transceiver {
+public:
   uint32_t changed;
   TRxPowerStatus powerStatus;
   uint8_t activeVFOIndex;
@@ -63,33 +61,32 @@ typedef struct
   uint8_t signalMeterLevel;
   uint8_t AFGain;
   TRxAudioMuteStatus audioMuted;
-} sdrRemoteTransceiver;
 
-// init default values
-void initSDRRemoteTransceiver(sdrRemoteTransceiver *trx);
+  Transceiver();
 
-// change current active VFO
-void setTRXActiveVFOIndex(sdrRemoteTransceiver *trx, uint8_t VFOIndex);
+  // change current active VFO
+  void setActiveVFOIndex(uint8_t VFOIndex);
 
-// set vfo frequency
-void setTRXVFOFrequency(sdrRemoteTransceiver *trx, uint8_t VFOIndex, uint64_t frequency);
+  // set vfo frequency
+  void setVFOFrequency(uint8_t VFOIndex, uint64_t frequency);
 
-// set vfo mode
-void setTRXVFOMode(sdrRemoteTransceiver *trx, uint8_t VFOIndex, TRXVFOMode mode);
+  // set vfo mode
+  void setVFOMode(uint8_t VFOIndex, TRXVFOMode mode);
 
-// set vfo step size (hz)
-void setTRXVFOHzStep(sdrRemoteTransceiver *trx, uint8_t VFOIndex, uint64_t hz);
+  // set vfo step size (hz)
+  void setVFOHzStep(uint8_t VFOIndex, uint64_t hz);
 
-// set signal level meter
-void setTRXSignalMeterLevel(sdrRemoteTransceiver *trx, uint8_t level);
+  // set signal level meter
+  void setSignalMeterLevel(uint8_t level);
 
-// set af gain
-void setTRXAFGain(sdrRemoteTransceiver *trx, uint8_t value);
+  // set af gain
+  void setAFGain(uint8_t value);
 
-// set audio status to muted
-void setTRXAudioMuted(sdrRemoteTransceiver *trx);
+  // set audio status to muted
+  void setAudioMuted();
 
-// set audio status to unmuted
-void setTRXAudioUnMuted(sdrRemoteTransceiver *trx);
+  // set audio status to unmuted
+  void setAudioUnMuted();
+};
 
 #endif

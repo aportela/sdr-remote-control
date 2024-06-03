@@ -12,9 +12,10 @@
 #include "Arduino.h"
 #include "SerialConnection.h"
 #include "Display.h"
+#include "Transceiver.h"
 
-#include "ts2k_sdrradio_protocol.h"
-#include "sdr_remote_transceiver.h"
+//#include "ts2k_sdrradio_protocol.h"
+//#include "sdr_remote_transceiver.h"
 
 #define TFT_CS 5
 #define TFT_RST 4
@@ -87,7 +88,8 @@ volatile uint64_t currentVFOFrequency = 200145;
 
 volatile uint64_t currentSMeterLevel = 0;
 
-sdrRemoteTransceiver trx;
+//sdrRemoteTransceiver trx;
+Transceiver* trx = nullptr;
 
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
@@ -108,8 +110,10 @@ SerialConnection* serialConnection;
 void setup() {
   serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
+  trx = new Transceiver();
   //initSDRRemoteTransceiver(&trx);
-  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION, true);
+  //display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+  display.showMainScreen();
 }
 
 bool transmitStatusChanged = true;
@@ -124,6 +128,7 @@ uint8_t VFOMode = 4;
 
 bool smeterCreated = false;
 void showMainScreen(void) {
+  /*
   if (transmitStatusChanged) {
     display.refreshTransmitStatus(isTransmitting);
     transmitStatusChanged = false;
@@ -146,9 +151,11 @@ void showMainScreen(void) {
   }
   display.refreshRNDDigitalSMeter(random(0, 42));
   // display.refreshRNDDigitalSMeter(currentSMeterLevel);
+  */
 }
 
 void mainVFORotaryEncoderLoop(void) {
+  /*
   int16_t delta = mainVFORotaryEncoder.encoderChanged();
   if (delta > 0) {
     int32_t newEncoderValue = mainVFORotaryEncoder.readEncoder();
@@ -193,6 +200,7 @@ void mainVFORotaryEncoderLoop(void) {
     trx.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   }
+  */
 }
 
 static bool buttonDown = false;
@@ -206,15 +214,17 @@ const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fp
 
 
 void loop() {
-  if (trx.powerStatus == TRX_PS_OFF) {
+  if (trx->powerStatus == TRX_PS_OFF) {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
     if (serialConnection->tryConnection()) {
-      trx.powerStatus = TRX_PS_ON;
+      trx->powerStatus = TRX_PS_ON;
       display.hideConnectScreen();
+      display.showMainScreen();
     }
   } else {
-    showMainScreen();
+    display.refreshMainScreen(trx);
+    //showMainScreen();
     /*
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
@@ -248,11 +258,10 @@ void loop() {
       showMainScreen();
     }
     */
+    // re-connect on null activity / timeouts ?
+    if (trx->powerStatus == TRX_PS_ON && millis() - serialConnection->lastRXValidCommand > 5000) {
+      //trx->powerStatus = TRX_PS_OFF;
+      //display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+    }
   }
-  /*
-  // TODO: if no "serial activity" detected restart connection
-  if (trx.powerStatus == TRX_PS_ON && millis() - serialConnectionlastRXActivity > 1000) {
-    trx.powerStatus = TRX_PS_OFF;
-  }
-  */
 }

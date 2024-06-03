@@ -1,5 +1,12 @@
 #include "Display.h"
 
+#define SMETER_PARTS 42
+#define SMETER_PART_WIDTH 4
+#define SMETER_PART_SPACE_WIDTH 2
+#define SMETER_PARTH_HEIGHT 18
+#define SMETER_PARTH_HEIGHT_SEPARATOR 20
+#define SMETER_PARTH_BG_COLOR 0x8410
+
 Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
   this->width = width;
@@ -17,10 +24,8 @@ void Display::clearScreen(uint8_t color) {
   this->screen.fillScreen(color);
 }
 
-void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion, bool clearPrevious) {
-  if (clearPrevious) {
-    this->screen.fillScreen(ST77XX_BLACK);
-  }
+void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
+  this->screen.fillScreen(ST77XX_BLACK);
   this->screen.drawRect(4, 4, 312, 232, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setTextSize(2);
@@ -36,13 +41,40 @@ void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion, b
 void Display::hideConnectScreen(void) {
   delete this->animatedScreenPtr;
   this->animatedScreenPtr = nullptr;
-  this->screen.fillScreen(ST77XX_BLACK);
 }
 
 void Display::refreshConnectScreen(void) {
   this->animatedScreenPtr->refresh(80, 80);
 }
 
+void Display::showMainScreen() {
+  this->screen.fillScreen(ST77XX_BLACK);
+  this->createDigitalSMeter();
+}
+
+void Display::refreshMainScreen(Transceiver* trx) {
+  if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS) {
+    this->refreshTransmitStatus(false);
+    trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX) {
+    this->refreshActiveVFO(trx->activeVFOIndex);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE) {
+    this->refreshVFOMode(trx->VFO[trx->activeVFOIndex].mode);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY) {
+    this->refreshVFOFreq(trx->VFO[trx->activeVFOIndex].frequency);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+  }
+  if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL) {
+    this->refreshRNDDigitalSMeter(random(0, 42));
+    //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
+  }
+}
+/*
 void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
   if (trx != NULL && trx->changed) {
     if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_STATUS) {
@@ -87,6 +119,7 @@ void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
   }
 }
 
+*/
 void Display::refreshTransmitStatus(bool isTransmitting) {
   if (isTransmitting) {
     this->screen.drawRect(0, 0, 29, 20, ST77XX_RED);
@@ -108,44 +141,44 @@ void Display::refreshActiveVFO(uint8_t number) {
   this->screen.printf("VFO%d", number);
 }
 
-void Display::refreshVFOMode(uint8_t mode) {
+void Display::refreshVFOMode(TRXVFOMode mode) {
   this->screen.drawRect(86, 0, 43, 20, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setCursor(89, 3);
   this->screen.setTextSize(2);
   switch (mode) {
-    case 0:
+    case TRX_VFO_MD_DSB:
       this->screen.printf("DSB");
       break;
-    case 1:
+    case TRX_VFO_MD_LSB:
       this->screen.printf("LSB");
       break;
-    case 2:
+    case TRX_VFO_MD_USB:
       this->screen.printf("USB");
       break;
-    case 3:
+    case TRX_VFO_MD_CW_U:
       this->screen.printf("CW_U");  // CW (upper sideband)
       break;
-    case 4:
+    case TRX_VFO_MD_FM:
       this->screen.printf("FM");
       break;
-    case 5:
+    case TRX_VFO_MD_SAM:
       this->screen.printf("SAM");  // (synchronous AM, includes ECSS)
       break;
-    case 6:
-      this->screen.printf("   ");  // not used
+    case TRX_VFO_MD_RESERVED:
+      this->screen.printf("  ");  // reserved / not used
       break;
-    case 7:
+    case TRX_VFO_MD_CW_L:
       this->screen.printf("CWL");  // CW (lower sideband)
       break;
-    case 8:
+    case TRX_VFO_MD_WFM:
       this->screen.printf("WFM");
       break;
-    case 9:
+    case TRX_VFO_MD_BFM:
       this->screen.printf("BFM");
       break;
     default:
-      this->screen.printf("???");  // invalid value
+      this->screen.printf("???");  // error / invalid value
       break;
   }
 }
@@ -180,13 +213,6 @@ void Display::refreshVFOFreq(uint64_t frequency) {
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.print(formattedFrequency);
 }
-
-#define SMETER_PARTS 42
-#define SMETER_PART_WIDTH 4
-#define SMETER_PART_SPACE_WIDTH 2
-#define SMETER_PARTH_HEIGHT 18
-#define SMETER_PARTH_HEIGHT_SEPARATOR 20
-#define SMETER_PARTH_BG_COLOR 0x8410
 
 void Display::createDigitalSMeter() {
   randomSeed(analogRead(0));
