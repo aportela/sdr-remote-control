@@ -4,50 +4,35 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 
-#define TOTAL_BANDWITH_RESOLUTION 320 / 2
-
-#define MIN_HZ_STEP_BETWEEN_MORSE_SIGNALS 8
-#define MAX_HZ_STEP_BETWEEN_MORSE_SIGNALS 12
-#define HZ_LIMIT_MORSE_SIGNALS 60  // (first 60 = morse, remaining = analog voice)
-
-#define MIN_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS 16
-#define MAX_HZ_STEP_BETWEEN_ANALOG_VOICE_SIGNALS 32
-
-#define STEP_BETWEEN_LSB_SIGNALS 10
-#define DEFAULT_SIGNAL_INIT_VALUE 128
-
-#define MIN_SIGNAL_VALUE 80
-#define MAX_SIGNAL_VALUE 255
-
-#define MIN_NOISE_VALUE 0
-#define MAX_NOISE_VALUE 48
-
-#define OSCILLOSCOPE_WIDTH TOTAL_BANDWITH_RESOLUTION
-#define OSCILLOSCOPE_HEIGHT 24
-
-#define WATERFALL_WIDTH TOTAL_BANDWITH_RESOLUTION
-#define WATERFALL_HEIGHT 64
+#define SSWA_WIDTH 160
 
 class SSWAnimation {
 public:
-  //SSWAnimation(Adafruit_ST7789 *existingDisplay);
+  SSWAnimation(Adafruit_ST7789* existingDisplay);
   ~SSWAnimation();
-  void draw(uint16_t xOffset, uint16_t yOffset);
-  void refresh(void);
+  // refresh animation
+  void refresh(uint16_t xOffset, uint16_t yOffset);
 private:
   Adafruit_ST7789* display;
-  GFXcanvas16 canvasSpectrumScope;
-  GFXcanvas16 canvasWaterFall;
+  GFXcanvas16* canvasSpectrumScope;
+  GFXcanvas16* canvasWaterFall;
 
-  uint16_t signalsData[TOTAL_BANDWITH_RESOLUTION];
-  uint16_t noiseData[TOTAL_BANDWITH_RESOLUTION];
-  uint16_t signalIndexes[TOTAL_BANDWITH_RESOLUTION];
+  uint16_t signalsData[SSWA_WIDTH];
+  uint16_t noiseData[SSWA_WIDTH];
+  uint16_t signalIndexes[SSWA_WIDTH];
 
+  // generate random noise data
   void refreshNoise(void);
+  // generate start/default signals levels
   void initSignals(void);
+  // regenerate signals levels
   void refreshSignals(void);
-  void moveCanvasDown(GFXcanvas16* canvas);
+  // move canvas one line down
+  void scrollDownWaterFallCanvas(GFXcanvas16* canvas);
+  // generate "blue gradient color" from signal (range value 0..255)
   uint16_t generateBlueGradientColorFromSignal(uint8_t value);
+  // paint spectrum scope & waterfall animation
+  void draw(uint16_t xOffset, uint16_t yOffset);
 };
 
 #endif  // SDR_REMOTE_CONTROL_SPECTRUM_SCOPE_WATERFALL_ANIMATION_H

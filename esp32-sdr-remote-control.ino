@@ -12,6 +12,7 @@
 #include "Arduino.h"
 #include "SerialConnection.h"
 #include "Display.h"
+#include "SSWAnimation.h"
 #include "ts2k_sdrradio_protocol.h"
 #include "sdr_remote_transceiver.h"
 
@@ -81,6 +82,8 @@ void IRAM_ATTR readBigEncoderISR() {
 
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 
+SSWAnimation* animatedScreenPtr = nullptr;
+
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
@@ -108,7 +111,7 @@ void setup() {
   serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   //initSDRRemoteTransceiver(&trx);
-  randomSeed(analogRead(0) ^ (micros() * esp_random()));  
+  animatedScreenPtr = new SSWAnimation(display.getScreenPointer());
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION, false);
 }
 
@@ -207,11 +210,13 @@ const long interval = 16;  // (33 => 30fps limit, 16 => 60fps limit, 7 => 144 fp
 
 void loop() {
   if (trx.powerStatus == TRX_PS_OFF) {
-    display.animateConnectScreen();
+    animatedScreenPtr->refresh(80, 80);
     // clear screen & drawn default connect screen at start (ONLY)
     if (serialConnection->tryConnection()) {
       trx.powerStatus = TRX_PS_ON;      
       display.clearScreen(ST77XX_BLACK);
+      delete animatedScreenPtr;
+      animatedScreenPtr = nullptr;
     } 
   } else {
     showMainScreen();

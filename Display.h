@@ -9,6 +9,7 @@
 class Display {
 public:
   Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
+  Adafruit_ST7789* getScreenPointer(void);
   void clearScreen(uint8_t color);
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion, bool clearPrevious);
   void animateConnectScreen(void);
