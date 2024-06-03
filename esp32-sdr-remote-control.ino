@@ -175,21 +175,7 @@ uint64_t frameCount = 0;
 uint64_t lastTime = 0;
 float fps = 0;
 
-
 void loop() {
-  uint64_t currentTime = millis();
-  uint64_t elapsedTime = currentTime - lastTime;
-  if (elapsedTime >= 1000) {
-    // Calcula los FPS
-    fps = (float)frameCount / (float)elapsedTime * 1000.0;
-
-    // Reinicia el contador y actualiza el tiempo
-    frameCount = 0;
-    lastTime = currentTime;
-  }
-  frameCount++;
-  display.refreshFPS(fps < 1000 ? fps: 999);
-
   if (trx->powerStatus == TRX_PS_OFF) {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
@@ -199,8 +185,22 @@ void loop() {
       display.showMainScreen();
     }
   } else {
-    display.refreshMainScreen(trx);
-    //showMainScreen();
+    uint64_t currentTime = millis();
+    uint64_t elapsedTime = currentTime - lastTime;
+    if (elapsedTime >= 1000) {
+      fps = (float)frameCount / (float)elapsedTime * 1000.0;
+      frameCount = 0;
+      lastTime = currentTime;
+    }
+    frameCount++;
+    /*
+      unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      showMainScreen();
+    }
+    */
+    display.refreshMainScreen(trx, fps < 1000 ? fps : 999);
     /*
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
@@ -227,12 +227,7 @@ void loop() {
         currentVFOFrequencyChanged = true;
       }
       mainVFORotaryEncoderLoop();
-      
-      unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-      previousMillis = currentMillis;
-      showMainScreen();
-    }
+     
     */
     // re-connect on null activity / timeouts ?
     if (trx->powerStatus == TRX_PS_ON && millis() - serialConnection->lastRXValidCommand > 5000) {

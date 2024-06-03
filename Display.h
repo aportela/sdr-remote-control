@@ -17,11 +17,10 @@ public:
   void refreshConnectScreen(void);
 
   void showMainScreen();
-  void refreshMainScreen(Transceiver* trx);
+  void refreshMainScreen(Transceiver* trx, float fps);
 
   void debugBottomStr(char* str, uint64_t value);
   void debugBottomStr2(String, uint64_t value);
-  void refreshFPS(float fps);
 private:
   uint16_t width;
   uint16_t height;
@@ -35,6 +34,7 @@ private:
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(TRXVFOMode mode);
+  void refreshFPS(float fps);
   void refreshVFOFreq(uint64_t frequency);
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);

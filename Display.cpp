@@ -52,7 +52,7 @@ void Display::showMainScreen() {
   this->createDigitalSMeter();
 }
 
-void Display::refreshMainScreen(Transceiver* trx) {
+void Display::refreshMainScreen(Transceiver* trx, float fps) {
   if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS) {
     this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
@@ -73,6 +73,7 @@ void Display::refreshMainScreen(Transceiver* trx) {
     this->refreshRNDDigitalSMeter(random(0, 42));
     //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
+  this->refreshFPS(fps);
 }
 /*
 void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
