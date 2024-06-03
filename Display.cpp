@@ -13,10 +13,6 @@ Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS
   this->screen.fillScreen(ST77XX_BLACK);
 }
 
-Adafruit_ST7789* Display::getScreenPointer(void) {
-  return (&this->screen);
-}
-
 void Display::clearScreen(uint8_t color) {
   this->screen.fillScreen(color);
 }
@@ -34,6 +30,17 @@ void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion, b
   this->screen.printf("v%.2f", currentVersion);
   this->screen.setCursor(10, 210);
   this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
+  this->animatedScreenPtr = new SSWAnimation(&this->screen);
+}
+
+void Display::hideConnectScreen(void) {
+  delete this->animatedScreenPtr;
+  this->animatedScreenPtr = nullptr;
+  this->screen.fillScreen(ST77XX_BLACK);
+}
+
+void Display::refreshConnectScreen(void) {
+  this->animatedScreenPtr->refresh(80, 80);
 }
 
 void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
