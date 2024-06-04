@@ -70,7 +70,8 @@ void Display::refreshMainScreen(Transceiver* trx, float fps) {
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
   if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL) {
-    this->refreshRNDDigitalSMeter(random(0, 42));
+    //this->refreshRNDDigitalSMeter(random(0, 42));
+    this->refreshRNDDigitalSMeter(trx->signalMeterLevel);
     //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
   this->refreshFPS(fps);
