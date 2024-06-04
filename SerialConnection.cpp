@@ -54,14 +54,14 @@ void SerialConnection::loop(Transceiver* trx) {
         /*
         this->send("FA;");   // get frequency
         this->send("MD;");   // get mode
-        this->send("SH;");   // get high filter
         this->send("SL;");   // get low filter
+        this->send("SH;");   // get high filter
         this->send("AG0;");  // get af gain (volume)
         this->send("MU;");   // get audio mute status
         this->send("SM0;");  // get signal meter level
         */
         // this works BETTER than sending separated commands (with own delay)
-        this->send("FA;MD;SH;SL;AG0;MU;SM0;");
+        this->send("FA;MD;SL;SH;AG0;MU;SM0;");
         while (this->serial->available() > 0) {
           this->lastRXActivity = millis();
           String receivedData = this->serial->readStringUntil(';');
@@ -71,12 +71,12 @@ void SerialConnection::loop(Transceiver* trx) {
           } else if (receivedData.startsWith("MD") && receivedData != "MD") {
             this->lastRXValidCommand = millis();
             trx->setVFOMode(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
-          } else if (receivedData.startsWith("SH") && receivedData != "SH") {
-            this->lastRXValidCommand = millis();
-            // TODO
           } else if (receivedData.startsWith("SL") && receivedData != "SL") {
             this->lastRXValidCommand = millis();
-            // TODO
+            trx->setVFOLowFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
+          } else if (receivedData.startsWith("SH") && receivedData != "SH") {
+            this->lastRXValidCommand = millis();
+            trx->setVFOHighFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
           } else if (receivedData.startsWith("AG") && receivedData != "AG") {
             this->lastRXValidCommand = millis();
             trx->setAFGain(receivedData.substring(2).toInt());

@@ -13,7 +13,7 @@ public:
 
   void send(String str);
 
-  void loop(Transceiver *trx);
+  void loop(Transceiver* trx);
 
   uint64_t lastRXActivity = 0;
   uint64_t lastRXValidCommand = 0;

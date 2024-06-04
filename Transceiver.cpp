@@ -47,6 +47,24 @@ void Transceiver::setVFOHzStep(uint8_t VFOIndex, uint64_t hz) {
   }
 }
 
+// set vfo low filter size (hz)
+void Transceiver::setVFOLowFilterHz(uint8_t VFOIndex, uint32_t hz) {
+  if (VFOIndex == 0 || VFOIndex == 1) {
+    this->VFO[VFOIndex].LF = hz;
+    this->VFO[VFOIndex].BW = this->VFO[VFOIndex].LF + this->VFO[VFOIndex].HF;
+    this->changed |= TRX_CFLAG_FILTER_LOW;
+  }
+}
+
+// set vfo high filter size (hz)
+void Transceiver::setVFOHighFilterHz(uint8_t VFOIndex, uint32_t hz) {
+  if (VFOIndex == 0 || VFOIndex == 1) {
+    this->VFO[VFOIndex].HF = hz;
+    this->VFO[VFOIndex].BW = this->VFO[VFOIndex].LF + this->VFO[VFOIndex].HF;
+    this->changed |= TRX_CFLAG_FILTER_HIGH;
+  }
+}
+
 // set signal level meter
 void Transceiver::setSignalMeterLevel(uint8_t level) {
   this->signalMeterLevel = level;
