@@ -3,8 +3,8 @@
 
 // TODO: ADJUST
 #define MILLISECONDS_BETWEEN_LOOP 10
-#define MILLISECONDS_WAITED_AFTER_FLUSH 5
-#define MILLISECONDS_WAITED_AFTER_SEND 10
+#define MILLISECONDS_WAITED_AFTER_FLUSH 2
+#define MILLISECONDS_WAITED_AFTER_SEND 5
 
 SerialConnection::SerialConnection(HardwareSerial* serialPort, long speed, long timeout)
   : serial(serialPort) {
@@ -51,8 +51,17 @@ void SerialConnection::loop(Transceiver* trx) {
     if (trx != nullptr) {
       if (trx->powerStatus == TRX_PS_ON) {
         // connected => main
-        this->send("FA;");
-        this->send("MD;");
+        /*
+        this->send("FA;");   // get frequency
+        this->send("MD;");   // get mode
+        this->send("SH;");   // get high filter
+        this->send("SL;");   // get low filter
+        this->send("AG0;");  // get af gain (volume)
+        this->send("MU;");   // get audio mute status
+        this->send("SM0;");  // get signal meter level
+        */
+        // this works BETTER than sending separated commands (with own delay)
+        this->send("FA;MD;SH;SL;AG0;MU;SM0;");
         while (this->serial->available() > 0) {
           this->lastRXActivity = millis();
           String receivedData = this->serial->readStringUntil(';');
@@ -61,7 +70,27 @@ void SerialConnection::loop(Transceiver* trx) {
             trx->setVFOFrequency(trx->activeVFOIndex, receivedData.substring(2).toInt());
           } else if (receivedData.startsWith("MD") && receivedData != "MD") {
             this->lastRXValidCommand = millis();
-            trx->setVFOMode(trx->activeVFOIndex, (TRXVFOMode) receivedData.substring(2).toInt());
+            trx->setVFOMode(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
+          } else if (receivedData.startsWith("SH") && receivedData != "SH") {
+            this->lastRXValidCommand = millis();
+            // TODO
+          } else if (receivedData.startsWith("SL") && receivedData != "SL") {
+            this->lastRXValidCommand = millis();
+            // TODO
+          } else if (receivedData.startsWith("AG") && receivedData != "AG") {
+            this->lastRXValidCommand = millis();
+            trx->setAFGain(receivedData.substring(2).toInt());
+          } else if (receivedData.startsWith("MU") && receivedData != "MU") {
+            this->lastRXValidCommand = millis();
+            uint8_t newMutedStatus = receivedData.substring(2).toInt();
+            if (trx->audioMuted == TRX_AUDIO_MUTED && newMutedStatus == 0) {
+              trx->setAudioMuted();
+            } else if (trx->audioMuted == TRX_AUDIO_NOT_MUTED && newMutedStatus == 1) {
+              trx->setAudioMuted();
+            }
+          } else if (receivedData.startsWith("SM") && receivedData != "SM") {
+            this->lastRXValidCommand = millis();
+            trx->setSignalMeterLevel(receivedData.substring(2).toInt());
           }
         }
       }
