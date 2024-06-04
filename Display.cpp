@@ -158,10 +158,10 @@ void Display::refreshVFOMode(TRXVFOMode mode) {
       this->screen.printf("USB");
       break;
     case TRX_VFO_MD_CW_U:
-      this->screen.printf("CW_U");  // CW (upper sideband)
+      this->screen.printf("CWU");  // CW (upper sideband)
       break;
     case TRX_VFO_MD_FM:
-      this->screen.printf("FM");
+      this->screen.printf(" FM");
       break;
     case TRX_VFO_MD_SAM:
       this->screen.printf("SAM");  // (synchronous AM, includes ECSS)
