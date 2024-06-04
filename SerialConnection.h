@@ -2,6 +2,8 @@
 #define SDR_REMOTE_CONTROL_SERIAL_CONNECTION_H
 
 #include <Arduino.h>
+#include <String.h>
+#include "Transceiver.h"
 
 class SerialConnection {
 public:
@@ -11,7 +13,7 @@ public:
 
   void send(String str);
 
-  String loop(void);
+  void loop(Transceiver *trx);
 
   uint64_t lastRXActivity = 0;
   uint64_t lastRXValidCommand = 0;

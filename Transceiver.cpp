@@ -1,7 +1,7 @@
 #include "Transceiver.h"
 
 Transceiver::Transceiver(void) {
-  this->powerStatus = TRX_PS_ON;
+  this->powerStatus = TRX_PS_OFF;
   this->activeVFOIndex = 0;
   this->VFO[0].frequency = 0;
   this->VFO[0].mode = TRX_VFO_MD_RESERVED;

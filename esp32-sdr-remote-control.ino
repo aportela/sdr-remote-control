@@ -96,8 +96,8 @@ void setup() {
   serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   trx = new Transceiver();
-  //display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
-  display.showMainScreen();
+  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+  //display.showMainScreen();
 }
 
 bool transmitStatusChanged = true;
@@ -201,6 +201,7 @@ void loop() {
     }
     */
     display.refreshMainScreen(trx, fps < 1000 ? fps : 999);
+    serialConnection->loop(trx);
     /*
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
       buttonDown = true;
@@ -231,8 +232,8 @@ void loop() {
     */
     // re-connect on null activity / timeouts ?
     if (trx->powerStatus == TRX_PS_ON && millis() - serialConnection->lastRXValidCommand > 5000) {
-      //trx->powerStatus = TRX_PS_OFF;
-      //display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+      trx->powerStatus = TRX_PS_OFF;
+      display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
     }
   }
 }
