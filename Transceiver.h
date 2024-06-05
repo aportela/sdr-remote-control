@@ -49,6 +49,9 @@ typedef struct
 {
   uint64_t frequency;
   TRXVFOMode mode;
+  uint32_t LF;    // low filter
+  uint32_t HF;    // high filter
+  uint32_t BW;    // bandwith
   uint64_t step;  // hz
 } TRXVFO;
 
@@ -75,6 +78,12 @@ public:
 
   // set vfo step size (hz)
   void setVFOHzStep(uint8_t VFOIndex, uint64_t hz);
+
+  // set vfo low filter size (hz)
+  void setVFOLowFilterHz(uint8_t VFOIndex, uint32_t hz);
+
+  // set vfo high filter size (hz)
+  void setVFOHighFilterHz(uint8_t VFOIndex, uint32_t hz);
 
   // set signal level meter
   void setSignalMeterLevel(uint8_t level);
