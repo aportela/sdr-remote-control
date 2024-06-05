@@ -24,6 +24,10 @@
   
   SDR Radio TS-2000 protocol value (hz) range is 0...99999
   Original Kenwood TS-2000 protocol value (custom) depends current mode 00...11 (each one has fixed hz corresponding values) 
+
+  SDR-RADIO BUG WARNING: getting (setting works fine) current mode with FM "variant" (NFM/WFM/BFM) modes (always return "MD4;")
+  https://forum.sdr-radio.com:4499/viewtopic.php?t=2264
+  TODO / WORKAROUND (?): use filter commands (SH/SL) to "identify" FM "variant mode" based on filter bandwidth (narrow fm = small bandwith, wide fm = medium bandwith, broadcast fm = big bandwidth)
 */
 
 typedef enum {
