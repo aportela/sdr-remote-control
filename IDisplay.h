@@ -5,14 +5,15 @@
 
 class IDisplay {
 public:
-  virtual void clearScreen(uint8_t color);
+  virtual ~IDisplay() {} 
+  virtual void clearScreen(uint8_t color) = 0;
 
-  virtual void showConnectScreen(uint32_t serialBaudRate, float currentVersion);
-  virtual void hideConnectScreen(void);
-  virtual void refreshConnectScreen(void);
+  virtual void showConnectScreen(uint32_t serialBaudRate, float currentVersion) = 0;
+  virtual void hideConnectScreen(void) = 0;
+  virtual void refreshConnectScreen(void) = 0;
 
-  virtual void showMainScreen();
-  virtual void refreshMainScreen(Transceiver* trx, float fps);
+  virtual void showMainScreen() = 0;
+  virtual void refreshMainScreen(Transceiver* trx, float fps) = 0;
   
 };
 
