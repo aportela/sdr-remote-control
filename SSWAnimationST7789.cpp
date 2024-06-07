@@ -22,9 +22,11 @@ SSWAnimationST7789::~SSWAnimationST7789() {
 // move canvas one line down
 void SSWAnimationST7789::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
   uint16_t* buffer = canvas->getBuffer();
-  for (int16_t y = canvas->height() - 1; y > 0; y--) {
-    for (int16_t x = 0; x < canvas->width(); x++) {
-      buffer[y * canvas->width() + x] = buffer[(y - 1) * canvas->width() + x];
+  int16_t w = canvas->width();
+  int16_t h = canvas->height();
+  for (int16_t y = h - 1; y > 0; y--) {
+    for (int16_t x = 0; x < w; x++) {
+      buffer[y * w + x] = buffer[(y - 1) * w + x];
     }
   }
 }
