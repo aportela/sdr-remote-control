@@ -19,6 +19,7 @@
 #define SSWA_MIN_SIGNAL_VALUE 80
 #define SSWA_MAX_SIGNAL_VALUE 255
 
+#ifdef DISPLAY_ST7789_240x320
 SSWAnimation::SSWAnimation(Adafruit_ST7789* existingDisplay) {
   if (existingDisplay != nullptr) {
     // init random seed
@@ -30,6 +31,25 @@ SSWAnimation::SSWAnimation(Adafruit_ST7789* existingDisplay) {
     this->initSignals();
   }
 }
+#endif
+
+#ifdef DISPLAY_ILI9488_480x320
+SSWAnimation::SSWAnimation(TFT_eSPI* existingDisplay) {
+  if (existingDisplay != nullptr) {
+    // init random seed
+    randomSeed(analogRead(0) ^ (micros() * esp_random()));
+    this->display = existingDisplay;
+    this->canvasSpectrumScope = new TFT_eSprite(existingDisplay);
+    this->canvasSpectrumScope.setColorDepth(8)
+    this->canvasSpectrumScope.createSprite(SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
+    this->canvasWaterFall = new TFT_eSprite(existingDisplay);
+    this->canvasWaterFall.setColorDepth(8)
+    this->canvasWaterFall.createSprite(SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
+    this->refreshNoise();
+    this->initSignals();
+  }
+}
+#endif
 
 SSWAnimation::~SSWAnimation() {
   delete this->canvasSpectrumScope;
@@ -188,6 +208,7 @@ void SSWAnimation::refreshSignals(void) {
   }
 }
 
+#ifdef DISPLAY_ST7789_240x320
 // move canvas one line down
 void SSWAnimation::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
   uint16_t* buffer = canvas->getBuffer();
@@ -197,6 +218,19 @@ void SSWAnimation::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
     }
   }
 }
+#endif
+
+#ifdef DISPLAY_ILI9488_480x320
+// move canvas one line down
+void SSWAnimation::scrollDownWaterFallCanvas(TFT_eSprite* canvas) {
+  uint16_t* buffer = canvas->frameBuffer(0);
+  for (int16_t y = canvas->height() - 1; y > 0; y--) {
+    for (int16_t x = 0; x < canvas->width(); x++) {
+      buffer[y * canvas->width() + x] = buffer[(y - 1) * canvas->width() + x];
+    }
+  }
+}
+#endif
 
 // generate "blue gradient color" from signal (range value 0..255)
 uint16_t SSWAnimation::generateBlueGradientColorFromSignal(uint8_t value) {

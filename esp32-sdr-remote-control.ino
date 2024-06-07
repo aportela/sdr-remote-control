@@ -5,8 +5,8 @@
 
 #define CURRENT_VERSION 0.01
 
-#define DISPLAY_ST7789_240x320
-//#define DISPLAY_ILI9488_480x320
+//#define DISPLAY_ST7789_240x320
+#define DISPLAY_ILI9488_480x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
@@ -23,11 +23,17 @@
 #define TFT_DC 2
 #define TFT_MOSI 23
 #define TFT_SCLK 18
+#define DISPLAY_WIDTH 240
+#define DISPLAY_HEIGHT 320
+#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
 #define DISPLAY_DRIVER_FOUND
 #endif
 
 #ifdef DISPLAY_ILI9488_480x320
-#include "Display-ILI9488-480x320.h"
+#include "Display-ILI9488-320x480.h"
+#define DISPLAY_WIDTH 320
+#define DISPLAY_HEIGHT 480
+#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
 #define DISPLAY_DRIVER_FOUND
 #endif
 
@@ -56,9 +62,6 @@
 #define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
 
 #ifdef DISPLAY_DRIVER_FOUND
-#define DISPLAY_WIDTH 240
-#define DISPLAY_HEIGHT 320
-#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
 #else
 #error NO_DISPLAY_DRIVER_FOUND
 #endif
@@ -77,11 +80,11 @@ void IRAM_ATTR readBigEncoderISR() {
 }
 
 #ifdef DISPLAY_ST7789_240x320
-DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 #endif
 
 #ifdef DISPLAY_ILI9488_480x320
-Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1);
+DisplayILI9488 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION);
 #endif
 
 bool currentVFOFrequencyChanged = true;

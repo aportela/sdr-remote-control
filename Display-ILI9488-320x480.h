@@ -1,16 +1,16 @@
-#ifndef SDR_REMOTE_CONTROL_DISPLAY_ST7789_H
-#define SDR_REMOTE_CONTROL_DISPLAY_ST7789_H
+#ifndef SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
+#define SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
 
-#include <Adafruit_GFX.h>
-#include <Adafruit_ST7789.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>
 
 #include "IDisplay.h"
-#include "SSWAnimation.h"
+//#include "SSWAnimation.h"
 #include "Transceiver.h"
 
-class DisplayST7789: public IDisplay {
+class DisplayILI9488: public IDisplay {
 public:
-  DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
+  DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation);
   void clearScreen(uint8_t color) override;
 
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion) override;
@@ -25,7 +25,7 @@ public:
 private:
   uint16_t width;
   uint16_t height;
-  Adafruit_ST7789 screen;
+  TFT_eSPI screen;
   SSWAnimation* animatedScreenPtr = nullptr;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
