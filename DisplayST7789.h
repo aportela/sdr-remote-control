@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include "Display.h"
-#include "SSWAnimation.h"
+#include "SSWAnimationST7789.h"
 #include "Transceiver.h"
 
 class DisplayST7789 : public Display {
@@ -20,7 +20,7 @@ public:
   void refreshMainScreen(Transceiver* trx, float fps) override;
 private:
   Adafruit_ST7789 screen;
-  SSWAnimation* animatedScreenPtr = nullptr;
+  SSWAnimationST7789* animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(TRXVFOMode mode);

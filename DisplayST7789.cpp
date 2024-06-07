@@ -49,7 +49,7 @@ void DisplayST7789::showConnectScreen(uint16_t serialBaudRate, float currentVers
   this->screen.getTextBounds(str, 0, 0, &x, &y, &w, &h);
   this->screen.setCursor((this->width - w) / 2, 210);
   this->screen.print(str);
-  this->animatedScreenPtr = new SSWAnimation(&this->screen);
+  this->animatedScreenPtr = new SSWAnimationST7789(&this->screen);
 }
 
 void DisplayST7789::hideConnectScreen(void) {

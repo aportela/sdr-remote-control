@@ -6,15 +6,12 @@
 
 class Display : public IDisplay {
 public:
-
   virtual void clearScreen(uint8_t color) override = 0;
   virtual void showConnectScreen(uint16_t serialBaudRate, float currentVersion) override = 0;
   virtual void hideConnectScreen(void) override = 0;
   virtual void refreshConnectScreen(void) override = 0;
-
   virtual void showMainScreen() override = 0;
   virtual void refreshMainScreen(Transceiver* trx, float fps) override = 0;
-
 protected:
   uint16_t width;
   uint16_t height;

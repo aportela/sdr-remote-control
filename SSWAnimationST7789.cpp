@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "SSWAnimation.h"
+#include "SSWAnimationST7789.h"
 
 #define SSWA_SPECTRUM_SCOPE_WIDTH SSWA_WIDTH
 #define SSWA_SPECTRUM_SCOPE_HEIGHT 24
@@ -19,8 +19,7 @@
 #define SSWA_MIN_SIGNAL_VALUE 80
 #define SSWA_MAX_SIGNAL_VALUE 255
 
-#ifdef DISPLAY_ST7789_240x320
-SSWAnimation::SSWAnimation(Adafruit_ST7789* existingDisplay) {
+SSWAnimationST7789::SSWAnimationST7789(Adafruit_ST7789* existingDisplay) {
   if (existingDisplay != nullptr) {
     // init random seed
     randomSeed(analogRead(0) ^ (micros() * esp_random()));
@@ -31,27 +30,8 @@ SSWAnimation::SSWAnimation(Adafruit_ST7789* existingDisplay) {
     this->initSignals();
   }
 }
-#endif
 
-#ifdef DISPLAY_ILI9488_480x320
-SSWAnimation::SSWAnimation(TFT_eSPI* existingDisplay) {
-  if (existingDisplay != nullptr) {
-    // init random seed
-    randomSeed(analogRead(0) ^ (micros() * esp_random()));
-    this->display = existingDisplay;
-    this->canvasSpectrumScope = new TFT_eSprite(existingDisplay);
-    this->canvasSpectrumScope.setColorDepth(8)
-    this->canvasSpectrumScope.createSprite(SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
-    this->canvasWaterFall = new TFT_eSprite(existingDisplay);
-    this->canvasWaterFall.setColorDepth(8)
-    this->canvasWaterFall.createSprite(SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
-    this->refreshNoise();
-    this->initSignals();
-  }
-}
-#endif
-
-SSWAnimation::~SSWAnimation() {
+SSWAnimationST7789::~SSWAnimationST7789() {
   delete this->canvasSpectrumScope;
   this->canvasSpectrumScope = nullptr;
   delete this->canvasWaterFall;
@@ -59,7 +39,7 @@ SSWAnimation::~SSWAnimation() {
 }
 
 // generate random noise data
-void SSWAnimation::refreshNoise(void) {
+void SSWAnimationST7789::refreshNoise(void) {
   const uint8_t MAX_VALUE = SSWA_MIN_SIGNAL_VALUE / 2;
   const uint8_t MIN_PEAK_INTERVAL = 10;
   const uint8_t MAX_PEAK_INTERVAL = 30;
@@ -79,7 +59,7 @@ void SSWAnimation::refreshNoise(void) {
 }
 
 // generate start/default signals levels
-void SSWAnimation::initSignals(void) {
+void SSWAnimationST7789::initSignals(void) {
   // left block are "cw/morse" signals
   // random spacing between signals
   uint16_t currentSignalIndex = random(SSWA_MIN_DIST_BETWEEN_CW_SIGNALS, SSWA_MAX_DIST_BETWEEN_CW_SIGNALS);
@@ -172,7 +152,7 @@ void SSWAnimation::initSignals(void) {
 }
 
 // regenerate signals levels
-void SSWAnimation::refreshSignals(void) {
+void SSWAnimationST7789::refreshSignals(void) {
   // re/generate "noise"
   this->refreshNoise();
   // left block are "cw/morse" signals
@@ -208,9 +188,8 @@ void SSWAnimation::refreshSignals(void) {
   }
 }
 
-#ifdef DISPLAY_ST7789_240x320
 // move canvas one line down
-void SSWAnimation::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
+void SSWAnimationST7789::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
   uint16_t* buffer = canvas->getBuffer();
   for (int16_t y = canvas->height() - 1; y > 0; y--) {
     for (int16_t x = 0; x < canvas->width(); x++) {
@@ -218,22 +197,9 @@ void SSWAnimation::scrollDownWaterFallCanvas(GFXcanvas16* canvas) {
     }
   }
 }
-#endif
-
-#ifdef DISPLAY_ILI9488_480x320
-// move canvas one line down
-void SSWAnimation::scrollDownWaterFallCanvas(TFT_eSprite* canvas) {
-  uint16_t* buffer = canvas->frameBuffer(0);
-  for (int16_t y = canvas->height() - 1; y > 0; y--) {
-    for (int16_t x = 0; x < canvas->width(); x++) {
-      buffer[y * canvas->width() + x] = buffer[(y - 1) * canvas->width() + x];
-    }
-  }
-}
-#endif
 
 // generate "blue gradient color" from signal (range value 0..255)
-uint16_t SSWAnimation::generateBlueGradientColorFromSignal(uint8_t value) {
+uint16_t SSWAnimationST7789::generateBlueGradientColorFromSignal(uint8_t value) {
   uint8_t r, g, b;
   if (value <= 71) {
     r = 0;
@@ -248,7 +214,7 @@ uint16_t SSWAnimation::generateBlueGradientColorFromSignal(uint8_t value) {
 }
 
 // paint spectrum scope & waterfall animation
-void SSWAnimation::draw(uint16_t xOffset, uint16_t yOffset) {
+void SSWAnimationST7789::draw(uint16_t xOffset, uint16_t yOffset) {
   // clear old spectrum scope data
   this->canvasSpectrumScope->fillScreen(ST77XX_BLACK);
   for (int16_t i = 0; i < SSWA_WIDTH; i++) {
@@ -305,7 +271,7 @@ void SSWAnimation::draw(uint16_t xOffset, uint16_t yOffset) {
 }
 
 // refresh animation
-void SSWAnimation::refresh(uint16_t xOffset, uint16_t yOffset) {
+void SSWAnimationST7789::refresh(uint16_t xOffset, uint16_t yOffset) {
   this->refreshSignals();
   this->draw(xOffset, yOffset);
 }
