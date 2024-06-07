@@ -1,9 +1,10 @@
+
 /*
   a lot of inspiration taken from https://github.com/Potatof/CATui
 */
-#include <Adafruit_GFX.h>     // Core graphics library
-#include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
-// #include <SPI.h>
+
+
+#define DISPLAY_ST7789_240x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
@@ -11,7 +12,11 @@
 
 #include "Arduino.h"
 #include "SerialConnection.h"
-#include "Display.h"
+
+#ifdef DISPLAY_ST7789_240x320
+#include "Display-ST7789-240x320.h"
+#endif
+
 #include "Transceiver.h"
 
 //#include "ts2k_sdrradio_protocol.h"
