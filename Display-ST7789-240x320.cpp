@@ -11,7 +11,6 @@ Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS
   : screen(pinCS, pinDC, pinRST) {
   this->width = width;
   this->height = height;
-  // Llama al método setRotation(1)
   this->screen.init(width, height);
   if (rotation > 0 && rotation < 4) {
     this->screen.setRotation(rotation);
@@ -190,7 +189,7 @@ void Display::refreshFPS(float fps) {
   this->screen.setTextColor(0xF85E, ST77XX_BLACK);
   this->screen.setCursor(233, 3);
   this->screen.setTextSize(2);
-  this->screen.printf("%03u FPS", (int16_t) fps);
+  this->screen.printf("%03u FPS", (int16_t)fps);
 }
 
 void Display::refreshVFOFreq(uint64_t frequency) {
