@@ -10,9 +10,7 @@ class SSWAnimation {
 public:
 #ifdef DISPLAY_ST7789_240x320
   SSWAnimation(Adafruit_ST7789* existingDisplay);
-#endif
-
-#ifdef DISPLAY_ILI9488_480x320
+#elif defined(DISPLAY_ILI9488_480x320)
   SSWAnimation(TFT_eSPI* existingDisplay);
 #endif
   ~SSWAnimation();
@@ -23,8 +21,7 @@ private:
   Adafruit_ST7789* display;
   GFXcanvas16* canvasSpectrumScope;
   GFXcanvas16* canvasWaterFall;
-#endif
-#ifdef DISPLAY_ILI9488_480x320
+#elif defined(DISPLAY_ILI9488_480x320)
   TFT_eSPI* ^ display;
   TFT_eSprite* canvasSpectrumScope;
   TFT_eSprite* canvasWaterFall;
@@ -40,13 +37,12 @@ private:
   void initSignals(void);
   // regenerate signals levels
   void refreshSignals(void);
-  // move canvas one line down
-  #ifdef DISPLAY_ST7789_240x320
+// move canvas one line down
+#ifdef DISPLAY_ST7789_240x320
   void scrollDownWaterFallCanvas(GFXcanvas16* canvas);
-  #endif
-  #ifdef DISPLAY_ILI9488_480x320
+#elif defined(DISPLAY_ILI9488_480x320)
   void scrollDownWaterFallCanvas(TFT_eSPI* canvas);
-  #endif
+#endif
   // generate "blue gradient color" from signal (range value 0..255)
   uint16_t generateBlueGradientColorFromSignal(uint8_t value);
   // paint spectrum scope & waterfall animation
