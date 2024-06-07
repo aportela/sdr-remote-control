@@ -7,13 +7,14 @@
 #define SMETER_PARTH_HEIGHT_SEPARATOR 20
 #define SMETER_PARTH_BG_COLOR 0x8410
 
-DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation)
+DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors)
   : screen() {
   this->width = width;
   this->height = height;
   this->screen.init();
-  // my screen by default inverts colors
-  this->screen.invertDisplay(true);
+  if (invertDisplayColors) {
+    this->screen.invertDisplay(true);
+  }
   if (rotation > 0 && rotation < 4) {
     this->screen.setRotation(rotation);
     if (rotation == 1 || rotation == 3) {
@@ -31,7 +32,7 @@ void DisplayILI9488::clearScreen(uint8_t color) {
 
 void DisplayILI9488::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(TFT_BLACK);
-  this->screen.drawRect(4, 4, this->width - 8, this->height -8, TFT_WHITE);
+  this->screen.drawRect(4, 4, this->width - 8, this->height - 8, TFT_WHITE);
   this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
   this->screen.setTextSize(2);
   this->screen.setCursor(18, 10);

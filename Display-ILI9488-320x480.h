@@ -8,9 +8,9 @@
 //#include "SSWAnimation.h"
 #include "Transceiver.h"
 
-class DisplayILI9488: public IDisplay {
+class DisplayILI9488 : public IDisplay {
 public:
-  DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation);
+  DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors);
   void clearScreen(uint8_t color) override;
 
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion) override;

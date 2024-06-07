@@ -33,7 +33,8 @@
 #include "Display-ILI9488-320x480.h"
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 480
-#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
+#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
+#define DISPLAY_INVERT_COLORS true // my screen by default inverts colors
 #define DISPLAY_DRIVER_FOUND
 #endif
 
@@ -84,7 +85,7 @@ DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, TFT_CS, T
 #endif
 
 #ifdef DISPLAY_ILI9488_480x320
-DisplayILI9488 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION);
+DisplayILI9488 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, DISPLAY_INVERT_COLORS);
 #endif
 
 bool currentVFOFrequencyChanged = true;
