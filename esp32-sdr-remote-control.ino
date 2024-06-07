@@ -3,6 +3,7 @@
   a lot of inspiration taken from https://github.com/Potatof/CATui
 */
 
+#define CURRENT_VERSION 0.01
 
 #define DISPLAY_ST7789_240x320
 
@@ -12,28 +13,20 @@
 
 #include "Arduino.h"
 #include "SerialConnection.h"
-
-#ifdef DISPLAY_ST7789_240x320
-#define DISPLAY_DRIVER_FOUND
-#include "Display-ST7789-240x320.h"
-#endif
-
 #include "Transceiver.h"
 
-//#include "ts2k_sdrradio_protocol.h"
-//#include "sdr_remote_transceiver.h"
-
+#ifdef DISPLAY_ST7789_240x320
+#include "Display-ST7789-240x320.h"
 #define TFT_CS 5
 #define TFT_RST 4
 #define TFT_DC 2
 #define TFT_MOSI 23
 #define TFT_SCLK 18
+#define DISPLAY_DRIVER_FOUND
+#endif
 
-#define DISPLAY_WIDTH 240
-#define DISPLAY_HEIGHT 320
-#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
 
-#define DISPLAY_INACTIVE_COLOR 0x0841
+//#include "ts2k_sdrradio_protocol.h"
 
 #define SERIAL_BAUD_RATE 57600
 #define SERIAL_TIMEOUT 2000
@@ -56,9 +49,11 @@
 #define MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE 5000
 #define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
 
-#define CURRENT_VERSION 0.01
-
-#ifndef DISPLAY_DRIVER_FOUND
+#ifdef DISPLAY_DRIVER_FOUND
+#define DISPLAY_WIDTH 240
+#define DISPLAY_HEIGHT 320
+#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ST7789 has resolution of 240x320, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
+#else
 #error NO_DISPLAY_DRIVER_FOUND
 #endif
 
@@ -75,7 +70,9 @@ void IRAM_ATTR readBigEncoderISR() {
   mainVFORotaryEncoder.readEncoder_ISR();
 }
 
+#ifdef DISPLAY_ST7789_240x320
 Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+#endif
 
 
 bool currentVFOFrequencyChanged = true;
