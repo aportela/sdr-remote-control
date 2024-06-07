@@ -26,7 +26,7 @@ private:
   uint16_t width;
   uint16_t height;
   TFT_eSPI screen;
-  SSWAnimation* animatedScreenPtr = nullptr;
+  //SSWAnimation* animatedScreenPtr = nullptr;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
   uint8_t peakSignal = 0;

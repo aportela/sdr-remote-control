@@ -5,8 +5,8 @@
 
 #define CURRENT_VERSION 0.01
 
-//#define DISPLAY_ST7789_240x320
-#define DISPLAY_ILI9488_480x320
+#define DISPLAY_ST7789_240x320
+//#define DISPLAY_ILI9488_480x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder

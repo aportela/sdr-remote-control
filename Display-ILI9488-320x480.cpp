@@ -32,7 +32,7 @@ void DisplayILI9488::clearScreen(uint8_t color) {
 
 void DisplayILI9488::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(TFT_BLACK);
-  this->screen.drawRect(4, 4, this->width - 8, this->height - 8, TFT_WHITE);
+  this->screen.drawRect(4, 4, this->width - 4, this->height - 4, TFT_WHITE);
   this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
   this->screen.setTextSize(2);
   this->screen.setCursor(18, 10);
@@ -41,16 +41,16 @@ void DisplayILI9488::showConnectScreen(uint32_t serialBaudRate, float currentVer
   this->screen.printf("v%.2f", currentVersion);
   this->screen.setCursor(10, 210);
   this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
-  this->animatedScreenPtr = new SSWAnimation(&this->screen);
+  //this->animatedScreenPtr = new SSWAnimation(&this->screen);
 }
 
 void DisplayILI9488::hideConnectScreen(void) {
-  delete this->animatedScreenPtr;
-  this->animatedScreenPtr = nullptr;
+  //delete this->animatedScreenPtr;
+  //this->animatedScreenPtr = nullptr;
 }
 
 void DisplayILI9488::refreshConnectScreen(void) {
-  this->animatedScreenPtr->refresh(80, 80);
+  //this->animatedScreenPtr->refresh(80, 80);
 }
 
 void DisplayILI9488::showMainScreen() {

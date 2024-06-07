@@ -29,7 +29,7 @@ void DisplayST7789::clearScreen(uint8_t color) {
 
 void DisplayST7789::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(ST77XX_BLACK);
-  this->screen.drawRect(4, 4, 312, 232, ST77XX_WHITE);
+  this->screen.drawRect(4, 4, this->width - 4, this->height - 4, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setTextSize(2);
   this->screen.setCursor(18, 10);
