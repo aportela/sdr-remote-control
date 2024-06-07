@@ -30,7 +30,7 @@ void DisplayILI9488::clearScreen(uint8_t color) {
   this->screen.fillScreen(color);
 }
 
-void DisplayILI9488::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
+void DisplayILI9488::showConnectScreen(uint16_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(TFT_BLACK);
   this->screen.drawRect(4, 4, this->width - 4, this->height - 4, TFT_WHITE);
   this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
