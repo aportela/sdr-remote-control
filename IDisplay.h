@@ -1,6 +1,7 @@
 #ifndef SDR_REMOTE_CONTROL_DISPLAY_INTERFACE
 #define SDR_REMOTE_CONTROL_DISPLAY_INTERFACE
 
+#include <stdint.h>
 #include "Transceiver.h"
 
 class IDisplay {
