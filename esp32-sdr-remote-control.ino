@@ -17,7 +17,7 @@
 #include "Transceiver.h"
 
 #ifdef DISPLAY_ST7789_240x320
-#include "Display-ST7789-240x320.h"
+#include "DisplayST7789.h"
 #define TFT_CS 5
 #define TFT_RST 4
 #define TFT_DC 2

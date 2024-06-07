@@ -8,7 +8,7 @@ class Display : public IDisplay {
 public:
 
   virtual void clearScreen(uint8_t color) override = 0;
-  virtual void showConnectScreen(uint32_t serialBaudRate, float currentVersion) override = 0;
+  virtual void showConnectScreen(uint16_t serialBaudRate, float currentVersion) override = 0;
   virtual void hideConnectScreen(void) override = 0;
   virtual void refreshConnectScreen(void) override = 0;
 

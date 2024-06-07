@@ -1,4 +1,4 @@
-#include "Display-ST7789-240x320.h"
+#include "DisplayST7789.h"
 
 #define SMETER_PARTS 42
 #define SMETER_PART_WIDTH 4
@@ -9,6 +9,7 @@
 
 DisplayST7789::DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
+  // TODO: extra pins
   this->width = width;
   this->height = height;
   this->screen.init(width, height);
@@ -27,17 +28,27 @@ void DisplayST7789::clearScreen(uint8_t color) {
   this->screen.fillScreen(color);
 }
 
-void DisplayST7789::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
+void DisplayST7789::showConnectScreen(uint16_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(ST77XX_BLACK);
-  this->screen.drawRect(4, 4, this->width - 4, this->height - 4, ST77XX_WHITE);
+  this->screen.drawRect(0, 0, this->width, this->height, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setTextSize(2);
-  this->screen.setCursor(18, 10);
-  this->screen.printf("ESP32 SDR Remote Control");
-  this->screen.setCursor(140, 30);
-  this->screen.printf("v%.2f", currentVersion);
-  this->screen.setCursor(10, 210);
-  this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
+  int16_t x, y;
+  uint16_t w, h;
+  char str[64];
+  sprintf(str, "ESP32 SDR Remote Control");
+  this->screen.getTextBounds(str, 0, 0, &x, &y, &w, &h);
+  this->screen.setCursor((this->width - w) / 2, 10);
+  this->screen.print(str);
+  sprintf(str, "v%.2f", currentVersion);
+  this->screen.getTextBounds(str, 0, 0, &x, &y, &w, &h);
+  this->screen.setCursor((this->width - w) / 2, 30);
+  this->screen.print(str);
+  this->screen.setTextSize(1);
+  sprintf(str, "Searching TS-2000 CAT connection (%d baud)", serialBaudRate);
+  this->screen.getTextBounds(str, 0, 0, &x, &y, &w, &h);
+  this->screen.setCursor((this->width - w) / 2, 210);
+  this->screen.print(str);
   this->animatedScreenPtr = new SSWAnimation(&this->screen);
 }
 
@@ -375,18 +386,4 @@ void DisplayST7789::refreshRNDDigitalSMeter(int newSignal) {
       }
     }
   }
-}
-
-void DisplayST7789::debugBottomStr(char* str, uint64_t value) {
-  this->screen.setCursor(0, 220);
-  this->screen.setTextSize(2);
-  this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
-  this->screen.printf("%s: %8llu", str, value);
-}
-
-void DisplayST7789::debugBottomStr2(String str, uint64_t value) {
-  this->screen.setCursor(0, 220);
-  this->screen.setTextSize(2);
-  this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
-  this->screen.printf("%s: %8llu", str, value);
 }
