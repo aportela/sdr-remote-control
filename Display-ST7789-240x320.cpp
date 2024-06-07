@@ -7,7 +7,7 @@
 #define SMETER_PARTH_HEIGHT_SEPARATOR 20
 #define SMETER_PARTH_BG_COLOR 0x8410
 
-Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
+DisplayST7789::DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
   this->width = width;
   this->height = height;
@@ -19,11 +19,11 @@ Display::Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS
   this->screen.fillScreen(ST77XX_BLACK);
 }
 
-void Display::clearScreen(uint8_t color) {
+void DisplayST7789::clearScreen(uint8_t color) {
   this->screen.fillScreen(color);
 }
 
-void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
+void DisplayST7789::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(ST77XX_BLACK);
   this->screen.drawRect(4, 4, 312, 232, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
@@ -37,21 +37,21 @@ void Display::showConnectScreen(uint32_t serialBaudRate, float currentVersion) {
   this->animatedScreenPtr = new SSWAnimation(&this->screen);
 }
 
-void Display::hideConnectScreen(void) {
+void DisplayST7789::hideConnectScreen(void) {
   delete this->animatedScreenPtr;
   this->animatedScreenPtr = nullptr;
 }
 
-void Display::refreshConnectScreen(void) {
+void DisplayST7789::refreshConnectScreen(void) {
   this->animatedScreenPtr->refresh(80, 80);
 }
 
-void Display::showMainScreen() {
+void DisplayST7789::showMainScreen() {
   this->screen.fillScreen(ST77XX_BLACK);
   this->createDigitalSMeter();
 }
 
-void Display::refreshMainScreen(Transceiver* trx, float fps) {
+void DisplayST7789::refreshMainScreen(Transceiver* trx, float fps) {
   if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS) {
     this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
@@ -76,7 +76,7 @@ void Display::refreshMainScreen(Transceiver* trx, float fps) {
   this->refreshFPS(fps);
 }
 /*
-void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
+void DisplayST7789::refreshMainScreen(sdrRemoteTransceiver* trx) {
   if (trx != NULL && trx->changed) {
     if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_STATUS) {
       trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_STATUS;
@@ -121,7 +121,7 @@ void Display::refreshMainScreen(sdrRemoteTransceiver* trx) {
 }
 
 */
-void Display::refreshTransmitStatus(bool isTransmitting) {
+void DisplayST7789::refreshTransmitStatus(bool isTransmitting) {
   if (isTransmitting) {
     this->screen.drawRect(0, 0, 29, 20, ST77XX_RED);
     this->screen.setTextColor(ST77XX_RED, ST77XX_BLACK);
@@ -134,7 +134,7 @@ void Display::refreshTransmitStatus(bool isTransmitting) {
   this->screen.print(isTransmitting ? "TX" : "RX");
 }
 
-void Display::refreshActiveVFO(uint8_t number) {
+void DisplayST7789::refreshActiveVFO(uint8_t number) {
   this->screen.drawRect(31, 0, 53, 20, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setCursor(34, 3);
@@ -142,7 +142,7 @@ void Display::refreshActiveVFO(uint8_t number) {
   this->screen.printf("VFO%d", number);
 }
 
-void Display::refreshVFOMode(TRXVFOMode mode) {
+void DisplayST7789::refreshVFOMode(TRXVFOMode mode) {
   this->screen.drawRect(86, 0, 43, 20, ST77XX_WHITE);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.setCursor(89, 3);
@@ -184,7 +184,7 @@ void Display::refreshVFOMode(TRXVFOMode mode) {
   }
 }
 
-void Display::refreshFPS(float fps) {
+void DisplayST7789::refreshFPS(float fps) {
   this->screen.drawRect(230, 0, 89, 20, 0xF85E);
   this->screen.setTextColor(0xF85E, ST77XX_BLACK);
   this->screen.setCursor(233, 3);
@@ -192,7 +192,7 @@ void Display::refreshFPS(float fps) {
   this->screen.printf("%03u FPS", (int16_t)fps);
 }
 
-void Display::refreshVFOFreq(uint64_t frequency) {
+void DisplayST7789::refreshVFOFreq(uint64_t frequency) {
   this->screen.setTextSize(3);
   char formattedFrequency[16];
   char nformattedFrequency[12];
@@ -223,7 +223,7 @@ void Display::refreshVFOFreq(uint64_t frequency) {
   this->screen.print(formattedFrequency);
 }
 
-void Display::createDigitalSMeter() {
+void DisplayST7789::createDigitalSMeter() {
   randomSeed(analogRead(0));
   this->screen.setTextSize(2);
   this->screen.setTextColor(ST77XX_WHITE);
@@ -249,7 +249,7 @@ void Display::createDigitalSMeter() {
   }
 }
 
-void Display::refreshRNDDigitalSMeter(int newSignal) {
+void DisplayST7789::refreshRNDDigitalSMeter(int newSignal) {
   this->oldSignal = this->currentSignal;
   // signal changed
   if (this->oldSignal != newSignal) {
@@ -373,14 +373,14 @@ void Display::refreshRNDDigitalSMeter(int newSignal) {
   }
 }
 
-void Display::debugBottomStr(char* str, uint64_t value) {
+void DisplayST7789::debugBottomStr(char* str, uint64_t value) {
   this->screen.setCursor(0, 220);
   this->screen.setTextSize(2);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
   this->screen.printf("%s: %8llu", str, value);
 }
 
-void Display::debugBottomStr2(String str, uint64_t value) {
+void DisplayST7789::debugBottomStr2(String str, uint64_t value) {
   this->screen.setCursor(0, 220);
   this->screen.setTextSize(2);
   this->screen.setTextColor(ST77XX_WHITE, ST77XX_BLACK);

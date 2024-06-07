@@ -4,12 +4,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 
+#include "IDisplay.h"
 #include "SSWAnimation.h"
 #include "Transceiver.h"
 
-class Display {
+class DisplayST7789: public IDisplay {
 public:
-  Display(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
+  DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
   void clearScreen(uint8_t color);
 
   void showConnectScreen(uint32_t serialBaudRate, float currentVersion);

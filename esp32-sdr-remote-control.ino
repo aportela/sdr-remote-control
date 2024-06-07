@@ -6,6 +6,7 @@
 #define CURRENT_VERSION 0.01
 
 #define DISPLAY_ST7789_240x320
+//#define DISPLAY_ILI9488_480x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
@@ -22,6 +23,11 @@
 #define TFT_DC 2
 #define TFT_MOSI 23
 #define TFT_SCLK 18
+#define DISPLAY_DRIVER_FOUND
+#endif
+
+#ifdef DISPLAY_ILI9488_480x320
+#include "Display-ILI9488-480x320.h"
 #define DISPLAY_DRIVER_FOUND
 #endif
 
@@ -71,9 +77,12 @@ void IRAM_ATTR readBigEncoderISR() {
 }
 
 #ifdef DISPLAY_ST7789_240x320
-Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 #endif
 
+#ifdef DISPLAY_ILI9488_480x320
+Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, 1);
+#endif
 
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
