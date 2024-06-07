@@ -1,8 +1,13 @@
 #ifndef SDR_REMOTE_CONTROL_SPECTRUM_SCOPE_WATERFALL_ANIMATION_H
 #define SDR_REMOTE_CONTROL_SPECTRUM_SCOPE_WATERFALL_ANIMATION_H
 
+#ifdef DISPLAY_ST7789_240x320
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
+#elif defined(DISPLAY_ILI9488_480x320)
+#include <SPI.h>
+#include <TFT_eSPI.h>
+#endif
 
 #define SSWA_WIDTH 160
 
@@ -22,7 +27,7 @@ private:
   GFXcanvas16* canvasSpectrumScope;
   GFXcanvas16* canvasWaterFall;
 #elif defined(DISPLAY_ILI9488_480x320)
-  TFT_eSPI* ^ display;
+  TFT_eSPI* display;
   TFT_eSprite* canvasSpectrumScope;
   TFT_eSprite* canvasWaterFall;
 #endif
