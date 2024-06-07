@@ -32,25 +32,28 @@ void DisplayILI9488::clearScreen(uint8_t color) {
 
 void DisplayILI9488::showConnectScreen(uint16_t serialBaudRate, float currentVersion) {
   this->screen.fillScreen(TFT_BLACK);
-  this->screen.drawRect(4, 4, this->width - 4, this->height - 4, TFT_WHITE);
+  this->screen.drawRect(0, 0, this->width, this->height, TFT_WHITE);
   this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
   this->screen.setTextSize(2);
-  this->screen.setCursor(18, 10);
-  this->screen.printf("ESP32 SDR Remote Control");
-  this->screen.setCursor(140, 30);
-  this->screen.printf("v%.2f", currentVersion);
-  this->screen.setCursor(10, 210);
-  this->screen.printf("TS-2000 CAT / %d baud", serialBaudRate);
-  //this->animatedScreenPtr = new SSWAnimation(&this->screen);
+  this->screen.setTextDatum(CC_DATUM);
+  char str[64];
+  sprintf(str, "ESP32 SDR Remote Control");
+  this->screen.drawString(str, this->width / 2, 16);
+  sprintf(str, "v%.2f", currentVersion);
+  this->screen.drawString(str, this->width / 2, 40);
+  this->screen.setTextSize(1);
+  sprintf(str, "Searching TS-2000 CAT connection (%d baud)", serialBaudRate);
+  this->screen.drawString(str, this->width / 2, 300);
+  this->animatedScreenPtr = new SSWAnimationILI9488(&this->screen);
 }
 
 void DisplayILI9488::hideConnectScreen(void) {
-  //delete this->animatedScreenPtr;
-  //this->animatedScreenPtr = nullptr;
+  delete this->animatedScreenPtr;
+  this->animatedScreenPtr = nullptr;
 }
 
 void DisplayILI9488::refreshConnectScreen(void) {
-  //this->animatedScreenPtr->refresh(80, 80);
+  this->animatedScreenPtr->refresh(160, 80);
 }
 
 void DisplayILI9488::showMainScreen() {

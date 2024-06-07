@@ -5,7 +5,8 @@
 #include <TFT_eSPI.h>
 
 #include "IDisplay.h"
-//#include "SSWAnimation.h"
+#include "SSWAnimationILI9488.h"
+
 #include "Transceiver.h"
 
 class DisplayILI9488 : public IDisplay {
@@ -26,7 +27,7 @@ private:
   uint16_t width;
   uint16_t height;
   TFT_eSPI screen;
-  //SSWAnimation* animatedScreenPtr = nullptr;
+  SSWAnimationILI9488* animatedScreenPtr = nullptr;
   uint8_t oldSignal;
   uint8_t currentSignal = 0;
   uint8_t peakSignal = 0;
