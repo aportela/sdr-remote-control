@@ -104,7 +104,7 @@ void SSWAnimationILI9488::draw(uint16_t xOffset, uint16_t yOffset) {
   }
   this->canvasSpectrumScope->pushSprite(xOffset, yOffset);
   this->canvasWaterFall->pushSprite(xOffset, yOffset + SSWA_SPECTRUM_SCOPE_HEIGHT + 4);
-  this->scrollDownWaterFallCanvas(this->canvasWaterFall);
+  //this->scrollDownWaterFallCanvas(this->canvasWaterFall);
 }
 
 // refresh animation
