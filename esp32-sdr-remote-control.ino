@@ -14,6 +14,7 @@
 #include "SerialConnection.h"
 
 #ifdef DISPLAY_ST7789_240x320
+#define DISPLAY_DRIVER_FOUND
 #include "Display-ST7789-240x320.h"
 #endif
 
@@ -56,6 +57,10 @@
 #define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
 
 #define CURRENT_VERSION 0.01
+
+#ifndef DISPLAY_DRIVER_FOUND
+#error NO_DISPLAY_DRIVER_FOUND
+#endif
 
 uint16_t freqChangeHzStepSize = 12500;  // Hz
 
