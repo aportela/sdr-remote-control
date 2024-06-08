@@ -5,8 +5,8 @@
 
 #define CURRENT_VERSION 0.01
 
-#define DISPLAY_ST7789_240x320
-//#define DISPLAY_ILI9488_480x320
+//#define DISPLAY_ST7789_240x320
+#define DISPLAY_ILI9488_480x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
@@ -47,6 +47,8 @@
 #define SERIAL_FLUSH_WAIT 10
 #define SERIAL_WAIT_AFTER_SEND_CMD 10
 
+// TODO: 3 rotary encoders volume / filter/ custom VFO step
+// TODO: 3 keys VFO A/B, toggle Mode, toggle Band
 #define ROTARY_ENCODER_A 34
 #define ROTARY_ENCODER_B 35
 #define ROTARY_ENCODER_SWITCH_BUTTON 32
