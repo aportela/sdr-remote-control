@@ -7,6 +7,12 @@
 #define SMETER_PARTH_HEIGHT_SEPARATOR 20
 #define SMETER_PARTH_BG_COLOR 0x8410
 
+/*
+  DEFAULT MOSI/CLK "SOFTWARE/HARDWARE PINs" NOTE
+  On my ESP32-WROOM-32 board (https://www.electronicshub.org/esp32-pinout/) HSPI_MOSI (Hardware SPI MOSI) is GPIO 13 and HSPI_CLK (Hardware clock) is GPIO 14
+  but AdaFruitGFX ST7789 driver constructor with hardware (NOT software) SPI uses by default VSPI_MOSI (Software SPI MOSI) on GPIO 23 and VSPI_CLK (Software clock) on GPIO
+  In theory the hardware pins should be more efficient but if I use them by calling the constructor that does not use the default pins used in Adafruit, the performance drops considerably
+*/
 DisplayST7789::DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
   this->width = width;
