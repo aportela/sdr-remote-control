@@ -2,7 +2,7 @@
 #define SDR_REMOTE_CONTROL_DISPLAY_INTERFACE
 
 #include <stdint.h>
-#include "Transceiver.h"
+#include "Transceiver.hpp"
 
 class IDisplay {
 public:

@@ -1,4 +1,4 @@
-#include "SSWAnimationILI9488.h"
+#include "SSWAnimationILI9488.hpp"
 
 SSWAnimationILI9488::SSWAnimationILI9488(TFT_eSPI* existingDisplay) {
   if (existingDisplay != nullptr) {

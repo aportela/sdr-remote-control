@@ -5,20 +5,20 @@
 
 #define CURRENT_VERSION 0.01
 
-//#define DISPLAY_ST7789_240x320
-#define DISPLAY_ILI9488_480x320
+#define DISPLAY_ST7789_240x320
+//#define DISPLAY_ILI9488_480x320
 
 // Ai Esp32 Rotary Encoder by Igor Antolic
 // https://github.com/igorantolic/ai-esp32-rotary-encoder
 #include <AiEsp32RotaryEncoder.h>
 
 #include "Arduino.h"
-#include "SerialConnection.h"
-#include "Transceiver.h"
-#include "FPSDebug.h"
+#include "SerialConnection.hpp"
+#include "Transceiver.hpp"
+#include "FPSDebug.hpp"
 
 #ifdef DISPLAY_ST7789_240x320
-#include "DisplayST7789.h"
+#include "DisplayST7789.hpp"
 #define TFT_CS 5
 #define TFT_RST 4
 #define TFT_DC 2
@@ -31,7 +31,7 @@
 #endif
 
 #ifdef DISPLAY_ILI9488_480x320
-#include "Display-ILI9488-320x480.h"
+#include "Display-ILI9488-320x480.hpp"
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 480
 #define DISPLAY_ROTATION 1          // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <String.h>
-#include "Transceiver.h"
+#include "Transceiver.hpp"
 
 class SerialConnection {
 public:

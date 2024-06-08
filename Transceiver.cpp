@@ -1,4 +1,4 @@
-#include "Transceiver.h"
+#include "Transceiver.hpp"
 
 Transceiver::Transceiver(void) {
   this->powerStatus = TRX_PS_OFF;

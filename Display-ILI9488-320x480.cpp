@@ -1,4 +1,4 @@
-#include "Display-ILI9488-320x480.h"
+#include "Display-ILI9488-320x480.hpp"
 
 #define SMETER_PARTS 42
 #define SMETER_PART_WIDTH 4

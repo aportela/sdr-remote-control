@@ -2,7 +2,7 @@
 #define SDR_REMOTE_CONTROL_SPECTRUM_SCOPE_WATERFALL_ANIMATION_H
 
 #include <Arduino.h>
-#include "ISSWAnimation.h"
+#include "ISSWAnimation.hpp"
 
 #define SSWA_WIDTH 160
 #define SSWA_SPECTRUM_SCOPE_WIDTH SSWA_WIDTH

@@ -1,18 +1,18 @@
-#ifndef SDR_REMOTE_CONTROL_DISPLAY_ST7789_H
-#define SDR_REMOTE_CONTROL_DISPLAY_ST7789_H
+#ifndef SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
+#define SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
 
-#include <Adafruit_GFX.h>
-#include <Adafruit_ST7789.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>
 
-#include <stdio.h>
-#include "Display.h"
-#include "SSWAnimationST7789.h"
-#include "Transceiver.h"
+#include "Display.hpp"
+#include "SSWAnimationILI9488.hpp"
 
-class DisplayST7789 : public Display {
+#include "Transceiver.hpp"
+
+class DisplayILI9488 : public Display {
 public:
-  DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
-  ~DisplayST7789();
+  DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors);
+  ~DisplayILI9488();
   void clearScreen(uint8_t color) override;
   void showConnectScreen(uint16_t serialBaudRate, float currentVersion) override;
   void hideConnectScreen(void) override;
@@ -20,8 +20,8 @@ public:
   void showMainScreen() override;
   void refreshMainScreen(Transceiver* trx) override;
 private:
-  Adafruit_ST7789 screen;
-  SSWAnimationST7789* animatedScreenPtr = nullptr;
+  TFT_eSPI screen;
+  SSWAnimationILI9488* animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(TRXVFOMode mode);

@@ -3,10 +3,10 @@
 
 #define DEBUG_FPS // uncomment this ONLY for debug/benchmark display
 
-#include "IDisplay.h"
-#include "Transceiver.h"
+#include "IDisplay.hpp"
+#include "Transceiver.hpp"
 #ifdef DEBUG_FPS
-#include "FPSDebug.h"
+#include "FPSDebug.hpp"
 #endif
 
 class Display : public IDisplay {

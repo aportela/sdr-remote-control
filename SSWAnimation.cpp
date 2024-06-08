@@ -1,4 +1,4 @@
-#include "SSWAnimation.h"
+#include "SSWAnimation.hpp"
 
 // generate random noise data
 void SSWAnimation::refreshNoise(void) {

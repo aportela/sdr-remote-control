@@ -1,4 +1,4 @@
-#include "SSWAnimationST7789.h"
+#include "SSWAnimationST7789.hpp"
 
 SSWAnimationST7789::SSWAnimationST7789(Adafruit_ST7789* existingDisplay) {
   if (existingDisplay != nullptr) {

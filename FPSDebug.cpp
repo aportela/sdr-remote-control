@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "FPSDebug.h"
+#include "FPSDebug.hpp"
 
 uint16_t FPSDebug::getFPS(void) {
   return (this->fps);

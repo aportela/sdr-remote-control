@@ -1,4 +1,4 @@
-#include "DisplayST7789.h"
+#include "DisplayST7789.hpp"
 
 #define SMETER_PARTS 42
 #define SMETER_PART_WIDTH 4

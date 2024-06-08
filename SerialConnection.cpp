@@ -1,5 +1,5 @@
 
-#include "SerialConnection.h"
+#include "SerialConnection.hpp"
 
 // TODO: ADJUST
 #define MILLISECONDS_BETWEEN_LOOP 10
