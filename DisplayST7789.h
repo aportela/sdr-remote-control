@@ -12,12 +12,13 @@
 class DisplayST7789 : public Display {
 public:
   DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST);
+  ~DisplayST7789();
   void clearScreen(uint8_t color) override;
   void showConnectScreen(uint16_t serialBaudRate, float currentVersion) override;
   void hideConnectScreen(void) override;
-  void refreshConnectScreen(void) override;
+  void refreshConnectScreen() override;
   void showMainScreen() override;
-  void refreshMainScreen(Transceiver* trx, float fps) override;
+  void refreshMainScreen(Transceiver* trx) override;
 private:
   Adafruit_ST7789 screen;
   SSWAnimationST7789* animatedScreenPtr = nullptr;

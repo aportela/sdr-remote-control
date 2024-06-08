@@ -12,6 +12,7 @@ DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation
   this->width = width;
   this->height = height;
   this->screen.init();
+  // TODO: setSwapBytes ?
   if (invertDisplayColors) {
     this->screen.invertDisplay(true);
   }
@@ -24,6 +25,12 @@ DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation
   }
   this->screen.setTextWrap(false);
   this->screen.fillScreen(TFT_BLACK);
+#ifdef DEBUG_FPS
+  this->fpsDebug = new FPSDebug();
+#endif
+}
+
+DisplayILI9488::~DisplayILI9488() {
 }
 
 void DisplayILI9488::clearScreen(uint8_t color) {
@@ -52,8 +59,14 @@ void DisplayILI9488::hideConnectScreen(void) {
   this->animatedScreenPtr = nullptr;
 }
 
-void DisplayILI9488::refreshConnectScreen(void) {
+void DisplayILI9488::refreshConnectScreen() {
   this->animatedScreenPtr->refresh(160, 80);
+#ifdef DEBUG_FPS
+  this->fpsDebug->loop();
+  this->screen.setCursor(230, 190);
+  this->screen.setTextSize(1);
+  this->screen.printf("%03u FPS", this->fpsDebug->getFPS());
+#endif
 }
 
 void DisplayILI9488::showMainScreen() {
@@ -61,7 +74,7 @@ void DisplayILI9488::showMainScreen() {
   this->createDigitalSMeter();
 }
 
-void DisplayILI9488::refreshMainScreen(Transceiver* trx, float fps) {
+void DisplayILI9488::refreshMainScreen(Transceiver* trx) {
   if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS) {
     this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
@@ -83,7 +96,9 @@ void DisplayILI9488::refreshMainScreen(Transceiver* trx, float fps) {
     this->refreshRNDDigitalSMeter(trx->signalMeterLevel);
     //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
-  this->refreshFPS(fps);
+#ifdef DEBUG_FPS
+  this->refreshFPS(this->fpsDebug->getFPS());
+#endif
 }
 
 void DisplayILI9488::refreshTransmitStatus(bool isTransmitting) {
@@ -310,18 +325,4 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal) {
       }
     }
   }
-}
-
-void DisplayILI9488::debugBottomStr(char* str, uint64_t value) {
-  this->screen.setCursor(0, 220);
-  this->screen.setTextSize(2);
-  this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
-  this->screen.printf("%s: %8llu", str, value);
-}
-
-void DisplayILI9488::debugBottomStr2(String str, uint64_t value) {
-  this->screen.setCursor(0, 220);
-  this->screen.setTextSize(2);
-  this->screen.setTextColor(TFT_WHITE, TFT_BLACK);
-  this->screen.printf("%s: %8llu", str, value);
 }

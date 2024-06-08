@@ -6,11 +6,11 @@ SSWAnimationILI9488::SSWAnimationILI9488(TFT_eSPI* existingDisplay) {
     randomSeed(analogRead(0) ^ (micros() * esp_random()));
     this->display = existingDisplay;
     this->canvasSpectrumScope = new TFT_eSprite(existingDisplay);
-    this->canvasSpectrumScope->setColorDepth(8);
+    this->canvasSpectrumScope->setColorDepth(16);
     this->canvasSpectrumScope->createSprite(SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
     this->canvasSpectrumScope->frameBuffer(1);
     this->canvasWaterFall = new TFT_eSprite(existingDisplay);
-    this->canvasWaterFall->setColorDepth(8);
+    this->canvasWaterFall->setColorDepth(16);
     this->canvasWaterFall->createSprite(SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
     this->canvasWaterFall->frameBuffer(1);
     this->refreshNoise();
@@ -27,7 +27,7 @@ SSWAnimationILI9488::~SSWAnimationILI9488() {
 
 // move canvas one line down
 void SSWAnimationILI9488::scrollDownWaterFallCanvas(TFT_eSprite* canvas) {
-  uint8_t* buffer = static_cast<uint8_t*>(canvas->getPointer());
+  uint16_t* buffer = static_cast<uint16_t*>(canvas->getPointer());
   int16_t w = canvas->width();
   int16_t h = canvas->height();
   for (int16_t y = h - 1; y > 0; y--) {

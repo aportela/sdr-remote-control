@@ -27,6 +27,13 @@ DisplayST7789::DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, 
   }
   this->screen.setTextWrap(false);
   this->screen.fillScreen(ST77XX_BLACK);
+#ifdef DEBUG_FPS
+  this->fpsDebug = new FPSDebug();
+#endif
+}
+
+
+DisplayST7789::~DisplayST7789() {
 }
 
 void DisplayST7789::clearScreen(uint8_t color) {
@@ -62,8 +69,14 @@ void DisplayST7789::hideConnectScreen(void) {
   this->animatedScreenPtr = nullptr;
 }
 
-void DisplayST7789::refreshConnectScreen(void) {
+void DisplayST7789::refreshConnectScreen() {
   this->animatedScreenPtr->refresh(80, 80);
+#ifdef DEBUG_FPS
+  this->fpsDebug->loop();
+  this->screen.setCursor(140, 190);
+  this->screen.setTextSize(1);
+  this->screen.printf("%03u FPS", this->fpsDebug->getFPS());
+#endif
 }
 
 void DisplayST7789::showMainScreen() {
@@ -71,7 +84,7 @@ void DisplayST7789::showMainScreen() {
   this->createDigitalSMeter();
 }
 
-void DisplayST7789::refreshMainScreen(Transceiver* trx, float fps) {
+void DisplayST7789::refreshMainScreen(Transceiver* trx) {
   if (trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS) {
     this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
@@ -93,7 +106,9 @@ void DisplayST7789::refreshMainScreen(Transceiver* trx, float fps) {
     this->refreshRNDDigitalSMeter(trx->signalMeterLevel);
     //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
-  this->refreshFPS(fps);
+#ifdef DEBUG_FPS
+  this->refreshFPS(this->fpsDebug->getFPS());
+#endif
 }
 /*
 void DisplayST7789::refreshMainScreen(sdrRemoteTransceiver* trx) {

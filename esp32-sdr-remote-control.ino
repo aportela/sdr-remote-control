@@ -15,6 +15,7 @@
 #include "Arduino.h"
 #include "SerialConnection.h"
 #include "Transceiver.h"
+#include "FPSDebug.h"
 
 #ifdef DISPLAY_ST7789_240x320
 #include "DisplayST7789.h"
@@ -33,8 +34,8 @@
 #include "Display-ILI9488-320x480.h"
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 480
-#define DISPLAY_ROTATION 1  // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
-#define DISPLAY_INVERT_COLORS true // my screen by default inverts colors
+#define DISPLAY_ROTATION 1          // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
+#define DISPLAY_INVERT_COLORS true  // my screen by default inverts colors
 #define DISPLAY_DRIVER_FOUND
 #endif
 
@@ -96,6 +97,8 @@ volatile uint64_t currentSMeterLevel = 0;
 //sdrRemoteTransceiver trx;
 Transceiver* trx = nullptr;
 
+FPSDebug* fpsDebug = nullptr;
+
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
   selectFocusRotaryEncoder.setup(readEncoderISR);
@@ -117,6 +120,7 @@ void setup() {
   initRotaryEncoders();
   trx = new Transceiver();
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+  fpsDebug = new FPSDebug();
   //display.showMainScreen();
 }
 
@@ -196,6 +200,7 @@ uint64_t lastTime = 0;
 float fps = 0;
 
 void loop() {
+  fpsDebug->loop();
   if (trx->powerStatus == TRX_PS_OFF) {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
@@ -205,22 +210,7 @@ void loop() {
       display.showMainScreen();
     }
   } else {
-    uint64_t currentTime = millis();
-    uint64_t elapsedTime = currentTime - lastTime;
-    if (elapsedTime >= 1000) {
-      fps = (float)frameCount / (float)elapsedTime * 1000.0;
-      frameCount = 0;
-      lastTime = currentTime;
-    }
-    frameCount++;
-    /*
-      unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-      previousMillis = currentMillis;
-      showMainScreen();
-    }
-    */
-    display.refreshMainScreen(trx, fps < 1000 ? fps : 999);
+    display.refreshMainScreen(trx);
     serialConnection->loop(trx);
     /*
     if (selectFocusRotaryEncoder.isEncoderButtonDown()) {
