@@ -9,7 +9,6 @@
 
 DisplayST7789::DisplayST7789(uint16_t width, uint16_t height, uint8_t rotation, int8_t pinCS, int8_t pinDC, int8_t pinMOSI, int8_t pinSCLK, int8_t pinRST)
   : screen(pinCS, pinDC, pinRST) {
-  // TODO: extra pins
   this->width = width;
   this->height = height;
   this->screen.init(width, height);
