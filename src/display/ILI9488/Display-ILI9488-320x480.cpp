@@ -47,7 +47,7 @@ void DisplayILI9488::showConnectScreen(uint16_t serialBaudRate, float currentVer
   this->screen.setTextSize(1);
   sprintf(str, "Searching TS-2000 CAT connection (%d baud)", serialBaudRate);
   this->screen.drawString(str, this->width / 2, 300);
-  this->animatedScreenPtr = new SSWAnimationILI9488(&this->screen);
+  this->animatedScreenPtr = new SSWAnimationILI9488(&this->screen, 160);
 }
 
 void DisplayILI9488::hideConnectScreen(void) {

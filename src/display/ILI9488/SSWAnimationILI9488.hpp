@@ -8,7 +8,7 @@
 class SSWAnimationILI9488 : public SSWAnimation
 {
 public:
-  SSWAnimationILI9488(LGFX *existingDisplay);
+  SSWAnimationILI9488(LGFX *existingDisplay, uint16_t width);
   ~SSWAnimationILI9488();
   void refresh(uint16_t xOffset, uint16_t yOffset) override;
 

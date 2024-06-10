@@ -5,13 +5,13 @@ void SSWAnimation::refreshNoise(void) {
   const uint8_t MAX_VALUE = SSWA_MIN_SIGNAL_VALUE / 2;
   const uint8_t MIN_PEAK_INTERVAL = 10;
   const uint8_t MAX_PEAK_INTERVAL = 30;
-  for (uint16_t i = 0; i < SSWA_WIDTH; i++) {
+  for (uint16_t i = 0; i < this->width; i++) {
     uint8_t currentValue = random(0, SSWA_MAX_NOISE_VALUE);
     uint8_t nextPeak = random(MIN_PEAK_INTERVAL, MAX_PEAK_INTERVAL);
     if (i % nextPeak == 0) {
       uint8_t peakValue = random(SSWA_MIN_NOISE_VALUE, SSWA_MAX_NOISE_VALUE);
       int8_t direction = random(0, 2) * 2 - 1;
-      for (int j = i; j < i + nextPeak && j < SSWA_WIDTH; j++) {
+      for (int j = i; j < i + nextPeak && j < this->width; j++) {
         this->noiseData[j] = max(0, min(255, currentValue + direction * abs(currentValue - peakValue) / nextPeak * (j - i)));
       }
       currentValue = peakValue;
@@ -53,15 +53,15 @@ void SSWAnimation::initSignals(void) {
   // generate signal level
   uint8_t currentSignalValue = random(SSWA_MIN_SIGNAL_VALUE, SSWA_MAX_SIGNAL_VALUE);
   // set "noise" (not real signal) by default
-  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < SSWA_WIDTH; i++) {
+  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < this->width; i++) {
     this->signalIndexes[i] = 0;
   }
-  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < SSWA_WIDTH; i++) {
+  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < this->width; i++) {
     if (i != 0) {
       // when reach next signal index
       if (i == currentSignalIndex) {
         // allow near signal indexes
-        if (i > 4 && i < SSWA_WIDTH - 4) {
+        if (i > 4 && i < this->width - 4) {
           // set signal level
           this->signalsData[i] = currentSignalValue;
           // analog voice signal requires more bandwith than "cw/morse" so re-generate also near signal indexes with random values
@@ -126,7 +126,7 @@ void SSWAnimation::refreshSignals(void) {
     }
   }
   // right block are "analog voice" signals
-  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < SSWA_WIDTH; i++) {
+  for (uint16_t i = SSWA_TOTAL_CW_SIGNALS_BANDWITH; i < this->width; i++) {
     // ignore noise, only eval real signals (peak & near data)
     if (this->signalIndexes[i] > 0) {
       // check signal existence on current index

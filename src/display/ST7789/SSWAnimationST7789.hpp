@@ -8,7 +8,7 @@
 
 class SSWAnimationST7789 : public SSWAnimation {
 public:
-  SSWAnimationST7789(Adafruit_ST7789* existingDisplay);
+  SSWAnimationST7789(Adafruit_ST7789* existingDisplay, uint16_t width);
   ~SSWAnimationST7789();
   void refresh(uint16_t xOffset, uint16_t yOffset) override;
 private:

@@ -4,10 +4,7 @@
 #include <Arduino.h>
 #include "ISSWAnimation.hpp"
 
-#define SSWA_WIDTH 160
-#define SSWA_SPECTRUM_SCOPE_WIDTH SSWA_WIDTH
 #define SSWA_SPECTRUM_SCOPE_HEIGHT 24
-#define SSWA_WATERFALL_WIDTH SSWA_WIDTH
 #define SSWA_WATERFALL_HEIGHT 64
 
 #define SSWA_MIN_DIST_BETWEEN_CW_SIGNALS 8
@@ -26,10 +23,12 @@
 class SSWAnimation : public ISSWAnimation {
 public:
   virtual void refresh(uint16_t xOffset, uint16_t yOffset) override = 0;
+private:
 protected:
-  uint16_t signalsData[SSWA_WIDTH];
-  uint16_t noiseData[SSWA_WIDTH];
-  uint16_t signalIndexes[SSWA_WIDTH];
+  uint16_t width = 160;
+  uint16_t *signalsData;
+  uint16_t *noiseData;
+  uint16_t *signalIndexes;
   // generate random noise data
   void refreshNoise(void);
   // generate start/default signals levels

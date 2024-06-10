@@ -1,16 +1,22 @@
 #include "SSWAnimationILI9488.hpp"
 
-SSWAnimationILI9488::SSWAnimationILI9488(LGFX* existingDisplay) {
+SSWAnimationILI9488::SSWAnimationILI9488(LGFX* existingDisplay, uint16_t width) {
   if (existingDisplay != nullptr) {
     // init random seed
     randomSeed(analogRead(0) ^ (micros() * esp_random()));
     this->display = existingDisplay;
     this->canvasSpectrumScope = new lgfx::LGFX_Sprite(existingDisplay);
     this->canvasSpectrumScope->setColorDepth(16);
-    this->canvasSpectrumScope->createSprite(SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
+    this->canvasSpectrumScope->createSprite(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
     this->canvasWaterFall = new lgfx::LGFX_Sprite(existingDisplay);
     this->canvasWaterFall->setColorDepth(16);
-    this->canvasWaterFall->createSprite(SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
+	if (this->width > 0) {
+		this->width = width;
+	}
+    this->canvasWaterFall->createSprite(this->width, SSWA_WATERFALL_HEIGHT);
+	this->signalsData = new uint16_t[this->width];
+	this->noiseData = new uint16_t[this->width];
+	this->signalIndexes = new uint16_t[this->width];	
     this->refreshNoise();
     this->initSignals();
   }
@@ -21,6 +27,12 @@ SSWAnimationILI9488::~SSWAnimationILI9488() {
   this->canvasSpectrumScope = nullptr;
   delete this->canvasWaterFall;
   this->canvasWaterFall = nullptr;
+  delete[] this->signalsData;
+  this->signalsData = nullptr;
+  delete[] this->noiseData;
+  this->noiseData = nullptr;
+  delete[] this->signalIndexes;
+  this->signalIndexes = nullptr;  
 }
 
 // move canvas one line down
@@ -54,7 +66,7 @@ uint16_t SSWAnimationILI9488::generateBlueGradientColorFromSignal(uint8_t value)
 void SSWAnimationILI9488::draw(uint16_t xOffset, uint16_t yOffset) {
   // clear old spectrum scope data
   this->canvasSpectrumScope->fillScreen(TFT_BLACK);
-  for (int16_t i = 0; i < SSWA_WIDTH; i++) {
+  for (int16_t i = 0; i < this->width; i++) {
     // left block are "cw/morse" signals
     if (i < SSWA_TOTAL_CW_SIGNALS_BANDWITH) {
       // if there is a signal at this index

@@ -1,12 +1,18 @@
 #include "SSWAnimationST7789.hpp"
 
-SSWAnimationST7789::SSWAnimationST7789(Adafruit_ST7789* existingDisplay) {
+SSWAnimationST7789::SSWAnimationST7789(Adafruit_ST7789* existingDisplay, uint16_t width) {
   if (existingDisplay != nullptr) {
     // init random seed
     randomSeed(analogRead(0) ^ (micros() * esp_random()));
     this->display = existingDisplay;
-    this->canvasSpectrumScope = new GFXcanvas16(SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
-    this->canvasWaterFall = new GFXcanvas16(SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
+    this->canvasSpectrumScope = new GFXcanvas16(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
+    this->canvasWaterFall = new GFXcanvas16(this->width, SSWA_WATERFALL_HEIGHT);
+	if (this->width > 0) {
+		this->width = width;
+	}
+	this->signalsData = new uint16_t[this->width];
+	this->noiseData = new uint16_t[this->width];
+	this->signalIndexes = new uint16_t[this->width];
     this->refreshNoise();
     this->initSignals();
   }
@@ -17,6 +23,12 @@ SSWAnimationST7789::~SSWAnimationST7789() {
   this->canvasSpectrumScope = nullptr;
   delete this->canvasWaterFall;
   this->canvasWaterFall = nullptr;
+  delete[] this->signalsData;
+  this->signalsData = nullptr;
+  delete[] this->noiseData;
+  this->noiseData = nullptr;
+  delete[] this->signalIndexes;
+  this->signalIndexes = nullptr;  
 }
 
 // move canvas one line down
@@ -50,7 +62,7 @@ uint16_t SSWAnimationST7789::generateBlueGradientColorFromSignal(uint8_t value) 
 void SSWAnimationST7789::draw(uint16_t xOffset, uint16_t yOffset) {
   // clear old spectrum scope data
   this->canvasSpectrumScope->fillScreen(ST77XX_BLACK);
-  for (int16_t i = 0; i < SSWA_WIDTH; i++) {
+  for (int16_t i = 0; i < this->width; i++) {
     // left block are "cw/morse" signals
     if (i < SSWA_TOTAL_CW_SIGNALS_BANDWITH) {
       // if there is a signal at this index
@@ -98,8 +110,8 @@ void SSWAnimationST7789::draw(uint16_t xOffset, uint16_t yOffset) {
       this->canvasWaterFall->drawPixel(i, 0, this->generateBlueGradientColorFromSignal(this->signalsData[i]));
     }
   }
-  this->display->drawRGBBitmap(xOffset, yOffset, this->canvasSpectrumScope->getBuffer(), SSWA_SPECTRUM_SCOPE_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT);
-  this->display->drawRGBBitmap(xOffset, yOffset + SSWA_SPECTRUM_SCOPE_HEIGHT + 4, this->canvasWaterFall->getBuffer(), SSWA_WATERFALL_WIDTH, SSWA_WATERFALL_HEIGHT);
+  this->display->drawRGBBitmap(xOffset, yOffset, this->canvasSpectrumScope->getBuffer(), this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
+  this->display->drawRGBBitmap(xOffset, yOffset + SSWA_SPECTRUM_SCOPE_HEIGHT + 4, this->canvasWaterFall->getBuffer(), this->width, SSWA_WATERFALL_HEIGHT);
   this->scrollDownWaterFallCanvas(this->canvasWaterFall);
 }
 
