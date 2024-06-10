@@ -7,12 +7,12 @@ SSWAnimationILI9488::SSWAnimationILI9488(LGFX* existingDisplay, uint16_t width) 
     this->display = existingDisplay;
     this->canvasSpectrumScope = new lgfx::LGFX_Sprite(existingDisplay);
     this->canvasSpectrumScope->setColorDepth(16);
+	if (this->width > 0) {
+		this->width = width;
+	}	
     this->canvasSpectrumScope->createSprite(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
     this->canvasWaterFall = new lgfx::LGFX_Sprite(existingDisplay);
     this->canvasWaterFall->setColorDepth(16);
-	if (this->width > 0) {
-		this->width = width;
-	}
     this->canvasWaterFall->createSprite(this->width, SSWA_WATERFALL_HEIGHT);
 	this->signalsData = new uint16_t[this->width];
 	this->noiseData = new uint16_t[this->width];

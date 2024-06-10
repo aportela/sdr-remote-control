@@ -5,11 +5,11 @@ SSWAnimationST7789::SSWAnimationST7789(Adafruit_ST7789* existingDisplay, uint16_
     // init random seed
     randomSeed(analogRead(0) ^ (micros() * esp_random()));
     this->display = existingDisplay;
-    this->canvasSpectrumScope = new GFXcanvas16(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
-    this->canvasWaterFall = new GFXcanvas16(this->width, SSWA_WATERFALL_HEIGHT);
 	if (this->width > 0) {
 		this->width = width;
-	}
+	}	
+    this->canvasSpectrumScope = new GFXcanvas16(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
+    this->canvasWaterFall = new GFXcanvas16(this->width, SSWA_WATERFALL_HEIGHT);
 	this->signalsData = new uint16_t[this->width];
 	this->noiseData = new uint16_t[this->width];
 	this->signalIndexes = new uint16_t[this->width];
