@@ -1,8 +1,7 @@
 #ifndef SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
 #define SDR_REMOTE_CONTROL_DISPLAY_ILI9488_H
 
-#include <SPI.h>
-#include <TFT_eSPI.h>
+#include "LGFX.hpp"
 
 #include "Display.hpp"
 #include "SSWAnimationILI9488.hpp"
@@ -20,7 +19,7 @@ public:
   void showMainScreen() override;
   void refreshMainScreen(Transceiver* trx) override;
 private:
-  TFT_eSPI screen;
+  LGFX screen;
   SSWAnimationILI9488* animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);

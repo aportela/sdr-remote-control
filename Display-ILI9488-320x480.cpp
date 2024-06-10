@@ -12,12 +12,8 @@ DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation
   this->width = width;
   this->height = height;
   this->screen.init();
-  // TODO: setSwapBytes ?
-  if (invertDisplayColors) {
-    this->screen.invertDisplay(true);
-  }
   if (rotation > 0 && rotation < 4) {
-    this->screen.setRotation(rotation);
+    //this->screen.setRotation(rotation);
     if (rotation == 1 || rotation == 3) {
       this->width = height;
       this->height = width;
