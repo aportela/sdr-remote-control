@@ -15,7 +15,6 @@
 #include "Arduino.h"
 #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
-#include "src/display/FPSDebug.hpp"
 
 #ifdef DISPLAY_ST7789_240x320
 #include "src/display/ST7789/DisplayST7789.hpp"
@@ -98,8 +97,6 @@ volatile uint64_t currentSMeterLevel = 0;
 //sdrRemoteTransceiver trx;
 Transceiver* trx = nullptr;
 
-FPSDebug* fpsDebug = nullptr;
-
 void initRotaryEncoders(void) {
   selectFocusRotaryEncoder.begin();
   selectFocusRotaryEncoder.setup(readEncoderISR);
@@ -121,7 +118,6 @@ void setup() {
   initRotaryEncoders();
   trx = new Transceiver();
   display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
-  fpsDebug = new FPSDebug();
   //display.showMainScreen();
 }
 
@@ -201,7 +197,6 @@ uint64_t lastTime = 0;
 float fps = 0;
 
 void loop() {
-  fpsDebug->loop();
   if (trx->powerStatus == TRX_PS_OFF) {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
