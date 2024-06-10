@@ -4,7 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 
-#include "SSWAnimation.hpp"
+#include "../SSWAnimation.hpp"
 
 class SSWAnimationST7789 : public SSWAnimation {
 public:

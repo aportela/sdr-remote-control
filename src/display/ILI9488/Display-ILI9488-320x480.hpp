@@ -3,12 +3,13 @@
 
 #include "LGFX.hpp"
 
-#include "Display.hpp"
+#include <stdio.h>
+#include "../Display.hpp"
 #include "SSWAnimationILI9488.hpp"
+#include "../../../Transceiver.hpp"
 
-#include "Transceiver.hpp"
-
-class DisplayILI9488 : public Display {
+class DisplayILI9488 : public Display
+{
 public:
   DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors);
   ~DisplayILI9488();
@@ -17,10 +18,11 @@ public:
   void hideConnectScreen(void) override;
   void refreshConnectScreen() override;
   void showMainScreen() override;
-  void refreshMainScreen(Transceiver* trx) override;
+  void refreshMainScreen(Transceiver *trx) override;
+
 private:
   LGFX screen;
-  SSWAnimationILI9488* animatedScreenPtr = nullptr;
+  SSWAnimationILI9488 *animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(TRXVFOMode mode);

@@ -15,10 +15,10 @@
 #include "Arduino.h"
 #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
-#include "FPSDebug.hpp"
+#include "src/display/FPSDebug.hpp"
 
 #ifdef DISPLAY_ST7789_240x320
-#include "DisplayST7789.hpp"
+#include "src/display/ST7789/DisplayST7789.hpp"
 #define TFT_CS 5
 #define TFT_RST 4
 #define TFT_DC 2
@@ -31,7 +31,7 @@
 #endif
 
 #ifdef DISPLAY_ILI9488_480x320
-#include "Display-ILI9488-320x480.hpp"
+#include "src/display/ILI9488/Display-ILI9488-320x480.hpp"
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 480
 #define DISPLAY_ROTATION 1          // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")

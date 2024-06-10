@@ -5,9 +5,9 @@
 #include <Adafruit_ST7789.h>
 
 #include <stdio.h>
-#include "Display.hpp"
+#include "../Display.hpp"
 #include "SSWAnimationST7789.hpp"
-#include "Transceiver.hpp"
+#include "../../../Transceiver.hpp"
 
 class DisplayST7789 : public Display {
 public:
