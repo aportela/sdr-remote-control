@@ -1,8 +1,7 @@
 
 #include "SerialConnection.hpp"
 
-// TODO: ADJUST
-#define MILLISECONDS_BETWEEN_LOOP 10
+#define MILLISECONDS_BETWEEN_LOOP 10 // WARNING: this (10ms) transfer/process THOUSANDS of commands per second, set a higher value if you notice saturation on the serial port (data refresh rates will be reduced)
 #define MILLISECONDS_WAITED_AFTER_FLUSH 2
 #define MILLISECONDS_WAITED_AFTER_SEND 5
 
@@ -67,21 +66,27 @@ void SerialConnection::loop(Transceiver* trx) {
           String receivedData = this->serial->readStringUntil(';');
           if (receivedData.startsWith("FA") && receivedData != "FA") {
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setVFOFrequency(trx->activeVFOIndex, receivedData.substring(2).toInt());
-          } else if (receivedData.startsWith("MD") && receivedData != "MD") {
+          } else if (receivedData.startsWith("MD") && receivedData != "MD") {            
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setVFOMode(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
-          } else if (receivedData.startsWith("SL") && receivedData != "SL") {
+          } else if (receivedData.startsWith("SL") && receivedData != "SL") {            
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setVFOLowFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
           } else if (receivedData.startsWith("SH") && receivedData != "SH") {
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setVFOHighFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
-          } else if (receivedData.startsWith("AG") && receivedData != "AG") {
+          } else if (receivedData.startsWith("AG") && receivedData != "AG") {            
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setAFGain(receivedData.substring(2).toInt());
-          } else if (receivedData.startsWith("MU") && receivedData != "MU") {
+          } else if (receivedData.startsWith("MU") && receivedData != "MU") {            
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             uint8_t newMutedStatus = receivedData.substring(2).toInt();
             if (trx->audioMuted == TRX_AUDIO_MUTED && newMutedStatus == 0) {
               trx->setAudioMuted();
@@ -90,6 +95,7 @@ void SerialConnection::loop(Transceiver* trx) {
             }
           } else if (receivedData.startsWith("SM") && receivedData != "SM") {
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             trx->setSignalMeterLevel(receivedData.substring(2).toInt());
           }
         }
