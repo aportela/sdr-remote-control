@@ -93,6 +93,7 @@ void DisplayILI9488::refreshMainScreen(Transceiver* trx) {
     //trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
 #ifdef DEBUG_FPS
+  this->fpsDebug->loop();
   this->refreshFPS(this->fpsDebug->getFPS());
 #endif
 }
@@ -160,12 +161,12 @@ void DisplayILI9488::refreshVFOMode(TRXVFOMode mode) {
   }
 }
 
-void DisplayILI9488::refreshFPS(float fps) {
+void DisplayILI9488::refreshFPS(uint16_t fps) {
   this->screen.drawRect(230, 0, 89, 20, 0xF85E);
   this->screen.setTextColor(0xF85E, TFT_BLACK);
   this->screen.setCursor(233, 3);
   this->screen.setTextSize(2);
-  this->screen.printf("%03u FPS", (int16_t)fps);
+  this->screen.printf("%03u FPS", fps);
 }
 
 void DisplayILI9488::refreshVFOFreq(uint64_t frequency) {

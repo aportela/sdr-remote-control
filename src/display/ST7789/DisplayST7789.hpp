@@ -25,7 +25,7 @@ private:
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number);
   void refreshVFOMode(TRXVFOMode mode);
-  void refreshFPS(float fps);
+  void refreshFPS(uint16_t fps);
   void refreshVFOFreq(uint64_t frequency);
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
