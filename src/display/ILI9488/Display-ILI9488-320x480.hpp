@@ -24,12 +24,14 @@ private:
   LGFX screen;
   SSWAnimationILI9488 *animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
-  void refreshActiveVFO(uint8_t number);
-  void refreshVFOMode(TRXVFOMode mode);
+  void refreshActiveVFO(uint8_t number, bool isActive);
+  void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
   void refreshFPS(uint16_t fps);
-  void refreshVFOFreq(uint64_t frequency);
+  void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
+  void refreshVolume(uint8_t AFGain, bool isMuted);
+  void refreshPassBandFilter(uint32_t LF, uint32_t HF, uint32_t BW);
 };
 
 #endif
