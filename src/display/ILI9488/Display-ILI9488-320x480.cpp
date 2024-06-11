@@ -1,7 +1,7 @@
 #include "Display-ILI9488-320x480.hpp"
 
 #define SMETER_PARTS 42
-#define SMETER_PART_WIDTH 4
+#define SMETER_PART_WIDTH 3
 #define SMETER_PART_SPACE_WIDTH 2
 #define SMETER_PARTH_HEIGHT 18
 #define SMETER_PARTH_HEIGHT_SEPARATOR 20
@@ -88,7 +88,7 @@ void DisplayILI9488::showMainScreen()
   this->screen.drawRect(0, 72, this->width / 2, 120, TFT_WHITE);
   this->screen.drawRect(this->width / 2, 72, this->width, 120, TFT_WHITE);
   this->screen.setTextDatum(TL_DATUM);
-  // this->createDigitalSMeter();
+  this->createDigitalSMeter();
 
   // Volume
   this->screen.setTextColor(COLOR_ACTIVE);
@@ -101,6 +101,9 @@ void DisplayILI9488::showMainScreen()
 
   // Passband filter
   this->screen.drawFastHLine(260, 175, 200, TFT_WHITE);
+
+  // serial command count
+  this->screen.drawRect(this->width - 225, this->height - 21, 124, 20, 0xF85E);
 
 #ifdef DEBUG_FPS
   // FPS container
@@ -152,6 +155,7 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
     trx->changed &= ~TRX_CFLAG_AF_GAIN;
     trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
   }
+  this->refreshCommandCount(trx->getSerialCommandCount());
 #ifdef DEBUG_FPS
   this->fpsDebug->loop();
   this->refreshFPS(this->fpsDebug->getFPS());
@@ -226,6 +230,14 @@ void DisplayILI9488::refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mo
   }
 }
 
+void DisplayILI9488::refreshCommandCount(uint64_t total)
+{
+  this->screen.setTextColor(0xF85E, TFT_BLACK);
+  this->screen.setCursor(this->width - 223, this->height - 18);
+  this->screen.setTextSize(2);
+  this->screen.printf("%06u CMD", total);
+}
+
 void DisplayILI9488::refreshFPS(uint16_t fps)
 {
   this->screen.setTextColor(0xF85E, TFT_BLACK);
@@ -274,32 +286,60 @@ void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t freq
 
 void DisplayILI9488::createDigitalSMeter()
 {
-  randomSeed(analogRead(0));
+  this->screen.setTextSize(3);
+  this->screen.setTextColor(COLOR_ACTIVE);
+  this->screen.setCursor(24, 90);
+  this->screen.print("S9");
   this->screen.setTextSize(2);
-  this->screen.setTextColor(TFT_WHITE);
-  this->screen.setCursor(36, 70);
-  this->screen.print("1 3 5 7 9");
-  this->screen.setCursor(165, 70);
-  this->screen.print("+20 +40 +60");
-  this->screen.setCursor(6, 98);
-  this->screen.print("S");
-  this->screen.setCursor(292, 98);
-  this->screen.print("dB");
-  this->screen.drawFastVLine(23, 94, 22, TFT_WHITE);
-  this->screen.drawFastVLine(284, 94, 22, TFT_WHITE);
-  this->screen.drawFastHLine(23, 116, 262, TFT_WHITE);
+  this->screen.print("+30dB");
+  this->screen.setTextSize(1);
+  this->screen.setTextColor(COLOR_ACTIVE);
+  this->screen.setCursor(13, 170);
+  this->screen.printf("%u", 0);
+  this->screen.setCursor(23, 170);
+  this->screen.printf("%u", 1);
+  this->screen.setCursor(33, 170);
+  this->screen.printf("%u", 2);
+  this->screen.setCursor(43, 170);
+  this->screen.printf("%u", 3);
+  this->screen.setCursor(53, 170);
+  this->screen.printf("%u", 4);
+  this->screen.setCursor(63, 170);
+  this->screen.printf("%u", 5);
+  this->screen.setCursor(73, 170);
+  this->screen.printf("%u", 6);
+  this->screen.setCursor(83, 170);
+  this->screen.printf("%u", 7);
+  this->screen.setCursor(93, 170);
+  this->screen.printf("%u", 8);
+  this->screen.setCursor(103, 170);
+  this->screen.printf("%u", 9);
+  this->screen.setCursor(138, 170);
+  this->screen.print("+20");
+  this->screen.setCursor(174, 170);
+  this->screen.print("+40");
+  this->screen.setCursor(210, 170);
+  this->screen.print("+60");
 
+  /*
   for (int i = 0; i <= SMETER_PARTS; i++)
   {
-    int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
-    if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42)
+    int x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+    if (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42)
     {
-      this->screen.fillRect(x, 94, SMETER_PART_WIDTH, 22, SMETER_PARTH_BG_COLOR);
+      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 22 + 4, COLOR_SECONDARY);
     }
     else
     {
-      this->screen.fillRect(x, 98, SMETER_PART_WIDTH, SMETER_PARTH_HEIGHT, SMETER_PARTH_BG_COLOR);
+      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 18, COLOR_SECONDARY);
     }
+  }
+  */
+  for (int i = 0; i <= SMETER_PARTS; i++)
+  {
+    int x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+    int height = 18;
+    this->screen.fillRect(x, 145 - i, SMETER_PART_WIDTH, height + i, COLOR_SECONDARY);
   }
 }
 

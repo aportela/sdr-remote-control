@@ -26,6 +26,7 @@ private:
   void refreshTransmitStatus(bool isTransmitting);
   void refreshActiveVFO(uint8_t number, bool isActive);
   void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
+  void refreshCommandCount(uint64_t total);
   void refreshFPS(uint16_t fps);
   void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
   void createDigitalSMeter();
