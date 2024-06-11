@@ -63,7 +63,7 @@ public:
   TRXVFO VFO[2];
   uint8_t signalMeterLevel;
   uint8_t AFGain;
-  TRxAudioMuteStatus audioMuted;
+  TRxAudioMuteStatus audioMuted;  
 
   Transceiver();
 
@@ -96,6 +96,13 @@ public:
 
   // set audio status to unmuted
   void setAudioUnMuted();
+
+  void incSerialCommandCount(void);
+
+  uint64_t getSerialCommandCount(void);
+
+  private:
+    uint64_t serialCommandCount = 0;
 };
 
 #endif
