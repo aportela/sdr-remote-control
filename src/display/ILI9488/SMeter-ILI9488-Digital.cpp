@@ -54,8 +54,8 @@ void SMeterILI9488Digital::preCalculateBarsSizeAndPosition(void)
 {
     for (uint8_t i = 0; i < BAR_COUNT; i++)
     {
-        this->barsX[i] = 14 + i * (BAR_WIDTH + BAR_HORIZONTAL_MARGIN);
-        this->barsY[i] = 145 - i;
+        this->barsX[i] = this->xOffset + 14 + i * (BAR_WIDTH + BAR_HORIZONTAL_MARGIN);
+        this->barsY[i] = this->yOffset + 70 - i;
         this->barsHeight[i] = BAR_MIN_HEIGHT + i;
     }
 }
