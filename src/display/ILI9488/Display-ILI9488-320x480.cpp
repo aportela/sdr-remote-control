@@ -2,12 +2,12 @@
 
 #define WIDGETS_VERTICAL_MARGIN 8
 
-#define VFO_WIDGET_WIDTH 464
-#define VFO_WIDGET_HEIGHT 72
-#define VFO_WIDGET_PADDING 8
-#define VFO_WIDGET_FONT_SIZE 3 // font size (setTextSize())
-#define VFO_WIDGET_FONT_WIDTH 20
-#define VFO_WIDGET_FONT_HEIGHT 20
+#define VFO_WIDGET_WIDTH 464                                                                                                                                    // widget width (without padding)
+#define VFO_WIDGET_HEIGHT 72                                                                                                                                    // widget height (without padding)
+#define VFO_WIDGET_PADDING 8                                                                                                                                    // real draw starts at this padding
+#define VFO_WIDGET_FONT_SIZE 3                                                                                                                                  // font size (setTextSize())
+#define VFO_WIDGET_FONT_WIDTH 20                                                                                                                                // font size (total pixel width)
+#define VFO_WIDGET_FONT_HEIGHT 20                                                                                                                               // font size (total pixel height)
 #define VFO_WIDGET_START_X_COORDINATE VFO_WIDGET_PADDING                                                                                                        // draw (x) starts here
 #define VFO_WIDGET_START_Y_COORDINATE VFO_WIDGET_PADDING                                                                                                        // draw (y) starts here
 #define VFO_WIDGET_STEP_HORIZONTAL_MARGIN 2                                                                                                                     // frequency step indicator top/bottom margin
