@@ -52,7 +52,7 @@ typedef struct
   uint32_t LF;    // low filter
   uint32_t HF;    // high filter
   uint32_t BW;    // bandwith
-  uint64_t step;  // hz
+  uint64_t customStep;  // hz
 } TRXVFO;
 
 class Transceiver {
@@ -76,8 +76,8 @@ public:
   // set vfo mode
   void setVFOMode(uint8_t VFOIndex, TRXVFOMode mode);
 
-  // set vfo step size (hz)
-  void setVFOHzStep(uint8_t VFOIndex, uint64_t hz);
+  // set vfo custom step size (hz)
+  void setVFOHzCustomStep(uint8_t VFOIndex, uint64_t hz);
 
   // set vfo low filter size (hz)
   void setVFOLowFilterHz(uint8_t VFOIndex, uint32_t hz);
