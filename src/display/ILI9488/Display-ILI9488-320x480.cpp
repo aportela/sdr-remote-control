@@ -1,5 +1,34 @@
 #include "Display-ILI9488-320x480.hpp"
 
+#define WIDGETS_VERTICAL_MARGIN 8
+
+#define VFO_WIDGET_WIDTH 464
+#define VFO_WIDGET_HEIGHT 72
+#define VFO_WIDGET_PADDING 8
+#define VFO_WIDGET_FONT_SIZE 3 // font size (setTextSize())
+#define VFO_WIDGET_FONT_WIDTH 20
+#define VFO_WIDGET_FONT_HEIGHT 20
+#define VFO_WIDGET_START_X_COORDINATE VFO_WIDGET_PADDING                                                                                                        // draw (x) starts here
+#define VFO_WIDGET_START_Y_COORDINATE VFO_WIDGET_PADDING                                                                                                        // draw (y) starts here
+#define VFO_WIDGET_STEP_HORIZONTAL_MARGIN 2                                                                                                                     // frequency step indicator top/bottom margin
+#define VFO_WIDGET_STEP_VERTICAL_MARGIN 4                                                                                                                       // frequency step indicator top/bottom margin
+#define VFO_WIDGET_STEP_WIDTH 16                                                                                                                                // frequency step indicator width
+#define VFO_WIDGET_STEP_HEIGHT 3                                                                                                                                // frequency step indicator height
+#define VFO_WIDGET_SINGLE_VFO_LINE_HEIGHT (VFO_WIDGET_FONT_HEIGHT + VFO_WIDGET_STEP_VERTICAL_MARGIN + VFO_WIDGET_STEP_HEIGHT + VFO_WIDGET_STEP_VERTICAL_MARGIN) // single VFO line (frequency step indicator included) height
+
+// first VFO x/y coordinates
+#define VFO_WIDGET_PRIMARY_START_X_COORDINATE VFO_WIDGET_START_X_COORDINATE
+#define VFO_WIDGET_PRIMARY_START_Y_COORDINATE VFO_WIDGET_START_Y_COORDINATE
+// first VFO freq step indicator x/y coordinates
+#define VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE 90
+#define VFO_WIDGET_PRIMARY_STEP_START_Y_COORDINATE VFO_WIDGET_PRIMARY_START_Y_COORDINATE + VFO_WIDGET_FONT_HEIGHT + VFO_WIDGET_STEP_VERTICAL_MARGIN
+// secondary VFO x/y coordinates
+#define VFO_WIDGET_SECONDARY_START_X_COORDINATE VFO_WIDGET_START_X_COORDINATE
+#define VFO_WIDGET_SECONDARY_START_Y_COORDINATE VFO_WIDGET_START_Y_COORDINATE + VFO_WIDGET_SINGLE_VFO_LINE_HEIGHT
+// secondary VFO freq step indicator x/y coordinates
+#define VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE 90
+#define VFO_WIDGET_SECONDARY_STEP_START_Y_COORDINATE VFO_WIDGET_SECONDARY_START_Y_COORDINATE + VFO_WIDGET_FONT_HEIGHT + VFO_WIDGET_STEP_VERTICAL_MARGIN
+
 #define SMETER_PARTS 42
 #define SMETER_PART_WIDTH 3
 #define SMETER_PART_SPACE_WIDTH 2
@@ -31,7 +60,7 @@ DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation
   }
   this->screen.setTextWrap(false);
   this->screen.fillScreen(TFT_BLACK);
-#ifdef DEBUG_FPS
+#ifdef DISPLAY_DEBUG
   this->fpsDebug = new FPSDebug();
 #endif
 }
@@ -72,7 +101,7 @@ void DisplayILI9488::hideConnectScreen(void)
 void DisplayILI9488::refreshConnectScreen()
 {
   this->animatedScreenPtr->refresh(120, 80);
-#ifdef DEBUG_FPS
+#ifdef DISPLAY_DEBUG
   this->fpsDebug->loop();
   this->screen.setCursor(230, 190);
   this->screen.setTextSize(1);
@@ -83,8 +112,10 @@ void DisplayILI9488::refreshConnectScreen()
 void DisplayILI9488::showMainScreen()
 {
   this->screen.fillScreen(TFT_BLACK);
+  // screen recangle border (DEBUG)
   this->screen.drawRect(0, 0, this->width, this->height, TFT_WHITE);
 
+  /*
   this->screen.drawRect(0, 72, this->width / 2, 120, TFT_WHITE);
   this->screen.drawRect(this->width / 2, 72, this->width, 120, TFT_WHITE);
   this->screen.setTextDatum(TL_DATUM);
@@ -101,14 +132,7 @@ void DisplayILI9488::showMainScreen()
 
   // Passband filter
   this->screen.drawFastHLine(260, 175, 200, TFT_WHITE);
-
-  // serial command count
-  this->screen.drawRect(this->width - 225, this->height - 21, 124, 20, 0xF85E);
-
-#ifdef DEBUG_FPS
-  // FPS container
-  this->screen.drawRect(this->width - 90, this->height - 21, 89, 20, 0xF85E);
-#endif
+  */
 }
 
 void DisplayILI9488::refreshMainScreen(Transceiver *trx)
@@ -121,9 +145,15 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX)
   {
-    this->refreshActiveVFO(0, trx->activeVFOIndex == 0);
-    this->refreshActiveVFO(1, trx->activeVFOIndex == 1);
+    this->refreshVFOIndex(0, trx->activeVFOIndex == 0);
+    this->refreshVFOIndex(1, trx->activeVFOIndex == 1);
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY)
+  {
+    this->refreshVFOFreq(0, trx->activeVFOIndex == 0, trx->VFO[0].frequency);
+    this->refreshVFOFreq(1, trx->activeVFOIndex == 1, trx->VFO[1].frequency);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE)
   {
@@ -131,11 +161,11 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
     this->refreshVFOMode(1, trx->activeVFOIndex == 1, trx->VFO[1].mode);
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
   }
-  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY)
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP)
   {
-    this->refreshVFOFreq(0, trx->activeVFOIndex == 0, trx->VFO[0].frequency);
-    this->refreshVFOFreq(1, trx->activeVFOIndex == 1, trx->VFO[1].frequency);
-    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    this->refreshVFOStep(0, trx->activeVFOIndex == 0, trx->VFO[0].customStep);
+    this->refreshVFOStep(1, trx->activeVFOIndex == 1, trx->VFO[1].customStep);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
   }
   if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL)
   {
@@ -145,20 +175,22 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
   }
   if (trx->changed & TRX_CFLAG_FILTER_LOW || trx->changed & TRX_CFLAG_FILTER_HIGH)
   {
-    this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
+    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
     trx->changed &= ~TRX_CFLAG_FILTER_LOW;
     trx->changed &= ~TRX_CFLAG_FILTER_HIGH;
   }
   if ((trx->changed & TRX_CFLAG_AF_GAIN) || (trx->changed & TRX_CFLAG_AUDIO_MUTE))
   {
-    this->refreshVolume(trx->AFGain, trx->audioMuted);
+    // this->refreshVolume(trx->AFGain, trx->audioMuted);
     trx->changed &= ~TRX_CFLAG_AF_GAIN;
     trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
   }
-  this->refreshCommandCount(trx->getSerialCommandCount());
-#ifdef DEBUG_FPS
+#ifdef DISPLAY_DEBUG
   this->fpsDebug->loop();
-  this->refreshFPS(this->fpsDebug->getFPS());
+  this->screen.setTextColor(0xF85E, TFT_BLACK);
+  this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, this->height - 16);
+  this->screen.setTextSize(1);
+  this->screen.printf("%03u FPS", this->fpsDebug->getFPS());
 #endif
 }
 
@@ -179,19 +211,65 @@ void DisplayILI9488::refreshTransmitStatus(bool isTransmitting)
   this->screen.print(isTransmitting ? "TX" : "RX");
 }
 
-void DisplayILI9488::refreshActiveVFO(uint8_t number, bool isActive)
+void DisplayILI9488::refreshVFOIndex(uint8_t number, bool isActive)
 {
   this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, TFT_BLACK);
-  this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, number == 0 ? VFO_PRIMARY_BLOCK_START_Y_COORDINATE : VFO_SECONDARY_BLOCK_START_Y_COORDINATE);
-  this->screen.setTextSize(3);
+  if (number == 0)
+  {
+    this->screen.setCursor(VFO_WIDGET_PRIMARY_START_X_COORDINATE, VFO_WIDGET_PRIMARY_START_Y_COORDINATE);
+  }
+  else
+  {
+    this->screen.setCursor(VFO_WIDGET_SECONDARY_START_X_COORDINATE, VFO_WIDGET_SECONDARY_START_Y_COORDINATE);
+  }
+
+  this->screen.setTextSize(VFO_WIDGET_FONT_SIZE);
   this->screen.print(number == 0 ? "VFOA" : "VFOB");
+}
+
+void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency)
+{
+  char formattedFrequency[16];
+  char nformattedFrequency[12];
+  // test if this method is more optimized than div operators
+  int resultIndex = 0;
+  sprintf(nformattedFrequency, "%012llu", frequency);
+  for (int i = 0; i < 12; ++i)
+  {
+    formattedFrequency[resultIndex++] = nformattedFrequency[i];
+    if ((i + 1) % 3 == 0 && i < 11)
+    {
+      formattedFrequency[resultIndex++] = '.';
+    }
+  }
+  formattedFrequency[resultIndex] = '\0';
+  this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, TFT_BLACK);
+  this->screen.setCursor(90, number == 0 ? VFO_WIDGET_PRIMARY_START_Y_COORDINATE : VFO_WIDGET_SECONDARY_START_Y_COORDINATE);
+  this->screen.setTextSize(VFO_WIDGET_FONT_SIZE);
+  this->screen.print(formattedFrequency);
+  if (frequency >= 1000000000)
+  {
+    this->screen.print("GHz");
+  }
+  else if (frequency >= 1000000)
+  {
+    this->screen.print("Mhz");
+  }
+  else if (frequency >= 1000)
+  {
+    this->screen.print("Khz");
+  }
+  else
+  {
+    this->screen.print("Hz ");
+  }
 }
 
 void DisplayILI9488::refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode)
 {
   this->screen.setTextColor(isActive ? TFT_CYAN : COLOR_SECONDARY, TFT_BLACK);
-  this->screen.setCursor(420, number == 0 ? VFO_PRIMARY_BLOCK_START_Y_COORDINATE : VFO_SECONDARY_BLOCK_START_Y_COORDINATE);
-  this->screen.setTextSize(3);
+  this->screen.setCursor(420, number == 0 ? VFO_WIDGET_PRIMARY_START_Y_COORDINATE : VFO_WIDGET_SECONDARY_START_Y_COORDINATE);
+  this->screen.setTextSize(VFO_WIDGET_FONT_SIZE);
   switch (mode)
   {
   case TRX_VFO_MD_DSB:
@@ -230,59 +308,68 @@ void DisplayILI9488::refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mo
   }
 }
 
-void DisplayILI9488::refreshCommandCount(uint64_t total)
+void DisplayILI9488::refreshVFOStep(uint8_t number, bool isActive, uint64_t step)
 {
-  this->screen.setTextColor(0xF85E, TFT_BLACK);
-  this->screen.setCursor(this->width - 223, this->height - 18);
-  this->screen.setTextSize(2);
-  this->screen.printf("%06u CMD", total);
-}
-
-void DisplayILI9488::refreshFPS(uint16_t fps)
-{
-  this->screen.setTextColor(0xF85E, TFT_BLACK);
-  this->screen.setCursor(this->width - 87, this->height - 18);
-  this->screen.setTextSize(2);
-  this->screen.printf("%03u FPS", fps);
-}
-
-void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency)
-{
-  char formattedFrequency[16];
-  char nformattedFrequency[12];
-  // test if this method is more optimized than div operators
-  int resultIndex = 0;
-  sprintf(nformattedFrequency, "%012llu", frequency);
-  for (int i = 0; i < 12; ++i)
+  uint16_t x = 0;
+  uint16_t y = 0;
+  // clear old step
+  if (number == 0)
   {
-    formattedFrequency[resultIndex++] = nformattedFrequency[i];
-    if ((i + 1) % 3 == 0 && i < 11)
-    {
-      formattedFrequency[resultIndex++] = '.';
-    }
-  }
-  formattedFrequency[resultIndex] = '\0';
-  this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, TFT_BLACK);
-  this->screen.setCursor(90, number == 0 ? VFO_PRIMARY_BLOCK_START_Y_COORDINATE : VFO_SECONDARY_BLOCK_START_Y_COORDINATE);
-  this->screen.setTextSize(3);
-  this->screen.print(formattedFrequency);
-  if (frequency >= 1000000000)
-  {
-    this->screen.print("GHz");
-  }
-  else if (frequency >= 1000000)
-  {
-    this->screen.print("Mhz");
-  }
-  else if (frequency >= 1000)
-  {
-    this->screen.print("Khz");
+    x = VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE;
+    y = VFO_WIDGET_PRIMARY_STEP_START_Y_COORDINATE;
   }
   else
   {
-    this->screen.print("Hz ");
+    x = VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE;
+    y = VFO_WIDGET_SECONDARY_STEP_START_Y_COORDINATE;
   }
-  this->screen.fillRect(88, VFO_PRIMARY_BLOCK_START_Y_COORDINATE + 24, 20, 3, COLOR_ACTIVE);
+  this->screen.fillRect(x, y, 15 * (VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN), VFO_WIDGET_STEP_HEIGHT, TFT_BLACK);
+  if (step > 0)
+  {
+    switch (step)
+    {
+    case 1: // 1 hz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 14);
+      break;
+    case 10: // 10 hz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 13);
+      break;
+    case 100: // 100 hz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 12);
+      break;
+    case 1000: // 1 Khz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 10);
+      break;
+    case 10000: // 10 Khz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 9);
+      break;
+    case 100000: // 100 Khz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 8);
+      break;
+    case 1000000: // 1 Mhz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 6);
+      break;
+    case 10000000: // 10 Mhz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 5);
+      break;
+    case 100000000: // 100 Mhz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 4);
+      break;
+    case 1000000000: // 1 Ghz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 2);
+      break;
+    case 10000000000: // 10 Ghz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + (VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN);
+      break;
+    case 100000000000: // 100 Ghz
+      x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE);
+      break;
+    default:
+      x = 0;
+      break;
+    }
+    this->screen.fillRect(x, y, VFO_WIDGET_STEP_WIDTH, VFO_WIDGET_STEP_HEIGHT, isActive ? COLOR_ACTIVE : COLOR_SECONDARY);
+  }
 }
 
 void DisplayILI9488::createDigitalSMeter()

@@ -8,6 +8,8 @@
 #include "SSWAnimationILI9488.hpp"
 #include "../../../Transceiver.hpp"
 
+#define DISPLAY_ILI9488_DEBUG
+
 class DisplayILI9488 : public Display
 {
 public:
@@ -24,11 +26,10 @@ private:
   LGFX screen;
   SSWAnimationILI9488 *animatedScreenPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
-  void refreshActiveVFO(uint8_t number, bool isActive);
-  void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
-  void refreshCommandCount(uint64_t total);
-  void refreshFPS(uint16_t fps);
+  void refreshVFOIndex(uint8_t number, bool isActive);
   void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
+  void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
+  void refreshVFOStep(uint8_t number, bool isActive, uint64_t step);
   void createDigitalSMeter();
   void refreshRNDDigitalSMeter(int newSignal);
   void refreshVolume(uint8_t AFGain, bool isMuted);
