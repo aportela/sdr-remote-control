@@ -9,7 +9,7 @@
 
 #define VFO_BLOCK_START_X_COORDINATE 8
 #define VFO_PRIMARY_BLOCK_START_Y_COORDINATE 8
-#define VFO_SECONDARY_BLOCK_START_Y_COORDINATE 40
+#define VFO_SECONDARY_BLOCK_START_Y_COORDINATE 44
 
 #define COLOR_ACTIVE 0xFFFF
 #define COLOR_SECONDARY 0x3186 // 0x3186, 0x4208, 0x7BEF
@@ -282,6 +282,7 @@ void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t freq
   {
     this->screen.print("Hz ");
   }
+  this->screen.fillRect(88, VFO_PRIMARY_BLOCK_START_Y_COORDINATE + 24, 20, 3, COLOR_ACTIVE);
 }
 
 void DisplayILI9488::createDigitalSMeter()
