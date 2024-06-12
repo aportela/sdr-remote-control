@@ -103,8 +103,11 @@ void DisplayILI9488::showConnectScreen(uint16_t serialBaudRate, float currentVer
 
 void DisplayILI9488::hideConnectScreen(void)
 {
-  delete this->animatedScreenPtr;
-  this->animatedScreenPtr = nullptr;
+  if (this->animatedScreenPtr != nullptr)
+  {
+    delete this->animatedScreenPtr;
+    this->animatedScreenPtr = nullptr;
+  }
 }
 
 void DisplayILI9488::refreshConnectScreen()
@@ -124,6 +127,7 @@ void DisplayILI9488::showMainScreen()
   // screen recangle border (DEBUG)
   this->screen.drawRect(0, 0, this->width, this->height, TFT_WHITE);
 
+  this->smeterDigitalPtr = new SMeterILI9488Digital(&this->screen);
   /*
   this->screen.drawRect(0, 72, this->width / 2, 120, TFT_WHITE);
   this->screen.drawRect(this->width / 2, 72, this->width, 120, TFT_WHITE);
@@ -142,6 +146,15 @@ void DisplayILI9488::showMainScreen()
   // Passband filter
   this->screen.drawFastHLine(260, 175, 200, TFT_WHITE);
   */
+}
+
+void DisplayILI9488::hideMainScreen(void)
+{
+  if (this->smeterDigitalPtr != nullptr)
+  {
+    delete this->smeterDigitalPtr;
+    this->smeterDigitalPtr = nullptr;
+  }
 }
 
 void DisplayILI9488::refreshMainScreen(Transceiver *trx)

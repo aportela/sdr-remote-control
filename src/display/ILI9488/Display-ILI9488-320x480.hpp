@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "../Display.hpp"
 #include "SSWAnimationILI9488.hpp"
+#include "SMeter-ILI9488-Digital.hpp"
 #include "../../../Transceiver.hpp"
 
 #define DISPLAY_ILI9488_DEBUG
@@ -20,11 +21,13 @@ public:
   void hideConnectScreen(void) override;
   void refreshConnectScreen() override;
   void showMainScreen() override;
+  void hideMainScreen() override;
   void refreshMainScreen(Transceiver *trx) override;
 
 private:
   LGFX screen;
   SSWAnimationILI9488 *animatedScreenPtr = nullptr;
+  SMeterILI9488Digital *smeterDigitalPtr = nullptr;
   void refreshTransmitStatus(bool isTransmitting);
   void refreshVFOIndex(uint8_t number, bool isActive);
   void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);

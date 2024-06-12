@@ -71,8 +71,11 @@ void DisplayST7789::showConnectScreen(uint16_t serialBaudRate, float currentVers
 
 void DisplayST7789::hideConnectScreen(void)
 {
-  delete this->animatedScreenPtr;
-  this->animatedScreenPtr = nullptr;
+  if (this->animatedScreenPtr != nullptr)
+  {
+    delete this->animatedScreenPtr;
+    this->animatedScreenPtr = nullptr;
+  }
 }
 
 void DisplayST7789::refreshConnectScreen()
@@ -90,6 +93,10 @@ void DisplayST7789::showMainScreen()
 {
   this->screen.fillScreen(ST77XX_BLACK);
   this->createDigitalSMeter();
+}
+
+void DisplayST7789::hideMainScreen(void)
+{
 }
 
 void DisplayST7789::refreshMainScreen(Transceiver *trx)

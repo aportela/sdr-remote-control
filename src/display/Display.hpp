@@ -17,6 +17,7 @@ public:
   virtual void hideConnectScreen(void) override = 0;
   virtual void refreshConnectScreen() override = 0;
   virtual void showMainScreen() override = 0;
+  virtual void hideMainScreen() override = 0;
   virtual void refreshMainScreen(Transceiver *trx) override = 0;
 
 protected:
