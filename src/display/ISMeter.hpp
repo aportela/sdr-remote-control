@@ -7,7 +7,7 @@ class ISMeter
 {
 public:
   virtual ~ISMeter() {}
-  virtual void refresh(uint16_t xOffset, uint16_t yOffset, uint8_t level) = 0;
+  virtual void refresh(uint8_t level) = 0;
 };
 
 #endif

@@ -35,6 +35,13 @@
 
 /* SMETER BLOCK START */
 
+#define SMETER_WIDGET_WIDTH 240  // widget width (without padding)
+#define SMETER_WIDGET_HEIGHT 120 // widget height (without padding)
+
+// first VFO x/y coordinates
+#define SMETER_WIDGET_PRIMARY_START_X_COORDINATE 0
+#define SMETER_WIDGET_PRIMARY_START_Y_COORDINATE 72
+
 /* SMETER BLOCK END */
 
 #define SMETER_PARTS 42
@@ -127,13 +134,9 @@ void DisplayILI9488::showMainScreen()
   // screen recangle border (DEBUG)
   this->screen.drawRect(0, 0, this->width, this->height, TFT_WHITE);
 
-  this->smeterDigitalPtr = new SMeterILI9488Digital(&this->screen);
-  /*
-  this->screen.drawRect(0, 72, this->width / 2, 120, TFT_WHITE);
-  this->screen.drawRect(this->width / 2, 72, this->width, 120, TFT_WHITE);
-  this->screen.setTextDatum(TL_DATUM);
-  this->createDigitalSMeter();
+  this->smeterDigitalPtr = new SMeterILI9488Digital(&this->screen, SMETER_WIDGET_WIDTH, SMETER_WIDGET_HEIGHT, SMETER_WIDGET_PRIMARY_START_X_COORDINATE, SMETER_WIDGET_PRIMARY_START_Y_COORDINATE);
 
+  /*
   // Volume
   this->screen.setTextColor(COLOR_ACTIVE);
   this->screen.setCursor(250, 80);
@@ -191,8 +194,7 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
   }
   if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL)
   {
-    // this->refreshRNDDigitalSMeter(random(0, 42));
-    // this->refreshRNDDigitalSMeter(trx->signalMeterLevel); //
+    this->smeterDigitalPtr->refresh(trx->signalMeterLevel);
     // trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
   if (trx->changed & TRX_CFLAG_FILTER_LOW || trx->changed & TRX_CFLAG_FILTER_HIGH)
@@ -408,65 +410,6 @@ void DisplayILI9488::refreshVFOStep(uint8_t number, bool isActive, uint64_t step
       break;
     }
     this->screen.fillRect(x, y, VFO_WIDGET_STEP_WIDTH, VFO_WIDGET_STEP_HEIGHT, isActive ? COLOR_ACTIVE : COLOR_SECONDARY);
-  }
-}
-
-void DisplayILI9488::createDigitalSMeter()
-{
-  this->screen.setTextSize(3);
-  this->screen.setTextColor(COLOR_ACTIVE);
-  this->screen.setCursor(24, 90);
-  this->screen.print("S9");
-  this->screen.setTextSize(2);
-  this->screen.print("+30dB");
-  this->screen.setTextSize(1);
-  this->screen.setTextColor(COLOR_ACTIVE);
-  this->screen.setCursor(13, 170);
-  this->screen.printf("%u", 0);
-  this->screen.setCursor(23, 170);
-  this->screen.printf("%u", 1);
-  this->screen.setCursor(33, 170);
-  this->screen.printf("%u", 2);
-  this->screen.setCursor(43, 170);
-  this->screen.printf("%u", 3);
-  this->screen.setCursor(53, 170);
-  this->screen.printf("%u", 4);
-  this->screen.setCursor(63, 170);
-  this->screen.printf("%u", 5);
-  this->screen.setCursor(73, 170);
-  this->screen.printf("%u", 6);
-  this->screen.setCursor(83, 170);
-  this->screen.printf("%u", 7);
-  this->screen.setCursor(93, 170);
-  this->screen.printf("%u", 8);
-  this->screen.setCursor(103, 170);
-  this->screen.printf("%u", 9);
-  this->screen.setCursor(138, 170);
-  this->screen.print("+20");
-  this->screen.setCursor(174, 170);
-  this->screen.print("+40");
-  this->screen.setCursor(210, 170);
-  this->screen.print("+60");
-
-  /*
-  for (uint8_t i = 0; i <= SMETER_PARTS; i++)
-  {
-    uint16_t x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
-    if (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42)
-    {
-      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 22 + 4, COLOR_NOT_ACTIVE);
-    }
-    else
-    {
-      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 18, COLOR_NOT_ACTIVE);
-    }
-  }
-  */
-  for (uint8_t i = 0; i <= SMETER_PARTS; i++)
-  {
-    int x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
-    int height = 18;
-    this->screen.fillRect(x, 145 - i, SMETER_PART_WIDTH, height + i, COLOR_NOT_ACTIVE);
   }
 }
 

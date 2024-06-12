@@ -33,7 +33,6 @@ private:
   void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
   void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
   void refreshVFOStep(uint8_t number, bool isActive, uint64_t step);
-  void createDigitalSMeter();
   void refreshRNDDigitalSMeter(uint8_t newSignal);
   void refreshVolume(uint8_t AFGain, bool isMuted);
   void refreshPassBandFilter(uint32_t LF, uint32_t HF, uint32_t BW);

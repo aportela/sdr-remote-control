@@ -1,13 +1,48 @@
 #include "SMeter-ILI9488-Digital.hpp"
 
-#define TOTAL_BARS 42
+#define COLOR_NOT_ACTIVE 0x18C3
+#define COLOR_ACTIVE 0xFFFF
 
-SMeterILI9488Digital::SMeterILI9488Digital(LGFX *existingDisplay)
+SMeterILI9488Digital::SMeterILI9488Digital(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset)
 {
     if (existingDisplay != nullptr)
     {
         this->display = existingDisplay;
+        this->width = width;
+        this->height = height;
+        this->xOffset = xOffset;
+        this->yOffset = yOffset;
         this->preCalculateBarsSizeAndPosition();
+        this->display->drawRect(this->xOffset, this->yOffset, this->width, this->height, TFT_WHITE);
+
+        this->display->setTextSize(1);
+        this->display->setTextColor(COLOR_ACTIVE);
+        this->display->setCursor(this->xOffset + 13, this->yOffset + 100);
+        this->display->printf("%u", 0);
+        this->display->setCursor(this->xOffset + 23, this->yOffset + 100);
+        this->display->printf("%u", 1);
+        this->display->setCursor(this->xOffset + 33, this->yOffset + 100);
+        this->display->printf("%u", 2);
+        this->display->setCursor(this->xOffset + 43, this->yOffset + 100);
+        this->display->printf("%u", 3);
+        this->display->setCursor(this->xOffset + 53, this->yOffset + 100);
+        this->display->printf("%u", 4);
+        this->display->setCursor(this->xOffset + 63, this->yOffset + 100);
+        this->display->printf("%u", 5);
+        this->display->setCursor(this->xOffset + 73, this->yOffset + 100);
+        this->display->printf("%u", 6);
+        this->display->setCursor(this->xOffset + 83, this->yOffset + 100);
+        this->display->printf("%u", 7);
+        this->display->setCursor(this->xOffset + 93, this->yOffset + 100);
+        this->display->printf("%u", 8);
+        this->display->setCursor(this->xOffset + 103, this->yOffset + 100);
+        this->display->printf("%u", 9);
+        this->display->setCursor(this->xOffset + 138, this->yOffset + 100);
+        this->display->print("+20");
+        this->display->setCursor(this->xOffset + 174, this->yOffset + 100);
+        this->display->print("+40");
+        this->display->setCursor(this->xOffset + 210, this->yOffset + 100);
+        this->display->print("+60");
     }
 }
 
@@ -17,8 +52,55 @@ SMeterILI9488Digital::~SMeterILI9488Digital()
 
 void SMeterILI9488Digital::preCalculateBarsSizeAndPosition(void)
 {
+    for (uint8_t i = 0; i < BAR_COUNT; i++)
+    {
+        this->barsX[i] = 14 + i * (BAR_WIDTH + BAR_HORIZONTAL_MARGIN);
+        this->barsY[i] = 145 - i;
+        this->barsHeight[i] = BAR_MIN_HEIGHT + i;
+    }
 }
 
-void SMeterILI9488Digital::refresh(uint16_t xOffset, uint16_t yOffset, uint8_t level)
+void SMeterILI9488Digital::refresh(uint8_t level)
 {
+    if (level != this->previousSignalMeterLevel)
+    {
+        this->display->setTextSize(3);
+        this->display->setTextColor(COLOR_ACTIVE);
+        this->display->setCursor(this->xOffset + 24, this->yOffset + 16);
+        // TODO only clear if required (changed from values < S9 to values > 9 or viceversa)
+        this->display->fillRect(this->xOffset + 24, this->yOffset + 16, 95, 22, TFT_BLACK);
+        //  TODO: check TS2K dB correspondency
+        if (level <= 18)
+        {
+            this->display->printf("S%udB", level / 2);
+        }
+        else
+        {
+            this->display->print("S9");
+            this->display->setTextSize(2);
+            this->display->printf("+%udB", (level - 18) * 3);
+        }
+
+        for (uint8_t i = 0; i < BAR_COUNT; i++)
+        {
+            uint16_t color = 0;
+            if (i < level)
+            {
+                if (i < 19)
+                {
+                    color = TFT_GREEN;
+                }
+                else
+                {
+                    color = TFT_RED;
+                }
+            }
+            else
+            {
+                color = COLOR_NOT_ACTIVE;
+            }
+            this->display->fillRect(this->barsX[i], this->barsY[i], BAR_WIDTH, this->barsHeight[i], color);
+        }
+    }
+    this->previousSignalMeterLevel = level;
 }
