@@ -10,6 +10,8 @@
 #define BAR_MIN_HEIGHT 18
 #define BAR_HORIZONTAL_MARGIN 2
 
+// #define BAR_GROW_LINEAL
+
 class SMeterILI9488Digital : public SMeter
 {
 public:
