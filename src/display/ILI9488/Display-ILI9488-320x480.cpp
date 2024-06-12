@@ -2,6 +2,8 @@
 
 #define WIDGETS_VERTICAL_MARGIN 8
 
+/* VFO BLOCK START */
+
 #define VFO_WIDGET_WIDTH 464                                                                                                                                    // widget width (without padding)
 #define VFO_WIDGET_HEIGHT 72                                                                                                                                    // widget height (without padding)
 #define VFO_WIDGET_PADDING 8                                                                                                                                    // real draw starts at this padding
@@ -29,6 +31,12 @@
 #define VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE 90
 #define VFO_WIDGET_SECONDARY_STEP_START_Y_COORDINATE VFO_WIDGET_SECONDARY_START_Y_COORDINATE + VFO_WIDGET_FONT_HEIGHT + VFO_WIDGET_STEP_VERTICAL_MARGIN
 
+/* VFO BLOCK END */
+
+/* SMETER BLOCK START */
+
+/* SMETER BLOCK END */
+
 #define SMETER_PARTS 42
 #define SMETER_PART_WIDTH 3
 #define SMETER_PART_SPACE_WIDTH 2
@@ -40,8 +48,9 @@
 #define VFO_PRIMARY_BLOCK_START_Y_COORDINATE 8
 #define VFO_SECONDARY_BLOCK_START_Y_COORDINATE 44
 
+#define COLOR_NOT_ACTIVE 0x18C3
 #define COLOR_ACTIVE 0xFFFF
-#define COLOR_SECONDARY 0x3186 // 0x3186, 0x4208, 0x7BEF
+#define COLOR_SECONDARY 0x528A
 
 DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors)
     : screen()
@@ -222,7 +231,6 @@ void DisplayILI9488::refreshVFOIndex(uint8_t number, bool isActive)
   {
     this->screen.setCursor(VFO_WIDGET_SECONDARY_START_X_COORDINATE, VFO_WIDGET_SECONDARY_START_Y_COORDINATE);
   }
-
   this->screen.setTextSize(VFO_WIDGET_FONT_SIZE);
   this->screen.print(number == 0 ? "VFOA" : "VFOB");
 }
@@ -232,9 +240,9 @@ void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t freq
   char formattedFrequency[16];
   char nformattedFrequency[12];
   // test if this method is more optimized than div operators
-  int resultIndex = 0;
+  uint8_t resultIndex = 0;
   sprintf(nformattedFrequency, "%012llu", frequency);
-  for (int i = 0; i < 12; ++i)
+  for (uint8_t i = 0; i < 12; ++i)
   {
     formattedFrequency[resultIndex++] = nformattedFrequency[i];
     if ((i + 1) % 3 == 0 && i < 11)
@@ -243,10 +251,28 @@ void DisplayILI9488::refreshVFOFreq(uint8_t number, bool isActive, uint64_t freq
     }
   }
   formattedFrequency[resultIndex] = '\0';
-  this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, TFT_BLACK);
   this->screen.setCursor(90, number == 0 ? VFO_WIDGET_PRIMARY_START_Y_COORDINATE : VFO_WIDGET_SECONDARY_START_Y_COORDINATE);
   this->screen.setTextSize(VFO_WIDGET_FONT_SIZE);
-  this->screen.print(formattedFrequency);
+  if (isActive)
+  {
+    uint8_t firstNonZeroIndex = 0;
+    while ((formattedFrequency[firstNonZeroIndex] == '0' || formattedFrequency[firstNonZeroIndex] == '.') && firstNonZeroIndex < 12)
+    {
+      firstNonZeroIndex++;
+    }
+    this->screen.setTextColor(COLOR_NOT_ACTIVE, TFT_BLACK);
+    for (uint8_t i = 0; i < firstNonZeroIndex; i++)
+    {
+      this->screen.print(formattedFrequency[i]);
+    }
+    this->screen.setTextColor(COLOR_ACTIVE, TFT_BLACK);
+    this->screen.print(&formattedFrequency[firstNonZeroIndex]);
+  }
+  else
+  {
+    this->screen.setTextColor(COLOR_SECONDARY, TFT_BLACK);
+    this->screen.print(formattedFrequency);
+  }
   if (frequency >= 1000000000)
   {
     this->screen.print("GHz");
@@ -410,28 +436,28 @@ void DisplayILI9488::createDigitalSMeter()
   this->screen.print("+60");
 
   /*
-  for (int i = 0; i <= SMETER_PARTS; i++)
+  for (uint8_t i = 0; i <= SMETER_PARTS; i++)
   {
-    int x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
+    uint16_t x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
     if (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 26 || i == 34 || i == 42)
     {
-      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 22 + 4, COLOR_SECONDARY);
+      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 22 + 4, COLOR_NOT_ACTIVE);
     }
     else
     {
-      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 18, COLOR_SECONDARY);
+      this->screen.fillRect(x, 40 + 98, SMETER_PART_WIDTH, 18, COLOR_NOT_ACTIVE);
     }
   }
   */
-  for (int i = 0; i <= SMETER_PARTS; i++)
+  for (uint8_t i = 0; i <= SMETER_PARTS; i++)
   {
     int x = 14 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
     int height = 18;
-    this->screen.fillRect(x, 145 - i, SMETER_PART_WIDTH, height + i, COLOR_SECONDARY);
+    this->screen.fillRect(x, 145 - i, SMETER_PART_WIDTH, height + i, COLOR_NOT_ACTIVE);
   }
 }
 
-void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
+void DisplayILI9488::refreshRNDDigitalSMeter(uint8_t newSignal)
 {
   this->oldSignal = this->currentSignal;
   // signal changed
@@ -485,7 +511,7 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
     }
 
     // BG
-    for (int i = start; i <= SMETER_PARTS; i++)
+    for (uint8_t i = start; i <= SMETER_PARTS; i++)
     {
       int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
       if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
@@ -499,7 +525,7 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
     }
 
     // PEAK
-    for (int i = 0; i <= SMETER_PARTS; i++)
+    for (uint8_t i = 0; i <= SMETER_PARTS; i++)
     {
       if (i == this->peakSignal)
       {
@@ -517,7 +543,7 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
     }
 
     // SIGNAL
-    for (int i = 0; i <= SMETER_PARTS; i++)
+    for (uint8_t i = 0; i <= SMETER_PARTS; i++)
     {
       // real value draw
       if (i < this->currentSignal)
@@ -548,7 +574,7 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
           this->peakSignal--;
           this->lastPeakChange = current;
 
-          for (int i = this->peakSignal + 1; i <= SMETER_PARTS; i++)
+          for (uint8_t i = this->peakSignal + 1; i <= SMETER_PARTS; i++)
           {
             int x = 26 + i * (SMETER_PART_WIDTH + SMETER_PART_SPACE_WIDTH);
             if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
@@ -561,7 +587,7 @@ void DisplayILI9488::refreshRNDDigitalSMeter(int newSignal)
             }
           }
 
-          for (int i = 0; i <= SMETER_PARTS; i++)
+          for (uint8_t i = 0; i <= SMETER_PARTS; i++)
           {
             if (i == this->peakSignal)
             {
@@ -588,7 +614,7 @@ void DisplayILI9488::refreshVolume(uint8_t AFGain, bool isMuted)
   this->screen.fillRect(331, 81, AFGain, 12, !isMuted ? COLOR_ACTIVE : TFT_RED);
   if (AFGain < 100)
   {
-    this->screen.fillRect(331 + AFGain, 81, 100 - AFGain, 12, COLOR_SECONDARY);
+    this->screen.fillRect(331 + AFGain, 81, 100 - AFGain, 12, COLOR_NOT_ACTIVE);
   }
   this->screen.setTextColor(!isMuted ? COLOR_ACTIVE : TFT_RED, TFT_BLACK);
   this->screen.setTextSize(2);
