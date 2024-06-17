@@ -20,7 +20,18 @@
 // #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
 
-#define MAX_FREQUENCY 900000000000
+#define FUNCUBE_DONGLE_MIN_FREQ 150000     // 150 Khz
+#define FUNCUBE_DONGLE_MAX_FREQ 1900000000 // 1.9 Ghz
+
+#define SDR_PLAY_RSPDUO_MIN_FREQ 1000       // 1Khz
+#define SDR_PLAY_RSPDUO_MAX_FREQ 2000000000 // 2 Ghz
+
+#define MIN_FREQUENCY FUNCUBE_DONGLE_MIN_FREQ
+#define MAX_FREQUENCY FUNCUBE_DONGLE_MAX_FREQ
+
+#define MIN_VOLUME 0
+#define MAX_VOLUME 100
+#define DEFAULT_VOLUME 50
 
 #ifdef DISPLAY_ST7789_240x320
 #include "src/display/ST7789/DisplayST7789.hpp"
@@ -53,21 +64,26 @@
 
 // TODO: 3 rotary encoders volume / filter/ custom VFO step
 // TODO: 3 keys VFO A/B, toggle Mode, toggle Band
-#define ROTARY_ENCODER_A 34
-#define ROTARY_ENCODER_B 35
-#define ROTARY_ENCODER_SWITCH_BUTTON 32
-#define ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
-#define ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
+#define SECONDARY_VFO_ROTARY_ENCODER_A 34
+#define SECONDARY_VFO_ROTARY_ENCODER_B 35
+#define SECONDARY_VFO_ROTARY_ENCODER_SWITCH_BUTTON 32
+#define SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define SECONDARY_VFO_ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
+
+#define SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE 0
+#define SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE 99
+#define SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE 50
 
 #define MAIN_VFO_ROTARY_ENCODER_PIN_A 26
 #define MAIN_VFO_ROTARY_ENCODER_PIN_B 25
-#define MAIN_VFO_ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
-#define MAIN_VFO_ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
+#define MAIN_VFO_ROTARY_ENCODER_SWITCH_BUTTON -1
+#define MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
 
 #define MAIN_VFO_ROTARY_ENCODER_MIN_VALUE 0
 #define MAIN_VFO_ROTARY_ENCODER_MAX_VALUE 9999
 #define MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE 5000
-#define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
+#define MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
 
 #ifdef DISPLAY_DRIVER_FOUND
 #else
@@ -76,12 +92,12 @@
 
 uint16_t freqChangeHzStepSize = 12500; // Hz
 
-AiEsp32RotaryEncoder selectFocusRotaryEncoder = AiEsp32RotaryEncoder(ROTARY_ENCODER_B, ROTARY_ENCODER_A, ROTARY_ENCODER_SWITCH_BUTTON, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
-AiEsp32RotaryEncoder mainVFORotaryEncoder = AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, -1, MAIN_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder mainVFORotaryEncoder = AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, MAIN_VFO_ROTARY_ENCODER_SWITCH_BUTTON, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder secondaryVFORotaryEncoder = AiEsp32RotaryEncoder(SECONDARY_VFO_ROTARY_ENCODER_B, SECONDARY_VFO_ROTARY_ENCODER_A, SECONDARY_VFO_ROTARY_ENCODER_SWITCH_BUTTON, SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, SECONDARY_VFO_ROTARY_ENCODER_STEPS);
 
 void IRAM_ATTR readEncoderISR()
 {
-  selectFocusRotaryEncoder.readEncoder_ISR();
+  secondaryVFORotaryEncoder.readEncoder_ISR();
 }
 
 void IRAM_ATTR readBigEncoderISR()
@@ -110,16 +126,16 @@ MainVFORotaryControl *vfo = nullptr;
 void initRotaryEncoders(void)
 {
 
-  selectFocusRotaryEncoder.begin();
-  selectFocusRotaryEncoder.setup(readEncoderISR);
-  selectFocusRotaryEncoder.setBoundaries(0, 99, true);
-  selectFocusRotaryEncoder.disableAcceleration();
-  selectFocusRotaryEncoder.setEncoderValue(50);
+  secondaryVFORotaryEncoder.begin();
+  secondaryVFORotaryEncoder.setup(readEncoderISR);
+  secondaryVFORotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+  secondaryVFORotaryEncoder.disableAcceleration();
+  secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
 
   mainVFORotaryEncoder.begin();
   mainVFORotaryEncoder.setup(readBigEncoderISR);
   mainVFORotaryEncoder.setBoundaries(MAIN_VFO_ROTARY_ENCODER_MIN_VALUE, MAIN_VFO_ROTARY_ENCODER_MAX_VALUE, true);
-  mainVFORotaryEncoder.setAcceleration(MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
+  mainVFORotaryEncoder.setAcceleration(MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
   mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
 }
 
@@ -242,7 +258,7 @@ void loop()
   {
     serialConnection->loop(trx);
     display.refreshMainScreen(trx);
-    if (selectFocusRotaryEncoder.isEncoderButtonDown())
+    if (secondaryVFORotaryEncoder.isEncoderButtonDown())
     {
       buttonDown = true;
     }
@@ -266,25 +282,24 @@ void loop()
     }
     else
     {
-      if (trx->VFO[trx->activeVFOIndex].customStep > 0)
+      int16_t encoderDelta = secondaryVFORotaryEncoder.encoderChanged();
+      if (encoderDelta > 0)
       {
-        int16_t encoderDelta = selectFocusRotaryEncoder.encoderChanged();
-        if (encoderDelta > 0)
+        if (trx->VFO[trx->activeVFOIndex].frequency + trx->VFO[trx->activeVFOIndex].customStep <= MAX_FREQUENCY)
         {
-          if (trx->VFO[trx->activeVFOIndex].frequency + trx->VFO[trx->activeVFOIndex].customStep <= MAX_FREQUENCY)
-          {
-            trx->VFO[trx->activeVFOIndex].frequency += trx->VFO[trx->activeVFOIndex].customStep;
-            trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-          }
+          trx->VFO[trx->activeVFOIndex].frequency += trx->VFO[trx->activeVFOIndex].customStep;
+          trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
         }
-        else if (encoderDelta < 0)
+        secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+      }
+      else if (encoderDelta < 0)
+      {
+        if (trx->VFO[trx->activeVFOIndex].frequency >= trx->VFO[trx->activeVFOIndex].customStep)
         {
-          if (trx->VFO[trx->activeVFOIndex].frequency > trx->VFO[trx->activeVFOIndex].customStep)
-          {
-            trx->VFO[trx->activeVFOIndex].frequency -= trx->VFO[trx->activeVFOIndex].customStep;
-            trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-          }
+          trx->VFO[trx->activeVFOIndex].frequency -= trx->VFO[trx->activeVFOIndex].customStep;
+          trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
         }
+        secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
       }
 
       mainVFORotaryEncoderLoop();
