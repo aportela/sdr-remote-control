@@ -601,3 +601,11 @@ void DisplayILI9488::refreshPassBandFilter(uint32_t LF, uint32_t HF, uint32_t BW
   // right
   this->screen.drawLine(420, 130, 450, 175, TFT_WHITE);
 }
+
+void DisplayILI9488::debug(int32_t Message)
+{
+  this->screen.setTextColor(0xF85E, TFT_BLACK);
+  this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, this->height - 32);
+  this->screen.setTextSize(1);
+  this->screen.print(Message);
+}

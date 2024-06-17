@@ -9,6 +9,9 @@
 #include "SMeter-ILI9488-Digital.hpp"
 #include "../../../Transceiver.hpp"
 
+#include <Arduino.h>
+#include <String.h>
+
 #define DISPLAY_ILI9488_DEBUG
 
 class DisplayILI9488 : public Display
@@ -23,6 +26,7 @@ public:
   void showMainScreen() override;
   void hideMainScreen() override;
   void refreshMainScreen(Transceiver *trx) override;
+  void debug(int32_t message);
 
 private:
   LGFX screen;
