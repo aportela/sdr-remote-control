@@ -27,7 +27,7 @@ protected:
     uint64_t lastTXActivity = 0;
     void flush(void);
     void send(String str);
-    virtual bool tryConnection(void) = 0;
+    virtual bool tryConnection(Transceiver *trx) = 0;
 };
 
 #endif

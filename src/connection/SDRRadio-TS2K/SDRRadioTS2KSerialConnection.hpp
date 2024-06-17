@@ -14,7 +14,7 @@ public:
     void loop(Transceiver *trx) override;
 
 protected:
-    bool tryConnection(void) override;
+    bool tryConnection(Transceiver *trx) override;
 };
 
 #endif

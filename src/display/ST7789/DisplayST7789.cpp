@@ -106,10 +106,10 @@ void DisplayST7789::refreshMainScreen(Transceiver *trx)
     this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
   }
-  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX)
+  if (trx->changed & TRX_CFLAG_VFO_INDEX)
   {
     this->refreshActiveVFO(trx->activeVFOIndex);
-    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+    trx->changed &= ~TRX_CFLAG_VFO_INDEX;
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE)
   {

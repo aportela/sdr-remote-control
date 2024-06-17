@@ -14,8 +14,13 @@
 
 #include "Arduino.h"
 #include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
+
+#include "src/controls/MainVFORotaryControl.hpp"
+
 // #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
+
+#define MAX_FREQUENCY 900000000000
 
 #ifdef DISPLAY_ST7789_240x320
 #include "src/display/ST7789/DisplayST7789.hpp"
@@ -100,8 +105,11 @@ volatile uint64_t currentSMeterLevel = 0;
 // sdrRemoteTransceiver trx;
 Transceiver *trx = nullptr;
 
+MainVFORotaryControl *vfo = nullptr;
+
 void initRotaryEncoders(void)
 {
+
   selectFocusRotaryEncoder.begin();
   selectFocusRotaryEncoder.setup(readEncoderISR);
   selectFocusRotaryEncoder.setBoundaries(0, 99, true);
@@ -124,9 +132,10 @@ void setup()
   // serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   trx = new Transceiver();
-  // TODO position bug after change connect->main screen
-  // display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
-  //  display.hideConnectScreen();
+  // vfo = new MainVFORotaryControl(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, 0, 0, trx);
+  //  TODO position bug after change connect->main screen
+  //  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+  //   display.hideConnectScreen();
   display.showMainScreen();
 }
 
@@ -151,22 +160,18 @@ void mainVFORotaryEncoderLoop(void)
     int32_t hzIncrement = 0;
     if (newEncoderValue > 5030)
     {
-      // display.debugBottomStr("++++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       hzIncrement = 1000;
     }
     else if (newEncoderValue > 5025)
     {
-      // display.debugBottomStr("+++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       hzIncrement = 100;
     }
     else if (newEncoderValue > 5015)
     {
-      // display.debugBottomStr("++", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       hzIncrement = 100;
     }
     else
     {
-      // display.debugBottomStr("+", newEncoderValue - MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
       hzIncrement = 1;
     }
     currentVFOFrequency += hzIncrement;
@@ -209,8 +214,6 @@ void mainVFORotaryEncoderLoop(void)
 
 static bool buttonDown = false;
 static bool spanChanged = false;
-unsigned int spanPosition = 11;
-const unsigned int spanPositions[] = {32, 50, 68, 104, 122, 140, 176, 194, 212, 248, 266, 284};
 
 unsigned long previousMillis = 0;
 // max screen refresh / second
@@ -222,14 +225,14 @@ float fps = 0;
 
 void loop()
 {
-  if (trx->powerStatus == TRX_PS_OFF)
+  if (!trx->poweredOn)
   {
     display.refreshConnectScreen();
     // clear screen & drawn default connect screen at start (ONLY)
     /*
-    if (serialConnection->tryConnection())
+    if (serialConnection->tryConnection(trx))
     {
-      trx->powerStatus = TRX_PS_ON;
+      trx->poweredOn = true;
       display.hideConnectScreen();
       display.showMainScreen();
     }
@@ -242,65 +245,54 @@ void loop()
     if (selectFocusRotaryEncoder.isEncoderButtonDown())
     {
       buttonDown = true;
-      // serialConnection->serial->printf("%u BUTTON DOWN\n", millis());
     }
     else if (buttonDown)
     {
       buttonDown = false;
       spanChanged = true;
-      // serialConnection->serial->printf("%u BUTTON UP\n", millis());
     }
     if (spanChanged)
     {
-      // serialConnection->serial->printf("%u SPAN CHANGED\n", millis());
-      spanPosition++;
-      if (spanPosition > 11)
+      if (trx->VFO[trx->activeVFOIndex].customStep > 1)
       {
-        spanPosition = 0;
-      }
-      spanChanged = false;
-      if (trx->VFO[trx->activeVFOIndex].customStep < 1000000)
-      {
-        trx->VFO[trx->activeVFOIndex].customStep *= 10;
-        // serialConnection->serial->printf("%u SPAN CHANGED < 1000000\n", millis());
+        trx->VFO[trx->activeVFOIndex].customStep /= 10;
       }
       else
       {
-        trx->VFO[trx->activeVFOIndex].customStep = 1;
-        // serialConnection->serial->printf("%u SPAN CHANGED ELSE\n", millis());
+        trx->VFO[trx->activeVFOIndex].customStep = 100000000000;
       }
       trx->changed |= TRX_CFLAG_ACTIVE_VFO_STEP;
+      spanChanged = false;
     }
     else
     {
-      int16_t encoderDelta = selectFocusRotaryEncoder.encoderChanged();
-      if (encoderDelta > 0)
+      if (trx->VFO[trx->activeVFOIndex].customStep > 0)
       {
-        // serialConnection->serial->printf("%u ENCODER DELTA > 0\n", millis());
-        trx->VFO[trx->activeVFOIndex].frequency++;
-        trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-        // trx->VFO[0].frequency++;
-        // trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-        //  currentVFOFrequency++;
-        //  currentVFOFrequencyChanged = true;
-      }
-      else if (encoderDelta < 0)
-      {
-        // serialConnection->serial->printf("%u ENCODER DELTA < 0\n", millis());
-        trx->VFO[trx->activeVFOIndex].frequency--;
-        trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-        // this->VFO[0].frequency++;
-        // trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-        //  currentVFOFrequency--;
-        //  currentVFOFrequencyChanged = true;
+        int16_t encoderDelta = selectFocusRotaryEncoder.encoderChanged();
+        if (encoderDelta > 0)
+        {
+          if (trx->VFO[trx->activeVFOIndex].frequency + trx->VFO[trx->activeVFOIndex].customStep <= MAX_FREQUENCY)
+          {
+            trx->VFO[trx->activeVFOIndex].frequency += trx->VFO[trx->activeVFOIndex].customStep;
+            trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+          }
+        }
+        else if (encoderDelta < 0)
+        {
+          if (trx->VFO[trx->activeVFOIndex].frequency > trx->VFO[trx->activeVFOIndex].customStep)
+          {
+            trx->VFO[trx->activeVFOIndex].frequency -= trx->VFO[trx->activeVFOIndex].customStep;
+            trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+          }
+        }
       }
 
-      // mainVFORotaryEncoderLoop();
+      mainVFORotaryEncoderLoop();
 
       // re-connect on null activity / timeouts ?
-      if (trx->powerStatus == TRX_PS_ON && serialConnection->isDisconnectedByTimeout())
+      if (trx->poweredOn && serialConnection->isDisconnectedByTimeout())
       {
-        // trx->powerStatus = TRX_PS_OFF;
+        // trx->poweredOn = false;
         // display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
       }
     }

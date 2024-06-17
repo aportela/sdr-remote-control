@@ -5,7 +5,7 @@ SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *seria
 {
 }
 
-bool SDRRadioTS2KSerialConnection::tryConnection(void)
+bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
 {
     this->flush();
     this->send("PS;");
@@ -17,6 +17,7 @@ bool SDRRadioTS2KSerialConnection::tryConnection(void)
         if (receivedData == "PS1")
         {
             this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
             this->flush();
             connected = true;
             break;
@@ -31,7 +32,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
     {
         if (trx != nullptr)
         {
-            if (trx->powerStatus == TRX_PS_ON)
+            if (trx->poweredOn)
             {
                 // connected => main
                 /*
@@ -53,25 +54,25 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     {
                         this->lastRXValidCommand = millis();
                         trx->incSerialCommandCount();
-                        trx->setVFOFrequency(trx->activeVFOIndex, receivedData.substring(2).toInt());
+                        trx->setActiveVFOFrequency(receivedData.substring(2).toInt());
                     }
                     else if (receivedData.startsWith("MD") && receivedData != "MD")
                     {
                         this->lastRXValidCommand = millis();
                         trx->incSerialCommandCount();
-                        trx->setVFOMode(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
+                        trx->setActiveVFOMode((TRXVFOMode)receivedData.substring(2).toInt());
                     }
                     else if (receivedData.startsWith("SL") && receivedData != "SL")
                     {
                         this->lastRXValidCommand = millis();
                         trx->incSerialCommandCount();
-                        trx->setVFOLowFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
+                        trx->setActiveVFOLowFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
                     }
                     else if (receivedData.startsWith("SH") && receivedData != "SH")
                     {
                         this->lastRXValidCommand = millis();
                         trx->incSerialCommandCount();
-                        trx->setVFOHighFilterHz(trx->activeVFOIndex, (TRXVFOMode)receivedData.substring(2).toInt());
+                        trx->setActiveVFOHighFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
                     }
                     else if (receivedData.startsWith("AG") && receivedData != "AG")
                     {

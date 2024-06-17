@@ -5,30 +5,32 @@
 #include <stddef.h>
 
 // bitmask definitions for checking changed values
-#define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0)  // 1
-#define TRX_CFLAG_TRANSMIT_RECEIVE_STATUS (1 << 1)        // 2
-#define TRX_CFLAG_ACTIVE_VFO_INDEX (1 << 2)               // 4
-#define TRX_CFLAG_ACTIVE_VFO_MODE (1 << 3)                // 8
-#define TRX_CFLAG_ACTIVE_VFO_FREQUENCY (1 << 4)           // 16
-#define TRX_CFLAG_ACTIVE_VFO_STEP (1 << 5)                // 32
-#define TRX_CFLAG_SIGNAL_METER_LEVEL (1 << 6)             // 64
-#define TRX_CFLAG_AUDIO_MUTE (1 << 7)                     // 128
-#define TRX_CFLAG_AF_GAIN (1 << 8)                        // 256
-#define TRX_CFLAG_FILTER_LOW (1 << 9)                     // 512
-#define TRX_CFLAG_FILTER_HIGH (1 << 10)                   // 1024
+#define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
+#define TRX_CFLAG_TRANSMIT_RECEIVE_STATUS (1 << 1)       // 2
+#define TRX_CFLAG_VFO_INDEX (1 << 2)                     // 4
+#define TRX_CFLAG_ACTIVE_VFO_FREQUENCY (1 << 3)          // 8
+#define TRX_CFLAG_ACTIVE_VFO_MODE (1 << 4)               // 16
+#define TRX_CFLAG_ACTIVE_VFO_STEP (1 << 5)               // 32
+#define TRX_CFLAG_ACTIVE_VFO_FILTER_LOW (1 << 6)         // 64
+#define TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH (1 << 7)        // 128
+#define TRX_CFLAG_SECONDARY_VFO_FREQUENCY (1 << 8)       // 256
+#define TRX_CFLAG_SECONDARY_VFO_MODE (1 << 9)            // 512
+#define TRX_CFLAG_SECONDARY_VFO_STEP (1 << 10)           // 1024
+#define TRX_CFLAG_SECONDARY_VFO_FILTER_LOW (1 << 11)     // 2048
+#define TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH (1 << 12)    // 4096
+#define TRX_CFLAG_SIGNAL_METER_LEVEL (1 << 13)           // 8192
+#define TRX_CFLAG_AUDIO_MUTE (1 << 14)                   // 16384
+#define TRX_CFLAG_AF_GAIN (1 << 15)                      // 32768
 
-typedef enum {
-  TRX_PS_OFF = 0,
-  TRX_PS_ON = 1
-} TRxPowerStatus;
-
-typedef enum {
+typedef enum
+{
   TRX_AUDIO_NOT_MUTED = 0,
   TRX_AUDIO_MUTED = 1
 } TRxAudioMuteStatus;
 
 // SDR Radio Console (by Simon Brown / G4ELI) Serial CAT https://www.sdr-radio.com/SerialPort
-typedef enum {
+typedef enum
+{
   TRX_VFO_MD_DSB = 0,
   TRX_VFO_MD_LSB = 1,
   TRX_VFO_MD_USB = 2,
@@ -49,41 +51,57 @@ typedef struct
 {
   uint64_t frequency;
   TRXVFOMode mode;
-  uint32_t LF;    // low filter
-  uint32_t HF;    // high filter
-  uint32_t BW;    // bandwith
-  uint64_t customStep;  // hz
+  uint32_t LF;         // low filter
+  uint32_t HF;         // high filter
+  uint32_t BW;         // bandwith
+  uint64_t customStep; // hz
 } TRXVFO;
 
-class Transceiver {
+class Transceiver
+{
 public:
-  uint32_t changed;
-  TRxPowerStatus powerStatus;
+  uint16_t changed;
+  bool poweredOn;
   uint8_t activeVFOIndex;
   TRXVFO VFO[2];
   uint8_t signalMeterLevel;
   uint8_t AFGain;
-  TRxAudioMuteStatus audioMuted;  
+  TRxAudioMuteStatus audioMuted;
 
   Transceiver();
 
   // change current active VFO
-  void setActiveVFOIndex(uint8_t VFOIndex);
+  void setVFOIndex(uint8_t VFOIndex);
 
-  // set vfo frequency
-  void setVFOFrequency(uint8_t VFOIndex, uint64_t frequency);
+  // set (active) vfo frequency
+  void setActiveVFOFrequency(uint64_t frequency);
 
-  // set vfo mode
-  void setVFOMode(uint8_t VFOIndex, TRXVFOMode mode);
+  // set (secondary) vfo frequency
+  void setSecondaryVFOFrequency(uint64_t frequency);
 
-  // set vfo custom step size (hz)
-  void setVFOHzCustomStep(uint8_t VFOIndex, uint64_t hz);
+  // set (active) vfo mode
+  void setActiveVFOMode(TRXVFOMode mode);
 
-  // set vfo low filter size (hz)
-  void setVFOLowFilterHz(uint8_t VFOIndex, uint32_t hz);
+  // set (secondary) vfo mode
+  void setSecondaryVFOMode(TRXVFOMode mode);
 
-  // set vfo high filter size (hz)
-  void setVFOHighFilterHz(uint8_t VFOIndex, uint32_t hz);
+  // set (active) vfo custom step size (hz)
+  void setActiveVFOHzCustomStep(uint64_t hz);
+
+  // set (secondary) vfo custom step size (hz)
+  void setSecondaryVFOHzCustomStep(uint64_t hz);
+
+  // set (active) vfo low filter size (hz)
+  void setActiveVFOLowFilterHz(uint32_t hz);
+
+  // set (secondary) vfo low filter size (hz)
+  void setSecondaryVFOLowFilterHz(uint32_t hz);
+
+  // set (active) vfo high filter size (hz)
+  void setActiveVFOHighFilterHz(uint32_t hz);
+
+  // set (secondary) vfo high filter size (hz)
+  void setSecondaryVFOHighFilterHz(uint32_t hz);
 
   // set signal level meter
   void setSignalMeterLevel(uint8_t level);
@@ -101,8 +119,8 @@ public:
 
   uint64_t getSerialCommandCount(void);
 
-  private:
-    uint64_t serialCommandCount = 0;
+private:
+  uint64_t serialCommandCount = 0;
 };
 
 #endif

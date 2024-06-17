@@ -168,40 +168,66 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
     // this->refreshTransmitStatus(false);
     trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
   }
-  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_INDEX)
+  if (trx->changed & TRX_CFLAG_VFO_INDEX)
   {
     this->refreshVFOIndex(0, trx->activeVFOIndex == 0);
     this->refreshVFOIndex(1, trx->activeVFOIndex == 1);
-    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_INDEX;
+    trx->changed &= ~TRX_CFLAG_VFO_INDEX;
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY)
   {
     this->refreshVFOFreq(0, trx->activeVFOIndex == 0, trx->VFO[0].frequency);
-    this->refreshVFOFreq(1, trx->activeVFOIndex == 1, trx->VFO[1].frequency);
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE)
   {
     this->refreshVFOMode(0, trx->activeVFOIndex == 0, trx->VFO[0].mode);
-    this->refreshVFOMode(1, trx->activeVFOIndex == 1, trx->VFO[1].mode);
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
   }
   if (trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP)
   {
     this->refreshVFOStep(0, trx->activeVFOIndex == 0, trx->VFO[0].customStep);
-    this->refreshVFOStep(1, trx->activeVFOIndex == 1, trx->VFO[1].customStep);
     trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW)
+  {
+    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
+  }
+  if (trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH)
+  {
+    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
+    trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
+  }
+  if (trx->changed & TRX_CFLAG_SECONDARY_VFO_FREQUENCY)
+  {
+    this->refreshVFOFreq(1, trx->activeVFOIndex == 1, trx->VFO[1].frequency);
+    trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
+  }
+  if (trx->changed & TRX_CFLAG_SECONDARY_VFO_MODE)
+  {
+    this->refreshVFOMode(1, trx->activeVFOIndex == 1, trx->VFO[1].mode);
+    trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_MODE;
+  }
+  if (trx->changed & TRX_CFLAG_SECONDARY_VFO_STEP)
+  {
+    this->refreshVFOStep(1, trx->activeVFOIndex == 1, trx->VFO[1].customStep);
+    trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
+  }
+  if (trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_LOW)
+  {
+    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
+    trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+  }
+  if (trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH)
+  {
+    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
+    trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
   }
   if (trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL)
   {
     this->smeterDigitalPtr->refresh(trx->signalMeterLevel);
-    // trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
-  }
-  if (trx->changed & TRX_CFLAG_FILTER_LOW || trx->changed & TRX_CFLAG_FILTER_HIGH)
-  {
-    // this->refreshPassBandFilter(trx->VFO[trx->activeVFOIndex].LF, trx->VFO[trx->activeVFOIndex].HF, trx->VFO[trx->activeVFOIndex].BW);
-    trx->changed &= ~TRX_CFLAG_FILTER_LOW;
-    trx->changed &= ~TRX_CFLAG_FILTER_HIGH;
+    trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
   }
   if ((trx->changed & TRX_CFLAG_AF_GAIN) || (trx->changed & TRX_CFLAG_AUDIO_MUTE))
   {
