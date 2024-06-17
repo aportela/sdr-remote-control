@@ -12,14 +12,6 @@ MainVFORotaryControl::~MainVFORotaryControl()
 
 void MainVFORotaryControl::onChange(int delta)
 {
-    if (delta > 0)
-    {
-        this->trx->VFO[this->trx->activeVFOIndex].frequency += 1;
-        this->trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-    }
-    else if (delta < 0)
-    {
-        this->trx->VFO[this->trx->activeVFOIndex].frequency -= 1;
-        this->trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-    }
+    this->trx->VFO[this->trx->activeVFOIndex].frequency += delta;
+    this->trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
 }
