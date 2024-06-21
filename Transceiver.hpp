@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string>
 
 // bitmask definitions for checking changed values
 #define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
@@ -62,6 +63,7 @@ class Transceiver
 public:
   uint16_t changed;
   bool poweredOn;
+  char radioName[32] = "unknown";
   uint8_t activeVFOIndex;
   TRXVFO VFO[2];
   uint8_t signalMeterLevel;
