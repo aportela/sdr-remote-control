@@ -8,13 +8,20 @@ SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *seria
 bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
 {
     this->flush();
-    this->send("PS;");
+    this->send("NA;PS;");
     bool connected = false;
     while (this->serial->available() > 0 && !connected)
     {
         this->lastRXActivity = millis();
         String receivedData = this->serial->readStringUntil(';');
-        if (receivedData == "PS1")
+        if (receivedData.startsWith("NA") && receivedData != "NA")
+        {
+            strcpy(trx->radioName, receivedData.substring(2).c_str());
+            this->lastRXValidCommand = millis();
+            trx->incSerialCommandCount();
+            break;
+        }
+        else if (receivedData == "PS1")
         {
             this->lastRXValidCommand = millis();
             trx->incSerialCommandCount();
