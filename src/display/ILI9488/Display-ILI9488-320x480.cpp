@@ -55,9 +55,11 @@
 #define VFO_PRIMARY_BLOCK_START_Y_COORDINATE 8
 #define VFO_SECONDARY_BLOCK_START_Y_COORDINATE 44
 
+#define COLOR_BG TFT_BLACK
 #define COLOR_NOT_ACTIVE 0x18C3
 #define COLOR_ACTIVE 0xFFFF
 #define COLOR_SECONDARY 0x528A
+#define COLOR_WARNING TFT_RED
 
 DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation, bool invertDisplayColors)
     : screen()
@@ -75,7 +77,7 @@ DisplayILI9488::DisplayILI9488(uint16_t width, uint16_t height, uint8_t rotation
     }
   }
   this->screen.setTextWrap(false);
-  this->screen.fillScreen(TFT_BLACK);
+  this->screen.fillScreen(COLOR_BG);
 #ifdef DISPLAY_DEBUG
   this->fpsDebug = new FPSDebug();
 #endif
@@ -130,21 +132,22 @@ void DisplayILI9488::refreshConnectScreen()
 
 void DisplayILI9488::showMainScreen()
 {
-  this->screen.fillScreen(TFT_BLACK);
+  this->screen.fillScreen(COLOR_BG);
   // screen recangle border (DEBUG)
   this->screen.drawRect(0, 0, this->width, this->height, TFT_WHITE);
 
   this->smeterDigitalPtr = new SMeterILI9488Digital(&this->screen, SMETER_WIDGET_WIDTH, SMETER_WIDGET_HEIGHT, SMETER_WIDGET_PRIMARY_START_X_COORDINATE, SMETER_WIDGET_PRIMARY_START_Y_COORDINATE);
 
-  /*
   // Volume
   this->screen.setTextColor(COLOR_ACTIVE);
   this->screen.setCursor(250, 80);
   this->screen.setTextSize(2);
   this->screen.print("VOLUME");
-  this->screen.drawRect(330, 80, 102, 14, TFT_PINK);
-  this->screen.setCursor(445, 80);
-  this->screen.print("00");
+  this->screen.drawRect(330, 80, 102, 14, COLOR_SECONDARY);
+  this->screen.setCursor(438, 80);
+  this->screen.print("000");
+
+  /*
 
   // Passband filter
   this->screen.drawFastHLine(260, 175, 200, TFT_WHITE);
@@ -231,13 +234,13 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
   }
   if ((trx->changed & TRX_CFLAG_AF_GAIN) || (trx->changed & TRX_CFLAG_AUDIO_MUTE))
   {
-    // this->refreshVolume(trx->AFGain, trx->audioMuted);
+    this->refreshVolume(trx->AFGain, trx->audioMuted);
     trx->changed &= ~TRX_CFLAG_AF_GAIN;
     trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
   }
 #ifdef DISPLAY_DEBUG
   this->fpsDebug->loop();
-  this->screen.setTextColor(0xF85E, TFT_BLACK);
+  this->screen.setTextColor(0xF85E, COLOR_BG);
   this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, this->height - 16);
   this->screen.setTextSize(1);
   this->screen.printf("%03u FPS", this->fpsDebug->getFPS());
@@ -249,12 +252,12 @@ void DisplayILI9488::refreshTransmitStatus(bool isTransmitting)
   if (isTransmitting)
   {
     this->screen.drawRect(0, 0, 29, 20, TFT_RED);
-    this->screen.setTextColor(TFT_RED, TFT_BLACK);
+    this->screen.setTextColor(TFT_RED, COLOR_BG);
   }
   else
   {
     this->screen.drawRect(0, 0, 29, 20, TFT_GREEN);
-    this->screen.setTextColor(TFT_GREEN, TFT_BLACK);
+    this->screen.setTextColor(TFT_GREEN, COLOR_BG);
   }
   this->screen.setCursor(3, 3);
   this->screen.setTextSize(2);
@@ -263,7 +266,7 @@ void DisplayILI9488::refreshTransmitStatus(bool isTransmitting)
 
 void DisplayILI9488::refreshVFOIndex(uint8_t number, bool isActive)
 {
-  this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, TFT_BLACK);
+  this->screen.setTextColor(isActive ? COLOR_ACTIVE : COLOR_SECONDARY, COLOR_BG);
   if (number == 0)
   {
     this->screen.setCursor(VFO_WIDGET_PRIMARY_START_X_COORDINATE, VFO_WIDGET_PRIMARY_START_Y_COORDINATE);
@@ -593,15 +596,15 @@ void DisplayILI9488::refreshRNDDigitalSMeter(uint8_t newSignal)
 
 void DisplayILI9488::refreshVolume(uint8_t AFGain, bool isMuted)
 {
-  this->screen.fillRect(331, 81, AFGain, 12, !isMuted ? COLOR_ACTIVE : TFT_RED);
+  this->screen.fillRect(331, 81, AFGain, 12, !isMuted ? COLOR_ACTIVE : COLOR_WARNING);
   if (AFGain < 100)
   {
     this->screen.fillRect(331 + AFGain, 81, 100 - AFGain, 12, COLOR_NOT_ACTIVE);
   }
-  this->screen.setTextColor(!isMuted ? COLOR_ACTIVE : TFT_RED, TFT_BLACK);
+  this->screen.setTextColor(!isMuted ? COLOR_ACTIVE : COLOR_WARNING, COLOR_BG);
   this->screen.setTextSize(2);
-  this->screen.setCursor(445, 80);
-  this->screen.printf("%02u", AFGain);
+  this->screen.setCursor(438, 80);
+  this->screen.printf("%03u", AFGain);
 }
 
 void DisplayILI9488::refreshPassBandFilter(uint32_t LF, uint32_t HF, uint32_t BW)
@@ -630,7 +633,7 @@ void DisplayILI9488::refreshPassBandFilter(uint32_t LF, uint32_t HF, uint32_t BW
 
 void DisplayILI9488::debug(int32_t Message)
 {
-  this->screen.setTextColor(0xF85E, TFT_BLACK);
+  this->screen.setTextColor(0xF85E, COLOR_BG);
   this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, this->height - 32);
   this->screen.setTextSize(1);
   this->screen.print(Message);
