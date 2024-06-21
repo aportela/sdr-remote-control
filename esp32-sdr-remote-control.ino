@@ -74,6 +74,16 @@
 #define SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE 99
 #define SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE 50
 
+#define VOLUME_ROTARY_ENCODER_A 33
+#define VOLUME_ROTARY_ENCODER_B 27
+#define VOLUME_ROTARY_ENCODER_SWITCH_BUTTON 14
+#define VOLUME_ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
+#define VOLUME_ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
+
+#define VOLUME_ROTARY_ENCODER_MIN_VALUE 0
+#define VOLUME_ROTARY_ENCODER_MAX_VALUE 99
+#define VOLUME_ROTARY_ENCODER_CENTER_VALUE 50
+
 #define MAIN_VFO_ROTARY_ENCODER_PIN_A 26
 #define MAIN_VFO_ROTARY_ENCODER_PIN_B 25
 #define MAIN_VFO_ROTARY_ENCODER_SWITCH_BUTTON -1
@@ -94,6 +104,12 @@ uint16_t freqChangeHzStepSize = 12500; // Hz
 
 AiEsp32RotaryEncoder mainVFORotaryEncoder = AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, MAIN_VFO_ROTARY_ENCODER_SWITCH_BUTTON, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_STEPS);
 AiEsp32RotaryEncoder secondaryVFORotaryEncoder = AiEsp32RotaryEncoder(SECONDARY_VFO_ROTARY_ENCODER_B, SECONDARY_VFO_ROTARY_ENCODER_A, SECONDARY_VFO_ROTARY_ENCODER_SWITCH_BUTTON, SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, SECONDARY_VFO_ROTARY_ENCODER_STEPS);
+AiEsp32RotaryEncoder volumeRotaryEncoder = AiEsp32RotaryEncoder(VOLUME_ROTARY_ENCODER_B, VOLUME_ROTARY_ENCODER_A, VOLUME_ROTARY_ENCODER_SWITCH_BUTTON, SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, SECONDARY_VFO_ROTARY_ENCODER_STEPS);
+
+void IRAM_ATTR readVolumeEncoderISR()
+{
+  volumeRotaryEncoder.readEncoder_ISR();
+}
 
 void IRAM_ATTR readEncoderISR()
 {
@@ -125,6 +141,11 @@ MainVFORotaryControl *vfo = nullptr;
 
 void initRotaryEncoders(void)
 {
+
+  volumeRotaryEncoder.begin();
+  volumeRotaryEncoder.setup(readVolumeEncoderISR);
+  volumeRotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+  volumeRotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
 
   secondaryVFORotaryEncoder.begin();
   secondaryVFORotaryEncoder.setup(readEncoderISR);
@@ -282,6 +303,26 @@ void loop()
     }
     else
     {
+      int16_t volumeEncoderDelta = volumeRotaryEncoder.encoderChanged();
+      if (volumeEncoderDelta > 0)
+      {
+        if (trx->AFGain < MAX_VOLUME)
+        {
+          trx->AFGain += 1;
+          trx->changed |= TRX_CFLAG_AF_GAIN;
+        }
+        volumeRotaryEncoder.setEncoderValue(VOLUME_ROTARY_ENCODER_CENTER_VALUE);
+      }
+      else if (volumeEncoderDelta < 0)
+      {
+        if (trx->AFGain > MIN_VOLUME)
+        {
+          trx->AFGain -= 1;
+          trx->changed |= TRX_CFLAG_AF_GAIN;
+        }
+        volumeRotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+      }
+
       int16_t encoderDelta = secondaryVFORotaryEncoder.encoderChanged();
       if (encoderDelta > 0)
       {
