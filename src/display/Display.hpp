@@ -4,7 +4,7 @@
 #define DISPLAY_DEBUG // uncomment this ONLY for debug/benchmark display
 
 #include "IDisplay.hpp"
-#include "Transceiver.hpp"
+#include "../../Transceiver.hpp"
 #ifdef DISPLAY_DEBUG
 #include "FPSDebug.hpp"
 #endif
