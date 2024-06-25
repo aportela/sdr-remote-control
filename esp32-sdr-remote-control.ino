@@ -62,6 +62,9 @@
 #define SERIAL_FLUSH_WAIT 10
 #define SERIAL_WAIT_AFTER_SEND_CMD 10
 
+#define ENC1_A 19
+#define ENC1_B 21
+
 // TODO: 3 rotary encoders volume / filter/ custom VFO step
 // TODO: 3 keys VFO A/B, toggle Mode, toggle Band
 #define SECONDARY_VFO_ROTARY_ENCODER_A 34
@@ -102,9 +105,11 @@
 
 uint16_t freqChangeHzStepSize = 12500; // Hz
 
+/*
 AiEsp32RotaryEncoder mainVFORotaryEncoder = AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, MAIN_VFO_ROTARY_ENCODER_SWITCH_BUTTON, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_STEPS);
 AiEsp32RotaryEncoder secondaryVFORotaryEncoder = AiEsp32RotaryEncoder(SECONDARY_VFO_ROTARY_ENCODER_B, SECONDARY_VFO_ROTARY_ENCODER_A, SECONDARY_VFO_ROTARY_ENCODER_SWITCH_BUTTON, SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, SECONDARY_VFO_ROTARY_ENCODER_STEPS);
 AiEsp32RotaryEncoder volumeRotaryEncoder = AiEsp32RotaryEncoder(VOLUME_ROTARY_ENCODER_B, VOLUME_ROTARY_ENCODER_A, VOLUME_ROTARY_ENCODER_SWITCH_BUTTON, SECONDARY_VFO_ROTARY_ENCODER_VCC_PIN, SECONDARY_VFO_ROTARY_ENCODER_STEPS);
+
 
 void IRAM_ATTR readVolumeEncoderISR()
 {
@@ -121,6 +126,7 @@ void IRAM_ATTR readBigEncoderISR()
   mainVFORotaryEncoder.readEncoder_ISR();
 }
 
+*/
 #ifdef DISPLAY_ST7789_240x320
 DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 #endif
@@ -139,25 +145,137 @@ Transceiver *trx = nullptr;
 
 MainVFORotaryControl *vfo = nullptr;
 
-void initRotaryEncoders(void)
+static bool ccw1_fall = false;
+static bool cw1_fall = false;
+
+void _encoder_callback_cw(uint gpio, uint32_t events)
+{
+  // static bool ccw1_fall = false;
+  // static bool cw1_fall = false;
+
+  // uint32_t gpio_state = (gpio_get_all() >> 10) & 0b0111;
+  // uint8_t enc_value = (gpio_state & 0x03);
+
+  uint8_t enc_value_A = digitalRead(ENC1_A);
+  uint8_t enc_value_B = digitalRead(ENC1_B);
+  uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
+
+  if (gpio == ENC1_A)
+  {
+    if ((!cw1_fall) && (enc_value == 0b10))
+    {
+      cw1_fall = true;
+    }
+    if ((ccw1_fall) && (enc_value == 0b00))
+    {
+      cw1_fall = false;
+      ccw1_fall = false;
+      // Serial.println("1-CCW");
+      trx->VFO[trx->activeVFOIndex].frequency--;
+      trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    }
+  }
+
+  if (gpio == ENC1_B)
+  {
+    if ((!ccw1_fall) && (enc_value == 0b01))
+    {
+      ccw1_fall = true;
+    }
+    if ((cw1_fall) && (enc_value == 0b00))
+    {
+      cw1_fall = false;
+      ccw1_fall = false;
+      // Serial.println("1-CW");
+      trx->VFO[trx->activeVFOIndex].frequency++;
+      trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    }
+  }
+}
+
+void encoder_callback_cw(uint pinA, uint pinB)
 {
 
-  volumeRotaryEncoder.begin();
-  volumeRotaryEncoder.setup(readVolumeEncoderISR);
-  volumeRotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
-  volumeRotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+  // uint32_t gpio_state = (gpio_get_all() >> 10) & 0b0111;
+  // uint8_t enc_value = (gpio_state & 0x03);
 
-  secondaryVFORotaryEncoder.begin();
-  secondaryVFORotaryEncoder.setup(readEncoderISR);
-  secondaryVFORotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
-  secondaryVFORotaryEncoder.disableAcceleration();
-  secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+  uint8_t enc_value_A = digitalRead(pinA);
+  uint8_t enc_value_B = digitalRead(pinB);
+  uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
 
-  mainVFORotaryEncoder.begin();
-  mainVFORotaryEncoder.setup(readBigEncoderISR);
-  mainVFORotaryEncoder.setBoundaries(MAIN_VFO_ROTARY_ENCODER_MIN_VALUE, MAIN_VFO_ROTARY_ENCODER_MAX_VALUE, true);
-  mainVFORotaryEncoder.setAcceleration(MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
-  mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
+  if ((!cw1_fall) && (enc_value == 0b10))
+  {
+    cw1_fall = true;
+  }
+  if ((ccw1_fall) && (enc_value == 0b00))
+  {
+    cw1_fall = false;
+    ccw1_fall = false;
+    // Serial.println("1-CCW");
+    trx->VFO[trx->activeVFOIndex].frequency--;
+    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+  }
+}
+
+void encoder_callback_ccw(uint pinA, uint pinB)
+{
+
+  // uint32_t gpio_state = (gpio_get_all() >> 10) & 0b0111;
+  // uint8_t enc_value = (gpio_state & 0x03);
+
+  uint8_t enc_value_A = digitalRead(pinA);
+  uint8_t enc_value_B = digitalRead(pinB);
+  uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
+
+  if ((!ccw1_fall) && (enc_value == 0b01))
+  {
+    ccw1_fall = true;
+  }
+  if ((cw1_fall) && (enc_value == 0b00))
+  {
+    cw1_fall = false;
+    ccw1_fall = false;
+    // Serial.println("1-CW");
+    trx->VFO[trx->activeVFOIndex].frequency++;
+    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+  }
+}
+
+void initRotaryEncoders(void)
+{
+  /*
+    volumeRotaryEncoder.begin();
+    volumeRotaryEncoder.setup(readVolumeEncoderISR);
+    volumeRotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+    volumeRotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+
+    secondaryVFORotaryEncoder.begin();
+    secondaryVFORotaryEncoder.setup(readEncoderISR);
+    secondaryVFORotaryEncoder.setBoundaries(SECONDARY_VFO_ROTARY_ENCODER_MIN_VALUE, SECONDARY_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+    secondaryVFORotaryEncoder.disableAcceleration();
+    secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
+
+    mainVFORotaryEncoder.begin();
+    mainVFORotaryEncoder.setup(readBigEncoderISR);
+    mainVFORotaryEncoder.setBoundaries(MAIN_VFO_ROTARY_ENCODER_MIN_VALUE, MAIN_VFO_ROTARY_ENCODER_MAX_VALUE, true);
+    mainVFORotaryEncoder.setAcceleration(MAIN_VFO_SECONDARY_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
+    mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
+    */
+  pinMode(ENC1_A, INPUT_PULLUP);
+  pinMode(ENC1_B, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(ENC1_A), []()
+                  { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC1_B), []()
+                  { encoder_callback_ccw(ENC1_A, ENC1_B); }, CHANGE);
+
+  /*
+attachInterrupt(digitalPinToInterrupt(ENC1_A), []()
+   { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
+attachInterrupt(digitalPinToInterrupt(ENC1_B), []()
+   { encoder_callback_ccw(ENC1_A, ENC1_B); }, CHANGE);
+   */
+  vfo = new MainVFORotaryControl(ENC1_A, ENC1_B, 100, 0, trx);
 }
 
 // SDRRadioTS2KSerialConnection *serialConnection;
@@ -188,6 +306,7 @@ uint8_t VFOMode = 4;
 
 bool smeterCreated = false;
 
+/*
 void mainVFORotaryEncoderLoop(void)
 {
   int16_t delta = mainVFORotaryEncoder.encoderChanged();
@@ -248,6 +367,7 @@ void mainVFORotaryEncoderLoop(void)
     mainVFORotaryEncoder.setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
   }
 }
+*/
 
 static bool buttonDown = false;
 static bool spanChanged = false;
@@ -279,6 +399,7 @@ void loop()
   {
     serialConnection->loop(trx);
     display.refreshMainScreen(trx);
+    /*
     if (secondaryVFORotaryEncoder.isEncoderButtonDown())
     {
       buttonDown = true;
@@ -288,6 +409,7 @@ void loop()
       buttonDown = false;
       spanChanged = true;
     }
+    */
     if (spanChanged)
     {
       if (trx->VFO[trx->activeVFOIndex].customStep > 1)
@@ -303,6 +425,8 @@ void loop()
     }
     else
     {
+
+      /*
       int16_t volumeEncoderDelta = volumeRotaryEncoder.encoderChanged();
       if (volumeEncoderDelta > 0)
       {
@@ -343,7 +467,8 @@ void loop()
         secondaryVFORotaryEncoder.setEncoderValue(SECONDARY_VFO_ROTARY_ENCODER_CENTER_VALUE);
       }
 
-      mainVFORotaryEncoderLoop();
+      */
+      // mainVFORotaryEncoderLoop();
 
       // re-connect on null activity / timeouts ?
       if (trx->poweredOn && serialConnection->isDisconnectedByTimeout())
