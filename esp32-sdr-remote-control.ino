@@ -91,6 +91,8 @@ volatile uint64_t currentSMeterLevel = 0;
 // sdrRemoteTransceiver trx;
 Transceiver *trx = nullptr;
 
+static uint64_t lastEncoderMillis = millis();
+
 static bool ccw1_fall = false;
 static bool cw1_fall = false;
 
@@ -109,7 +111,22 @@ void encoder_callback_ccw(uint pinA, uint pinB)
   {
     cw1_fall = false;
     ccw1_fall = false;
-    trx->VFO[trx->activeVFOIndex].frequency--;
+    uint8_t delta = 0;
+    uint64_t currentMillis = millis();
+    if (currentMillis - lastEncoderMillis < 20)
+    {
+      delta = 5;
+    }
+    else if (currentMillis - lastEncoderMillis < 50)
+    {
+      delta = 2;
+    }
+    else
+    {
+      delta = 1;
+    }
+    lastEncoderMillis = currentMillis;
+    trx->VFO[trx->activeVFOIndex].frequency -= delta;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
 }
@@ -128,7 +145,22 @@ void encoder_callback_cw(uint pinA, uint pinB)
   {
     cw1_fall = false;
     ccw1_fall = false;
-    trx->VFO[trx->activeVFOIndex].frequency++;
+    uint8_t delta = 0;
+    uint64_t currentMillis = millis();
+    if (currentMillis - lastEncoderMillis < 20)
+    {
+      delta = 5;
+    }
+    else if (currentMillis - lastEncoderMillis < 50)
+    {
+      delta = 2;
+    }
+    else
+    {
+      delta = 1;
+    }
+    lastEncoderMillis = currentMillis;
+    trx->VFO[trx->activeVFOIndex].frequency += delta;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
 }
