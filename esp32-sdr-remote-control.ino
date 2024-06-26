@@ -96,6 +96,9 @@ static uint64_t lastEncoderMillis = millis();
 static bool ccw1_fall = false;
 static bool cw1_fall = false;
 
+// read & debounce rotary encoder
+// code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
+
 void encoder_callback_ccw(uint pinA, uint pinB)
 {
 
