@@ -48,6 +48,7 @@ SMeterILI9488Digital::SMeterILI9488Digital(LGFX *existingDisplay, uint16_t width
 
 SMeterILI9488Digital::~SMeterILI9488Digital()
 {
+    this->display = nullptr;
 }
 
 void SMeterILI9488Digital::preCalculateBarsSizeAndPosition(void)
