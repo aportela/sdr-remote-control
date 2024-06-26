@@ -152,6 +152,9 @@ void DisplayILI9488::showMainScreen()
   // Passband filter
   this->screen.drawFastHLine(260, 175, 200, TFT_WHITE);
   */
+
+  // FN BUTTON MENU
+  this->menuPtr = new MenuILI9488(&this->screen, 478, 40, 0, 200);
 }
 
 void DisplayILI9488::hideMainScreen(void)
@@ -160,6 +163,11 @@ void DisplayILI9488::hideMainScreen(void)
   {
     delete this->smeterDigitalPtr;
     this->smeterDigitalPtr = nullptr;
+  }
+  if (this->menuPtr != nullptr)
+  {
+    delete this->menuPtr;
+    this->menuPtr = nullptr;
   }
 }
 
