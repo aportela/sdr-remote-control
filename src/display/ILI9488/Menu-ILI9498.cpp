@@ -123,8 +123,12 @@ void MenuILI9488::initMenu(void)
 
 void MenuILI9488::refresh()
 {
-    for (uint8_t i = 0; i < 4; i++)
+    uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
+    uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
+    for (uint8_t i = startIndex; i < BUTTONS_PER_PAGE; i++)
     {
+        this->buttons[i]->onChange();
+        // TODO: active flag on page changes ???
         this->buttons[i]->draw();
     }
 }
