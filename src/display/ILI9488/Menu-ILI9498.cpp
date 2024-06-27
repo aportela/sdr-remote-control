@@ -98,26 +98,36 @@ MenuILI9488::~MenuILI9488()
 
 void MenuILI9488::initMenu(void)
 {
-    for (uint8_t i = 0, f = 1; i < TOTAL_MENU_BUTTONS; i++, f++)
+    for (uint8_t i = 0, f = 1, row = 0, col = 0; i < TOTAL_MENU_BUTTONS; i++, f++)
     {
-        char topLabel[9];
+        char topLabel[24];
         if (f > BUTTONS_PER_PAGE)
         {
             f = 1;
         }
         sprintf(topLabel, "F%d", f);
-        char mainLabel[9];
+        char mainLabel[24];
         sprintf(mainLabel, buttonLabels[i]);
         this->buttons[i] = new MenuButtonILI9488(
             this->display,
-            i,                                                       // index
-            (i * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
-            (0 * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
-            topLabel,                                                // top label
-            mainLabel,                                               // bottom label
-            i == 0,                                                  // active
-            buttonCallbacks[i]                                       // callback
+            i,                                                         // index
+            (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
+            (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
+            topLabel,                                                  // top label
+            mainLabel,                                                 // bottom label
+            i == 0,                                                    // active
+            buttonCallbacks[i]                                         // callback
         );
+        col++;
+        if (col == COLS_PER_PAGE)
+        {
+            col = 0;
+            row++;
+        }
+        if (row == ROWS_PER_PAGE)
+        {
+            row = 0;
+        }
     }
 }
 
@@ -125,7 +135,7 @@ void MenuILI9488::refresh(bool forceAll)
 {
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
     uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
-    for (uint8_t i = startIndex; i < BUTTONS_PER_PAGE; i++)
+    for (uint8_t i = startIndex; i < endIndex; i++)
     {
         if (forceAll)
         {

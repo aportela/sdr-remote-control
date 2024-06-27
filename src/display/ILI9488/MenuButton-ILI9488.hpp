@@ -10,7 +10,7 @@
 class MenuButtonILI9488 : public MenuButton
 {
 public:
-    MenuButtonILI9488(LGFX *existingDisplay, uint8_t index, uint16_t x, uint16_t y, char *topLabel, char *bottomLabel, bool active, ButtonCallback onClick);
+    MenuButtonILI9488(LGFX *existingDisplay, uint8_t index, uint16_t x, uint16_t y, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
     ~MenuButtonILI9488();
     void draw(void) override;
 

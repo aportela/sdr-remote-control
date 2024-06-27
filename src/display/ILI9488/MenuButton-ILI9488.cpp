@@ -9,8 +9,8 @@
 #define BUTTON_NOT_ACTIVE_LABEL_COLOR 0xFFFF
 #define BUTTON_ACTIVE_LABEL_COLOR 0x0000
 
-MenuButtonILI9488::MenuButtonILI9488(LGFX *existingDisplay, uint8_t index, uint16_t x, uint16_t y, char *topLabel, char *bottomLabel, bool active, ButtonCallback onClick)
-    : MenuButton(index, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, topLabel, bottomLabel, active, onClick)
+MenuButtonILI9488::MenuButtonILI9488(LGFX *existingDisplay, uint8_t index, uint16_t x, uint16_t y, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick)
+    : MenuButton(index, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, const_cast<char *>(topLabel), const_cast<char *>(bottomLabel), active, onClick)
 {
     if (existingDisplay != nullptr)
     {

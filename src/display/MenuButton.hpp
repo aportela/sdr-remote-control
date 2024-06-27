@@ -22,7 +22,7 @@ protected:
     bool changed;
 
 public:
-    MenuButton(uint8_t index, uint16_t x, uint16_t y, uint16_t width, uint16_t height, char *topLabel, char *bottomLabel, bool active, ButtonCallback onClick);
+    MenuButton(uint8_t index, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
     ~MenuButton();
     virtual void draw(void) = 0;
     void onChange();
