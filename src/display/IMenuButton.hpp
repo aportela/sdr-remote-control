@@ -7,7 +7,7 @@ class IMenuButton
 {
 public:
     virtual ~IMenuButton() {}
-    virtual void draw(uint16_t x, uint16_t y);
+    virtual void draw(void) = 0;
 };
 
 #endif
