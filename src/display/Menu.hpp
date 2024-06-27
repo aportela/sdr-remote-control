@@ -8,7 +8,7 @@ class Menu : public IMenu
 {
 public:
     Menu(void);
-    virtual void refresh() = 0;
+    virtual void refresh(bool forceAll) = 0;
     virtual void previousPage(void) = 0;
     virtual void nextPage(void) = 0;
 

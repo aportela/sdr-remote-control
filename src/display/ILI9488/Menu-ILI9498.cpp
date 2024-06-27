@@ -80,7 +80,7 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
         this->yOffset = yOffset;
         this->totalPages = TOTAL_MENU_PAGES;
         this->initMenu();
-        this->refresh();
+        this->refresh(true);
     }
     //   1: define buttons (index, labels, callbacks)
     //   2: set default menu start/end indexes
@@ -121,14 +121,17 @@ void MenuILI9488::initMenu(void)
     }
 }
 
-void MenuILI9488::refresh()
+void MenuILI9488::refresh(bool forceAll)
 {
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
     uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
     for (uint8_t i = startIndex; i < BUTTONS_PER_PAGE; i++)
     {
-        this->buttons[i]->onChange();
-        // TODO: active flag on page changes ???
+        if (forceAll)
+        {
+            this->buttons[i]->onChange();
+        }
+        // TODO: save/restore active flag on page changes ???
         this->buttons[i]->draw();
     }
 }
@@ -138,7 +141,7 @@ void MenuILI9488::previousPage(void)
     if (this->currentPage > 0)
     {
         this->currentPage--;
-        // this->refresh(this->currentPage * BUTTONS_PER_PAGE, (this->currentPage * BUTTONS_PER_PAGE) + BUTTONS_PER_PAGE);
+        this->refresh(true);
     }
 }
 
@@ -147,6 +150,6 @@ void MenuILI9488::nextPage(void)
     if (this->currentPage < this->totalPages)
     {
         this->currentPage++;
-        // this->refresh(this->currentPage * BUTTONS_PER_PAGE, (this->currentPage * BUTTONS_PER_PAGE) + BUTTONS_PER_PAGE);
+        this->refresh(true);
     }
 }

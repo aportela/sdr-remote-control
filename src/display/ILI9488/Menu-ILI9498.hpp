@@ -15,7 +15,7 @@ class MenuILI9488 : public Menu
 public:
     MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset);
     ~MenuILI9488();
-    void refresh() override;
+    void refresh(bool forceAll) override;
     void previousPage(void) override;
     void nextPage(void) override;
 

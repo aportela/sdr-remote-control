@@ -7,7 +7,7 @@ class IMenu
 {
 public:
     virtual ~IMenu() {}
-    virtual void refresh() = 0;
+    virtual void refresh(bool forceAll) = 0;
     virtual void previousPage(void) = 0;
     virtual void nextPage(void) = 0;
 };
