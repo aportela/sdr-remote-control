@@ -89,13 +89,16 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
 
 MenuILI9488::~MenuILI9488()
 {
+    for (uint8_t i = 0; i < TOTAL_MENU_BUTTONS; i++)
+    {
+        delete (this->buttons[i]);
+    }
     this->display = nullptr;
-    delete (this->buttons[0]);
 }
 
 void MenuILI9488::initMenu(void)
 {
-    for (uint8_t i = 0, uint8_t, f = 1; i < TOTAL_MENU_BUTTONS; i++, f++)
+    for (uint8_t i = 0, f = 1; i < TOTAL_MENU_BUTTONS; i++, f++)
     {
         char topLabel[9];
         if (f > BUTTONS_PER_PAGE)
