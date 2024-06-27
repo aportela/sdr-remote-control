@@ -14,11 +14,11 @@ public:
 
 private:
 protected:
-    uint16_t width = 0;
-    uint16_t height = 0;
-    uint16_t xOffset = 0;
-    uint16_t yOffset = 0;
-    uint8_t currentPage = 0;
-    uint8_t totalPages = 0;
+    uint16_t width;
+    uint16_t height;
+    uint16_t xOffset;
+    uint16_t yOffset;
+    uint8_t currentPage;
+    uint8_t totalPages;
 };
 #endif
