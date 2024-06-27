@@ -21,9 +21,9 @@ public:
 
 private:
     LGFX *display;
-    MenuButtonILI9488 *button;
+    MenuButtonILI9488 *buttons[TOTAL_MENU_BUTTONS];
+    void initMenu(void);
     void drawMenu(void);
-    void drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label, bool active);
 };
 
 #endif

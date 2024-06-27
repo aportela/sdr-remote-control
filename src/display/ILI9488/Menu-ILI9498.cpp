@@ -44,21 +44,9 @@ const char *buttonLabels[] = {
     "        ",
     "<<<<<<<<"};
 
-/*
-  "VFO  A/B"
-  "VFO STEP"
-  "VFO MODE"
-
-  "  TUNE  "
-  " VOLUME "
-  " FILTER "
-
-  " > BAND "
-  " < BAND "
-
-  "SETTINGS"
-  "  BACK  "
-*/
+void defaultCallBack(void)
+{
+}
 
 MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : Menu()
 {
@@ -70,6 +58,7 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
         this->xOffset = xOffset;
         this->yOffset = yOffset;
         this->totalPages = TOTAL_MENU_PAGES;
+        this->initMenu();
         this->drawMenu();
     }
     //   1: define buttons (index, labels, callbacks)
@@ -79,81 +68,45 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
 
 MenuILI9488::~MenuILI9488()
 {
+    this->display = nullptr;
+    delete (this->buttons[0]);
 }
 
-void MenuILI9488::drawMenu(void)
+void MenuILI9488::initMenu(void)
 {
-    /*
-    "12345678"
-
-    "VFO  A/B"
-    "VFO STEP"
-    "VFO MODE"
-
-    "  TUNE  "
-    " VOLUME "
-    " FILTER "
-
-    " > BAND "
-    " < BAND "
-
-    "SETTINGS"
-    "  BACK  "
-    */
-
-    for (uint8_t row = 0, index = 0; row < ROWS_PER_PAGE; row++)
+    for (uint8_t i = 0, uint8_t, f = 1; i < TOTAL_MENU_BUTTONS; i++, f++)
     {
-        for (uint8_t col = 0; col < COLS_PER_PAGE; col++, index++)
+        char topLabel[9];
+        if (f > 8)
         {
-            this->drawButton(index, row, col, buttonLabels[index], index % 2 == 0);
+            f = 1;
+        }
+        sprintf(topLabel, "F%d", f);
+        char mainLabel[9];
+        sprintf(mainLabel, buttonLabels[i]);
+        this->buttons[i] = new MenuButtonILI9488(
+            this->display,
+            i,                                                       // index
+            (i * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
+            (0 * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
+            topLabel,                                                // top label
+            mainLabel,                                               // bottom label
+            i == 0,                                                  // active
+            defaultCallBack                                          // callback
+        );
+        if (i < 4)
+        {
+            this->buttons[i]->draw();
         }
     }
 }
 
-void MenuILI9488::drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label, bool active)
+void MenuILI9488::drawMenu(void)
 {
-    uint16_t buttonX = (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset;
-    uint16_t buttonY = (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset;
-    if (!active)
+    for (uint8_t i = 0; i < 4; i++)
     {
-        this->display->drawRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, DEFAULT_COLOR);
+        this->buttons[i]->draw();
     }
-    else
-    {
-        this->display->fillRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, DEFAULT_COLOR);
-    }
-
-    char buffer[9];
-    if (index < 8)
-    {
-        sprintf(buffer, "F%d", index + 1);
-    }
-    else
-    {
-        sprintf(buffer, "F?");
-    }
-    this->display->setTextSize(2);
-    if (!active)
-    {
-        this->display->setTextColor(DEFAULT_COLOR, DEFAULT_BG);
-    }
-    else
-    {
-        this->display->setTextColor(DEFAULT_BG, DEFAULT_COLOR);
-    }
-    this->display->setCursor(buttonX + TOP_BUTTON_LABEL_X, buttonY + TOP_BUTTON_LABEL_Y);
-    this->display->print(buffer);
-
-    if (index < 8)
-    {
-        sprintf(buffer, buttonLabels[index]);
-    }
-    else
-    {
-        sprintf(buffer, "--------");
-    }
-    this->display->setCursor(buttonX + MAIN_BUTTON_LABEL_X, buttonY + MAIN_BUTTON_LABEL_Y);
-    this->display->print(buffer);
 }
 
 void MenuILI9488::refresh(uint8_t startMenuIndex, uint8_t selectedMenuIndex)
