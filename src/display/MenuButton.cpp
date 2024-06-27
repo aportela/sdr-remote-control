@@ -5,6 +5,10 @@ MenuButton::MenuButton(uint8_t index, uint16_t x, uint16_t y, uint16_t width, ui
 {
 }
 
+MenuButton::~MenuButton()
+{
+}
+
 void MenuButton::onChange()
 {
     this->changed = true;
