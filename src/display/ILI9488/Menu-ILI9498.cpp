@@ -25,6 +25,10 @@
 
 #define TOTAL_MENU_PAGES 2
 
+void defaultCallBack(void)
+{
+}
+
 const char *buttonLabels[] = {
     "  TUNE  ",
     " VOLUME ",
@@ -42,11 +46,28 @@ const char *buttonLabels[] = {
     "        ",
     "        ",
     "        ",
-    "<<<<<<<<"};
+    "<<<<<<<<",
+};
 
-void defaultCallBack(void)
-{
-}
+const ButtonCallback buttonCallbacks[] = {
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+    defaultCallBack,
+};
 
 MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : Menu()
 {
@@ -92,7 +113,7 @@ void MenuILI9488::initMenu(void)
             topLabel,                                                // top label
             mainLabel,                                               // bottom label
             i == 0,                                                  // active
-            defaultCallBack                                          // callback
+            buttonCallbacks[i]                                       // callback
         );
         if (i < 4)
         {
