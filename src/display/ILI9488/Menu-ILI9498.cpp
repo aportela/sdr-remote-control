@@ -1,6 +1,7 @@
 #include "Menu-ILI9498.hpp"
 
-#define COLOR 0xFFFF
+#define DEFAULT_COLOR 0xFFFF
+#define DEFAULT_BG 0x0000
 
 // TODO: ADJUST WIDH & MARGIN
 #define ROWS 2
@@ -95,16 +96,23 @@ void MenuILI9488::drawMenu(void)
     {
         for (uint8_t col = 0; col < COLS; col++, index++)
         {
-            this->drawButton(index, row, col, buttonLabels[index]);
+            this->drawButton(index, row, col, buttonLabels[index], index % 2 == 0);
         }
     }
 }
 
-void MenuILI9488::drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label)
+void MenuILI9488::drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label, bool active)
 {
     uint16_t buttonX = (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset;
     uint16_t buttonY = (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset;
-    this->display->drawRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, COLOR);
+    if (!active)
+    {
+        this->display->drawRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, DEFAULT_COLOR);
+    }
+    else
+    {
+        this->display->fillRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, DEFAULT_COLOR);
+    }
 
     char buffer[9];
     if (index < 8)
@@ -116,6 +124,14 @@ void MenuILI9488::drawButton(uint8_t index, uint8_t row, uint8_t col, const char
         sprintf(buffer, "F?");
     }
     this->display->setTextSize(2);
+    if (!active)
+    {
+        this->display->setTextColor(DEFAULT_COLOR, DEFAULT_BG);
+    }
+    else
+    {
+        this->display->setTextColor(DEFAULT_BG, DEFAULT_COLOR);
+    }
     this->display->setCursor(buttonX + TOP_BUTTON_LABEL_X, buttonY + TOP_BUTTON_LABEL_Y);
     this->display->print(buffer);
 

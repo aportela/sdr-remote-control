@@ -17,7 +17,7 @@ private:
     LGFX *display;
 
     void drawMenu(void);
-    void drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label);
+    void drawButton(uint8_t index, uint8_t row, uint8_t col, const char *label, bool active);
 };
 
 #endif
