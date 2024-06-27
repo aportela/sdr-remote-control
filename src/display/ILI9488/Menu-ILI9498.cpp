@@ -4,8 +4,6 @@
 #define DEFAULT_BG 0x0000
 
 // TODO: ADJUST WIDH & MARGIN
-#define ROWS 2
-#define COLS 4
 #define BUTTON_MARGIN_X 12
 #define BUTTON_MARGIN_Y 4
 
@@ -19,6 +17,13 @@
 // MAIN LABEL (Fn DESCRIPTION)
 #define MAIN_BUTTON_LABEL_X 9
 #define MAIN_BUTTON_LABEL_Y 28
+
+#define COLS_PER_PAGE 4
+#define ROWS_PER_PAGE 2
+
+#define BUTTONS_PER_PAGE (COLS_PER_PAGE * ROWS_PER_PAGE)
+
+#define TOTAL_MENU_PAGES 2
 
 const char *buttonLabels[] = {
     "  TUNE  ",
@@ -64,8 +69,12 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
         this->height = height;
         this->xOffset = xOffset;
         this->yOffset = yOffset;
+        this->totalPages = TOTAL_MENU_PAGES;
         this->drawMenu();
     }
+    //   1: define buttons (index, labels, callbacks)
+    //   2: set default menu start/end indexes
+    //   3: refresh (draw from start to end)
 }
 
 MenuILI9488::~MenuILI9488()
@@ -92,9 +101,9 @@ void MenuILI9488::drawMenu(void)
     "  BACK  "
     */
 
-    for (uint8_t row = 0, index = 0; row < ROWS; row++)
+    for (uint8_t row = 0, index = 0; row < ROWS_PER_PAGE; row++)
     {
-        for (uint8_t col = 0; col < COLS; col++, index++)
+        for (uint8_t col = 0; col < COLS_PER_PAGE; col++, index++)
         {
             this->drawButton(index, row, col, buttonLabels[index], index % 2 == 0);
         }
@@ -149,4 +158,22 @@ void MenuILI9488::drawButton(uint8_t index, uint8_t row, uint8_t col, const char
 
 void MenuILI9488::refresh(uint8_t startMenuIndex, uint8_t selectedMenuIndex)
 {
+}
+
+void MenuILI9488::previousPage(void)
+{
+    if (this->currentPage > 0)
+    {
+        this->currentPage--;
+        this->refresh(this->currentPage * BUTTONS_PER_PAGE, (this->currentPage * BUTTONS_PER_PAGE) + BUTTONS_PER_PAGE);
+    }
+}
+
+void MenuILI9488::nextPage(void)
+{
+    if (this->currentPage < this->totalPages)
+    {
+        this->currentPage++;
+        this->refresh(this->currentPage * BUTTONS_PER_PAGE, (this->currentPage * BUTTONS_PER_PAGE) + BUTTONS_PER_PAGE);
+    }
 }
