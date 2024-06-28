@@ -2,6 +2,7 @@
 
 Transceiver::Transceiver(void)
 {
+  this->lockedByControls = false;
   this->poweredOn = false;
   this->poweredOn = true;
   this->activeVFOIndex = 0;
@@ -15,6 +16,18 @@ Transceiver::Transceiver(void)
   this->signalMeterLevel = 0;
   this->AFGain = 50;
   this->audioMuted = TRX_AUDIO_NOT_MUTED;
+}
+
+// check if data is locked by external controls
+bool Transceiver::isLockedByControls()
+{
+  return (this->lockedByControls);
+}
+
+// set lock
+void Transceiver::setLockedByControls(bool status)
+{
+  this->lockedByControls = status;
 }
 
 // change current active VFO

@@ -60,6 +60,9 @@ typedef struct
 
 class Transceiver
 {
+private:
+  bool lockedByControls;
+
 public:
   uint16_t changed;
   bool poweredOn;
@@ -71,6 +74,12 @@ public:
   TRxAudioMuteStatus audioMuted;
 
   Transceiver();
+
+  // check if data is locked by external controls
+  bool isLockedByControls();
+
+  // set lock
+  void setLockedByControls(bool status);
 
   // change current active VFO
   void setVFOIndex(uint8_t VFOIndex);

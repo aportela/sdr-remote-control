@@ -102,6 +102,7 @@ static bool cw1_fall = false;
 void encoder_callback_ccw(uint pinA, uint pinB)
 {
 
+  trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
   uint8_t enc_value_B = digitalRead(pinB);
   uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
@@ -132,10 +133,12 @@ void encoder_callback_ccw(uint pinA, uint pinB)
     trx->VFO[trx->activeVFOIndex].frequency -= delta;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
+  trx->setLockedByControls(false);
 }
 
 void encoder_callback_cw(uint pinA, uint pinB)
 {
+  trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
   uint8_t enc_value_B = digitalRead(pinB);
   uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
@@ -166,6 +169,7 @@ void encoder_callback_cw(uint pinA, uint pinB)
     trx->VFO[trx->activeVFOIndex].frequency += delta;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
+  trx->setLockedByControls(false);
 }
 
 void initRotaryEncoders(void)
