@@ -96,6 +96,9 @@ static uint64_t lastEncoderMillis = millis();
 static bool ccw1_fall = false;
 static bool cw1_fall = false;
 
+SDRRadioTS2KSerialConnection *serialConnection;
+// SerialConnection *serialConnection;
+
 // read & debounce rotary encoder
 // code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
 
@@ -131,6 +134,7 @@ void encoder_callback_ccw(uint pinA, uint pinB)
     }
     lastEncoderMillis = currentMillis;
     trx->VFO[trx->activeVFOIndex].frequency -= delta;
+    trx->changed |= TRX_CFLAG_SEND_CAT;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
   trx->setLockedByControls(false);
@@ -167,6 +171,7 @@ void encoder_callback_cw(uint pinA, uint pinB)
     }
     lastEncoderMillis = currentMillis;
     trx->VFO[trx->activeVFOIndex].frequency += delta;
+    trx->changed |= TRX_CFLAG_SEND_CAT;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
   }
   trx->setLockedByControls(false);
@@ -182,9 +187,6 @@ void initRotaryEncoders(void)
   attachInterrupt(digitalPinToInterrupt(ENC1_B), []()
                   { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
 }
-
-// SDRRadioTS2KSerialConnection *serialConnection;
-SerialConnection *serialConnection;
 
 void setup()
 {
