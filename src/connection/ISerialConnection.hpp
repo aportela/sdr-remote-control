@@ -10,6 +10,7 @@ class ISerialConnection
 public:
     virtual ~ISerialConnection() {}
     virtual void loop(Transceiver *trx) = 0;
+    virtual void syncLocalToRemote(Transceiver *trx) = 0;
 };
 
 #endif

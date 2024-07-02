@@ -104,8 +104,7 @@ SDRRadioTS2KSerialConnection *serialConnection;
 
 void encoder_callback_ccw(uint pinA, uint pinB)
 {
-
-  trx->setLockedByControls(true);
+  // trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
   uint8_t enc_value_B = digitalRead(pinB);
   uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
@@ -134,15 +133,15 @@ void encoder_callback_ccw(uint pinA, uint pinB)
     }
     lastEncoderMillis = currentMillis;
     trx->VFO[trx->activeVFOIndex].frequency -= delta;
-    trx->changed |= TRX_CFLAG_SEND_CAT;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    trx->changed |= TRX_CFLAG_SEND_CAT;
   }
-  trx->setLockedByControls(false);
+  // trx->setLockedByControls(false);
 }
 
 void encoder_callback_cw(uint pinA, uint pinB)
 {
-  trx->setLockedByControls(true);
+  // trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
   uint8_t enc_value_B = digitalRead(pinB);
   uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
@@ -171,10 +170,10 @@ void encoder_callback_cw(uint pinA, uint pinB)
     }
     lastEncoderMillis = currentMillis;
     trx->VFO[trx->activeVFOIndex].frequency += delta;
-    trx->changed |= TRX_CFLAG_SEND_CAT;
     trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    trx->changed |= TRX_CFLAG_SEND_CAT;
   }
-  trx->setLockedByControls(false);
+  // trx->setLockedByControls(false);
 }
 
 void initRotaryEncoders(void)
@@ -191,7 +190,6 @@ void initRotaryEncoders(void)
 void setup()
 {
   serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
-  // serialConnection = new SerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   trx = new Transceiver();
   // vfo = new MainVFORotaryControl(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, 0, 0, trx);
@@ -241,7 +239,14 @@ void loop()
   }
   else
   {
-    serialConnection->loop(trx);
+    if (millis() - lastEncoderMillis < 50)
+    {
+      serialConnection->syncLocalToRemote(trx);
+    }
+    else
+    {
+      serialConnection->loop(trx);
+    }
     display.refreshMainScreen(trx);
     /*
     if (secondaryVFORotaryEncoder.isEncoderButtonDown())

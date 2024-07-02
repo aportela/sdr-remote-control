@@ -18,6 +18,8 @@ public:
     ~SerialConnection() {}
 
     virtual void loop(Transceiver *trx) = 0;
+    virtual void syncLocalToRemote(Transceiver *trx) = 0;
+
     bool isDisconnectedByTimeout(void);
 
 protected:

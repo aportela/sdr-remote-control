@@ -21,6 +21,7 @@ Transceiver::Transceiver(void)
 // check if data is locked by external controls
 bool Transceiver::isLockedByControls()
 {
+  return (false);
   return (this->lockedByControls);
 }
 

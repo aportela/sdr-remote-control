@@ -27,7 +27,6 @@ void SerialConnection::rxFlush(void)
     {
         Serial.read();
     }
-    delay(MILLISECONDS_WAITED_AFTER_FLUSH);
 }
 
 void SerialConnection::send(String str)
