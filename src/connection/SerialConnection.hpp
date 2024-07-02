@@ -26,6 +26,7 @@ protected:
     uint64_t lastRXValidCommand = 0;
     uint64_t lastTXActivity = 0;
     void flush(void);
+    void rxFlush(void);
     void send(String str);
     virtual bool tryConnection(Transceiver *trx) = 0;
 };

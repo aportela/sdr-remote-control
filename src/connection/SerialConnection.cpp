@@ -21,6 +21,15 @@ void SerialConnection::flush(void)
     delay(MILLISECONDS_WAITED_AFTER_FLUSH);
 }
 
+void SerialConnection::rxFlush(void)
+{
+    while (Serial.available() > 0)
+    {
+        Serial.read();
+    }
+    delay(MILLISECONDS_WAITED_AFTER_FLUSH);
+}
+
 void SerialConnection::send(String str)
 {
     this->serial->print(str);
