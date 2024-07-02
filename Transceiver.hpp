@@ -22,6 +22,7 @@
 #define TRX_CFLAG_SIGNAL_METER_LEVEL (1 << 13)           // 8192
 #define TRX_CFLAG_AUDIO_MUTE (1 << 14)                   // 16384
 #define TRX_CFLAG_AF_GAIN (1 << 15)                      // 32768
+#define TRX_CFLAG_SEND_CAT (1 << 16)                     // 65536
 
 typedef enum
 {
@@ -64,7 +65,7 @@ private:
   bool lockedByControls;
 
 public:
-  uint16_t changed;
+  uint32_t changed;
   bool poweredOn;
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex;
