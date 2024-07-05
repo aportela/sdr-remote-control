@@ -48,6 +48,20 @@ void Transceiver::setActiveVFOFrequency(uint64_t frequency)
   this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
 }
 
+// increment (active) vfo frequency by specified hz
+void Transceiver::incrementActiveVFOFrequency(uint64_t hz)
+{
+  this->VFO[0].frequency += hz;
+  this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+}
+
+// decrement (active) vfo frequency by specified hz
+void Transceiver::decrementActiveVFOFrequency(uint64_t hz)
+{
+  this->VFO[0].frequency -= hz;
+  this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+}
+
 // set (secondary) vfo frequency
 void Transceiver::setSecondaryVFOFrequency(uint64_t frequency)
 {
@@ -126,6 +140,34 @@ void Transceiver::setSignalMeterLevel(uint8_t level)
 void Transceiver::setAFGain(uint8_t value)
 {
   this->AFGain = value;
+  this->changed |= TRX_CFLAG_AF_GAIN;
+}
+
+// increment ag gain by specified units
+void Transceiver::incrementAFGain(uint8_t units)
+{
+  if ((this->AFGain + units) <= 100)
+  {
+    this->AFGain += units;
+  }
+  else
+  {
+    this->AFGain = 100;
+  }
+  this->changed |= TRX_CFLAG_AF_GAIN;
+}
+
+// decrement ag gain by specified units
+void Transceiver::decrementAFGain(uint8_t units)
+{
+  if ((this->AFGain - units) >= 0)
+  {
+    this->AFGain -= units;
+  }
+  else
+  {
+    this->AFGain = 0;
+  }
   this->changed |= TRX_CFLAG_AF_GAIN;
 }
 

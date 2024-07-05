@@ -88,6 +88,12 @@ public:
   // set (active) vfo frequency
   void setActiveVFOFrequency(uint64_t frequency);
 
+  // increment (active) vfo frequency by specified hz
+  void incrementActiveVFOFrequency(uint64_t hz);
+
+  // decrement (active) vfo frequency by specified hz
+  void decrementActiveVFOFrequency(uint64_t hz);
+
   // set (secondary) vfo frequency
   void setSecondaryVFOFrequency(uint64_t frequency);
 
@@ -120,6 +126,12 @@ public:
 
   // set af gain
   void setAFGain(uint8_t value);
+
+  // increment ag gain by specified units
+  void incrementAFGain(uint8_t units);
+
+  // decrement ag gain by specified units
+  void decrementAFGain(uint8_t units);
 
   // set audio status to muted
   void setAudioMuted();
