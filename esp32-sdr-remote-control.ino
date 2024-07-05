@@ -169,7 +169,15 @@ void encoder_callback_ccw(uint pinA, uint pinB)
     uint8_t delta = 0;
     uint8_t acceleratedDelta = 0;
     uint64_t currentMillis = millis();
-    if (currentMillis - lastEncoderMillis < 20)
+    if (currentMillis - lastEncoderMillis < 5)
+    {
+      acceleratedDelta = 20;
+    }
+    else if (currentMillis - lastEncoderMillis < 10)
+    {
+      acceleratedDelta = 10;
+    }
+    else if (currentMillis - lastEncoderMillis < 20)
     {
       acceleratedDelta = 5;
     }
@@ -204,7 +212,15 @@ void encoder_callback_cw(uint pinA, uint pinB)
     ccw1_fall = false;
     uint8_t acceleratedDelta = 0;
     uint64_t currentMillis = millis();
-    if (currentMillis - lastEncoderMillis < 20)
+    if (currentMillis - lastEncoderMillis < 5)
+    {
+      acceleratedDelta = 20;
+    }
+    else if (currentMillis - lastEncoderMillis < 10)
+    {
+      acceleratedDelta = 10;
+    }
+    else if (currentMillis - lastEncoderMillis < 20)
     {
       acceleratedDelta = 5;
     }
