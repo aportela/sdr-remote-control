@@ -83,6 +83,15 @@ DisplayST7789 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, TFT_CS, T
 DisplayILI9488 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, DISPLAY_INVERT_COLORS);
 #endif
 
+// bitmask definitions for encoder changes
+#define ENCODER_CHANGE_TUNE (1 << 0)        // 1
+#define ENCODER_CHANGE_VOLUME (1 << 1)      // 2
+#define ENCODER_CHANGE_FILTER_BOTH (1 << 2) // 4
+#define ENCODER_CHANGE_FILTER_LOW (1 << 3)  // 8
+#define ENCODER_CHANGE_FILTER_HIGH (1 << 4) // 16
+
+uint8_t encoderChangeBitmask = 0;
+
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
 
@@ -102,6 +111,56 @@ SDRRadioTS2KSerialConnection *serialConnection;
 // read & debounce rotary encoder
 // code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
 
+void onEncoderIncrement(uint acceleratedDelta)
+{
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    trx->VFO[trx->activeVFOIndex].frequency += acceleratedDelta;
+    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    if (trx->AFGain < 100)
+    {
+      trx->AFGain += 1;
+      trx->changed |= TRX_CFLAG_AF_GAIN;
+    }
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+  {
+    trx->VFO[trx->activeVFOIndex].LF += acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].HF += acceleratedDelta;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+  }
+  trx->changed |= TRX_CFLAG_SEND_CAT;
+}
+
+void onEncoderDecrement(uint acceleratedDelta)
+{
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    trx->VFO[trx->activeVFOIndex].frequency -= acceleratedDelta;
+    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    if (trx->AFGain > 0)
+    {
+      trx->AFGain -= 1;
+      trx->changed |= TRX_CFLAG_AF_GAIN;
+    }
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+  {
+    trx->VFO[trx->activeVFOIndex].LF -= acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].HF -= acceleratedDelta;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+  }
+  trx->changed |= TRX_CFLAG_SEND_CAT;
+}
+
 void encoder_callback_ccw(uint pinA, uint pinB)
 {
   // trx->setLockedByControls(true);
@@ -118,23 +177,22 @@ void encoder_callback_ccw(uint pinA, uint pinB)
     cw1_fall = false;
     ccw1_fall = false;
     uint8_t delta = 0;
+    uint8_t acceleratedDelta = 0;
     uint64_t currentMillis = millis();
     if (currentMillis - lastEncoderMillis < 20)
     {
-      delta = 5;
+      acceleratedDelta = 5;
     }
     else if (currentMillis - lastEncoderMillis < 50)
     {
-      delta = 2;
+      acceleratedDelta = 2;
     }
     else
     {
-      delta = 1;
+      acceleratedDelta = 1;
     }
     lastEncoderMillis = currentMillis;
-    trx->VFO[trx->activeVFOIndex].frequency -= delta;
-    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-    trx->changed |= TRX_CFLAG_SEND_CAT;
+    onEncoderDecrement(acceleratedDelta);
   }
   // trx->setLockedByControls(false);
 }
@@ -154,24 +212,22 @@ void encoder_callback_cw(uint pinA, uint pinB)
   {
     cw1_fall = false;
     ccw1_fall = false;
-    uint8_t delta = 0;
+    uint8_t acceleratedDelta = 0;
     uint64_t currentMillis = millis();
     if (currentMillis - lastEncoderMillis < 20)
     {
-      delta = 5;
+      acceleratedDelta = 5;
     }
     else if (currentMillis - lastEncoderMillis < 50)
     {
-      delta = 2;
+      acceleratedDelta = 2;
     }
     else
     {
-      delta = 1;
+      acceleratedDelta = 1;
     }
     lastEncoderMillis = currentMillis;
-    trx->VFO[trx->activeVFOIndex].frequency += delta;
-    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-    trx->changed |= TRX_CFLAG_SEND_CAT;
+    onEncoderIncrement(acceleratedDelta);
   }
   // trx->setLockedByControls(false);
 }
@@ -191,6 +247,8 @@ void setup()
 {
   serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
+  // by default encoder changes affect tune
+  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
   trx = new Transceiver();
   // vfo = new MainVFORotaryControl(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, 0, 0, trx);
   //  TODO position bug after change connect->main screen
