@@ -115,16 +115,11 @@ void onEncoderIncrement(uint acceleratedDelta)
 {
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    trx->VFO[trx->activeVFOIndex].frequency += acceleratedDelta;
-    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    trx->incrementActiveVFOFrequency(acceleratedDelta);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    if (trx->AFGain < 100)
-    {
-      trx->AFGain += 1;
-      trx->changed |= TRX_CFLAG_AF_GAIN;
-    }
+    trx->incrementAFGain(1);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
@@ -140,16 +135,11 @@ void onEncoderDecrement(uint acceleratedDelta)
 {
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    trx->VFO[trx->activeVFOIndex].frequency -= acceleratedDelta;
-    trx->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    trx->decrementActiveVFOFrequency(acceleratedDelta);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    if (trx->AFGain > 0)
-    {
-      trx->AFGain -= 1;
-      trx->changed |= TRX_CFLAG_AF_GAIN;
-    }
+    trx->decrementAFGain(1);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
@@ -248,7 +238,7 @@ void setup()
   serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
   // by default encoder changes affect tune
-  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   // vfo = new MainVFORotaryControl(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, 0, 0, trx);
   //  TODO position bug after change connect->main screen
