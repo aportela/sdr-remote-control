@@ -90,7 +90,7 @@ DisplayILI9488 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_ROTATION, DISPLAY_
 #define ENCODER_CHANGE_FILTER_LOW (1 << 3)  // 8
 #define ENCODER_CHANGE_FILTER_HIGH (1 << 4) // 16
 
-uint8_t encoderChangeBitmask = 0;
+volatile uint8_t encoderChangeBitmask = 0;
 
 bool currentVFOFrequencyChanged = true;
 volatile uint64_t currentVFOFrequency = 200145;
@@ -151,7 +151,7 @@ void onEncoderDecrement(uint acceleratedDelta)
   trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
-void encoder_callback_ccw(uint pinA, uint pinB)
+void IRAM_ATTR encoder_callback_ccw(uint pinA, uint pinB)
 {
   // trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
@@ -195,7 +195,7 @@ void encoder_callback_ccw(uint pinA, uint pinB)
   // trx->setLockedByControls(false);
 }
 
-void encoder_callback_cw(uint pinA, uint pinB)
+void IRAM_ATTR encoder_callback_cw(uint pinA, uint pinB)
 {
   // trx->setLockedByControls(true);
   uint8_t enc_value_A = digitalRead(pinA);
@@ -238,6 +238,20 @@ void encoder_callback_cw(uint pinA, uint pinB)
   // trx->setLockedByControls(false);
 }
 
+void IRAM_ATTR key_callback(void)
+{
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+  }
+}
+
 void initRotaryEncoders(void)
 {
   pinMode(ENC1_A, INPUT_PULLUP);
@@ -249,10 +263,17 @@ void initRotaryEncoders(void)
                   { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
 }
 
+void initKeys(void)
+{
+  pinMode(13, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(13), key_callback, RISING);
+}
+
 void setup()
 {
   serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
   initRotaryEncoders();
+  initKeys();
   // by default encoder changes affect tune
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
