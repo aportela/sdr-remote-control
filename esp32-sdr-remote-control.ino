@@ -20,6 +20,8 @@
 // #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
 
+#include "src/controls/Keypad8.hpp"
+
 #define FUNCUBE_DONGLE_MIN_FREQ 150000     // 150 Khz
 #define FUNCUBE_DONGLE_MAX_FREQ 1900000000 // 1.9 Ghz
 
@@ -238,101 +240,6 @@ void IRAM_ATTR encoder_callback_cw(uint pinA, uint pinB)
   // trx->setLockedByControls(false);
 }
 
-uint8_t fkey = 0;
-
-void IRAM_ATTR key_callbackF1()
-{
-  display.setButtonDisabled(1);
-  display.setButtonDisabled(2);
-  encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
-  encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
-  display.setButtonEnabled(0);
-  /*
-  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
-    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
-    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
-  }
-  display.setButtonDisabled(fkey);
-  if (fkey < 8)
-  {
-    fkey++;
-  }
-  else
-  {
-    fkey = 0;
-  }
-  display.setButtonEnabled(fkey);
-  */
-}
-
-void IRAM_ATTR key_callbackF2()
-{
-  display.setButtonDisabled(0);
-  display.setButtonDisabled(2);
-  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
-  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
-  display.setButtonEnabled(1);
-  /*
-  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
-    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
-    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
-  }
-  display.setButtonDisabled(fkey);
-  if (fkey < 8)
-  {
-    fkey++;
-  }
-  else
-  {
-    fkey = 0;
-  }
-  display.setButtonEnabled(fkey);
-  */
-}
-
-void IRAM_ATTR key_callbackF3()
-{
-  display.setButtonDisabled(0);
-  display.setButtonDisabled(1);
-  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
-  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
-  display.setButtonEnabled(2);
-  /*
-  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
-    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
-  {
-    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
-    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
-  }
-  display.setButtonDisabled(fkey);
-  if (fkey < 8)
-  {
-    fkey++;
-  }
-  else
-  {
-    fkey = 0;
-  }
-  display.setButtonEnabled(fkey);
-  */
-}
-
 void initRotaryEncoders(void)
 {
   pinMode(ENC1_A, INPUT_PULLUP);
@@ -344,14 +251,38 @@ void initRotaryEncoders(void)
                   { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
 }
 
+void F1(void)
+{
+  display.setButtonEnabled(0);
+  display.setButtonDisabled(1);
+  display.setButtonDisabled(2);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+  encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+}
+
+void F2(void)
+{
+  display.setButtonDisabled(0);
+  display.setButtonEnabled(1);
+  display.setButtonDisabled(2);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+}
+
+void F3(void)
+{
+  display.setButtonDisabled(0);
+  display.setButtonDisabled(1);
+  display.setButtonEnabled(2);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+  encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+}
+
 void initKeys(void)
 {
-  pinMode(12, INPUT_PULLUP);
-  pinMode(13, INPUT_PULLUP);
-  pinMode(14, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(12), key_callbackF1, RISING);
-  attachInterrupt(digitalPinToInterrupt(13), key_callbackF2, RISING);
-  attachInterrupt(digitalPinToInterrupt(14), key_callbackF3, RISING);
+  Keypad8::initKey(KP8_F1, 12, F1);
+  Keypad8::initKey(KP8_F2, 13, F2);
+  Keypad8::initKey(KP8_F3, 14, F3);
 }
 
 void setup()
