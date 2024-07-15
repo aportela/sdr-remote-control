@@ -29,6 +29,7 @@ void MenuButtonILI9488::draw(void)
     {
         if (!this->active)
         {
+            this->display->fillRect(this->x, this->y, this->width, this->height, BUTTON_NOT_ACTIVE_BACKGROUND_COLOR);
             this->display->drawRect(this->x, this->y, this->width, this->height, BUTTON_ACTIVE_BACKGROUND_COLOR);
         }
         else
