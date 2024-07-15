@@ -15,8 +15,6 @@
 #include "Arduino.h"
 #include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
 
-// #include "src/controls/MainVFORotaryControl.hpp"
-
 // #include "SerialConnection.hpp"
 #include "Transceiver.hpp"
 
@@ -293,7 +291,6 @@ void setup()
   // by default encoder changes affect tune
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
-  // vfo = new MainVFORotaryControl(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, 0, 0, trx);
   //  TODO position bug after change connect->main screen
   //  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
   //   display.hideConnectScreen();
