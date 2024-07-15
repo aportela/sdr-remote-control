@@ -146,6 +146,22 @@ void MenuILI9488::refresh(bool forceAll)
     }
 }
 
+void MenuILI9488::setButtonEnabled(uint8_t btnIndex)
+{
+    if (btnIndex < BUTTONS_PER_PAGE)
+    {
+        this->buttons[btnIndex]->setActive(true);
+    }
+}
+
+void MenuILI9488::setButtonDisabled(uint8_t btnIndex)
+{
+    if (btnIndex < BUTTONS_PER_PAGE)
+    {
+        this->buttons[btnIndex]->setActive(false);
+    }
+}
+
 void MenuILI9488::previousPage(void)
 {
     if (this->currentPage > 0)

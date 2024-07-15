@@ -16,6 +16,8 @@ public:
     MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset);
     ~MenuILI9488();
     void refresh(bool forceAll) override;
+    void setButtonEnabled(uint8_t btnIndex);
+    void setButtonDisabled(uint8_t btnIndex);
     void previousPage(void) override;
     void nextPage(void) override;
 

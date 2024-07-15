@@ -28,6 +28,8 @@ public:
   void hideMainScreen() override;
   void refreshMainScreen(Transceiver *trx) override;
   void debug(int32_t message);
+  void setButtonEnabled(uint8_t btnIndex);
+  void setButtonDisabled(uint8_t btnIndex);
 
 private:
   LGFX screen;

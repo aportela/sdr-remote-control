@@ -108,8 +108,8 @@ static bool cw1_fall = false;
 SDRRadioTS2KSerialConnection *serialConnection;
 // SerialConnection *serialConnection;
 
-// read & debounce rotary encoder
-// code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
+//  read & debounce rotary encoder
+//  code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
 
 void onEncoderIncrement(uint acceleratedDelta)
 {
@@ -238,8 +238,16 @@ void IRAM_ATTR encoder_callback_cw(uint pinA, uint pinB)
   // trx->setLockedByControls(false);
 }
 
-void IRAM_ATTR key_callback(void)
+uint8_t fkey = 0;
+
+void IRAM_ATTR key_callbackF1()
 {
+  display.setButtonDisabled(1);
+  display.setButtonDisabled(2);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+  encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+  display.setButtonEnabled(0);
+  /*
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
     encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
@@ -250,6 +258,79 @@ void IRAM_ATTR key_callback(void)
     encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
     encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   }
+  display.setButtonDisabled(fkey);
+  if (fkey < 8)
+  {
+    fkey++;
+  }
+  else
+  {
+    fkey = 0;
+  }
+  display.setButtonEnabled(fkey);
+  */
+}
+
+void IRAM_ATTR key_callbackF2()
+{
+  display.setButtonDisabled(0);
+  display.setButtonDisabled(2);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  display.setButtonEnabled(1);
+  /*
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+  }
+  display.setButtonDisabled(fkey);
+  if (fkey < 8)
+  {
+    fkey++;
+  }
+  else
+  {
+    fkey = 0;
+  }
+  display.setButtonEnabled(fkey);
+  */
+}
+
+void IRAM_ATTR key_callbackF3()
+{
+  display.setButtonDisabled(0);
+  display.setButtonDisabled(1);
+  encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+  encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  display.setButtonEnabled(2);
+  /*
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_TUNE;
+    encoderChangeBitmask |= ENCODER_CHANGE_VOLUME;
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    encoderChangeBitmask &= ~ENCODER_CHANGE_VOLUME;
+    encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+  }
+  display.setButtonDisabled(fkey);
+  if (fkey < 8)
+  {
+    fkey++;
+  }
+  else
+  {
+    fkey = 0;
+  }
+  display.setButtonEnabled(fkey);
+  */
 }
 
 void initRotaryEncoders(void)
@@ -265,8 +346,12 @@ void initRotaryEncoders(void)
 
 void initKeys(void)
 {
+  pinMode(12, INPUT_PULLUP);
   pinMode(13, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(13), key_callback, RISING);
+  pinMode(14, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(12), key_callbackF1, RISING);
+  attachInterrupt(digitalPinToInterrupt(13), key_callbackF2, RISING);
+  attachInterrupt(digitalPinToInterrupt(14), key_callbackF3, RISING);
 }
 
 void setup()

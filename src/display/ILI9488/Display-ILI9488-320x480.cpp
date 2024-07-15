@@ -253,6 +253,7 @@ void DisplayILI9488::refreshMainScreen(Transceiver *trx)
   this->screen.setTextSize(1);
   this->screen.printf("%03u FPS", this->fpsDebug->getFPS());
 #endif
+  this->menuPtr->refresh(false);
 }
 
 void DisplayILI9488::refreshTransmitStatus(bool isTransmitting)
@@ -645,4 +646,14 @@ void DisplayILI9488::debug(int32_t Message)
   this->screen.setCursor(VFO_BLOCK_START_X_COORDINATE, this->height - 32);
   this->screen.setTextSize(1);
   this->screen.print(Message);
+}
+
+void DisplayILI9488::setButtonEnabled(uint8_t btnIndex)
+{
+  this->menuPtr->setButtonEnabled(btnIndex);
+}
+
+void DisplayILI9488::setButtonDisabled(uint8_t btnIndex)
+{
+  this->menuPtr->setButtonDisabled(btnIndex);
 }
