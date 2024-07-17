@@ -1,18 +1,30 @@
 #ifndef SDR_REMOTE_CONTROL_ROTARY_CONTROL_H
 #define SDR_REMOTE_CONTROL_ROTARY_CONTROL_H
 
-#include <AiEsp32RotaryEncoder.h>
-
+#include <Arduino.h>
 #include <stdint.h>
+
+enum RotaryControlChange
+{
+    RCC_CLOCKWISE,
+    RCC_COUNTERCLOCKWISE
+};
+
+typedef void (*RotaryControlCallback)(uint8_t, uint64_t);
 
 class RotaryControl
 {
 public:
-    RotaryControl(int pinA, int pinB, uint8_t steps, uint8_t acceleration);
-    ~RotaryControl();
-    virtual void onChange(int delta) = 0;
-    AiEsp32RotaryEncoder *encoder;
-    void onUpdate(void);
+    static uint8_t pinA;
+    static uint8_t pinB;
+    static RotaryControlCallback RCCallbacks[2];
+    static volatile bool ccw1_fall;
+    static volatile bool cw1_fall;
+    static volatile uint64_t lastEncoderMillis;
+    static void RCInterruptHandler(RotaryControlChange rcChange, uint8_t acceleratedDelta, uint64_t lastEncoderMillis);
+    static void counterClockWiseCallback(uint8_t pinA, uint8_t pinB);
+    static void clockWiseCallback(uint8_t pinA, uint8_t pinB);
+    static void init(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback);
 };
 
 #endif

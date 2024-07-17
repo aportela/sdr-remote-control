@@ -1,95 +1,117 @@
-#include <Arduino.h>
-
 #include "RotaryControl.hpp"
 
-#define MAIN_VFO_ROTARY_ENCODER_PIN_A 25
-#define MAIN_VFO_ROTARY_ENCODER_PIN_B 26
-#define MAIN_VFO_ROTARY_ENCODER_BUTTON_PIN -1
-#define MAIN_VFO_ROTARY_ENCODER_VCC_PIN -1 // put -1 of Rotary encoder Vcc is connected directly to 3,3V
-#define MAIN_VFO_ROTARY_ENCODER_STEPS 4    // depending on your encoder - try 1,2 or 4 to get expected behaviour
+uint8_t RotaryControl::pinA = 0;
+uint8_t RotaryControl::pinB = 0;
+RotaryControlCallback RotaryControl::RCCallbacks[2] = {nullptr, nullptr};
+volatile bool RotaryControl::ccw1_fall = false;
+volatile bool RotaryControl::cw1_fall = false;
+volatile uint64_t RotaryControl::lastEncoderMillis = 0;
 
-#define MAIN_VFO_ROTARY_ENCODER_MIN_VALUE 0
-#define MAIN_VFO_ROTARY_ENCODER_MAX_VALUE 9999
-#define MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE 5000
-#define MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE 100
-
-void IRAM_ATTR readBigEncoderISRWithoutArgs()
+void IRAM_ATTR RotaryControl::RCInterruptHandler(RotaryControlChange rcChange, uint8_t acceleratedDelta, uint64_t lastEncoderMillis)
 {
-    // mainVFORotaryEncoder.readEncoder_ISR();
-}
-
-static void readBigEncoderISRWithArgs(void *arg)
-{
-    RotaryControl *instance = static_cast<RotaryControl *>(arg);
-    instance->encoder->readEncoder_ISR();
-
-    instance->onUpdate();
-}
-
-RotaryControl::RotaryControl(int pinA, int pinB, uint8_t steps, uint8_t acceleration)
-{
-    this->encoder = new AiEsp32RotaryEncoder(MAIN_VFO_ROTARY_ENCODER_PIN_A, MAIN_VFO_ROTARY_ENCODER_PIN_B, MAIN_VFO_ROTARY_ENCODER_BUTTON_PIN, MAIN_VFO_ROTARY_ENCODER_VCC_PIN, MAIN_VFO_ROTARY_ENCODER_STEPS);
-    this->encoder->begin();
-
-    // this->encoder->setup(readBigEncoderISRWithoutArgs);
-    attachInterruptArg(digitalPinToInterrupt(MAIN_VFO_ROTARY_ENCODER_PIN_A), readBigEncoderISRWithArgs, this, CHANGE);
-    attachInterruptArg(digitalPinToInterrupt(MAIN_VFO_ROTARY_ENCODER_PIN_B), readBigEncoderISRWithArgs, this, CHANGE);
-    this->encoder->setBoundaries(MAIN_VFO_ROTARY_ENCODER_MIN_VALUE, MAIN_VFO_ROTARY_ENCODER_MAX_VALUE, true);
-    this->encoder->setAcceleration(MAIN_VFO_ROTARY_ENCODER_ACCELERATION_VALUE);
-    this->encoder->setEncoderValue(MAIN_VFO_ROTARY_ENCODER_CENTER_VALUE);
-}
-
-RotaryControl::~RotaryControl()
-{
-    delete this->encoder;
-    this->encoder = nullptr;
-}
-
-void RotaryControl::onUpdate(void)
-{
-    int16_t delta = this->encoder->encoderChanged();
-    if (delta > 0)
+    if (RotaryControl::RCCallbacks[rcChange])
     {
-        int32_t newEncoderValue = this->encoder->readEncoder();
-        int32_t hzIncrement = 0;
-        if (newEncoderValue > 5030)
+        RotaryControl::RCCallbacks[rcChange](acceleratedDelta, lastEncoderMillis);
+    }
+}
+
+//  read & debounce rotary encoder
+//  code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
+
+void IRAM_ATTR RotaryControl::counterClockWiseCallback(uint8_t pinA, uint8_t pinB)
+{
+    uint8_t enc_value_A = digitalRead(pinA);
+    uint8_t enc_value_B = digitalRead(pinB);
+    uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
+
+    if ((!RotaryControl::cw1_fall) && (enc_value == 0b10))
+    {
+        RotaryControl::cw1_fall = true;
+    }
+    if ((RotaryControl::ccw1_fall) && (enc_value == 0b00))
+    {
+        RotaryControl::cw1_fall = false;
+        RotaryControl::ccw1_fall = false;
+        uint8_t delta = 0;
+        uint8_t acceleratedDelta = 0;
+        uint64_t currentMillis = millis();
+        if (currentMillis - RotaryControl::lastEncoderMillis < 5)
         {
-            hzIncrement = 1000;
+            acceleratedDelta = 20;
         }
-        else if (newEncoderValue > 5025)
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 10)
         {
-            hzIncrement = 100;
+            acceleratedDelta = 10;
         }
-        else if (newEncoderValue > 5015)
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 20)
         {
-            hzIncrement = 100;
+            acceleratedDelta = 5;
+        }
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 50)
+        {
+            acceleratedDelta = 2;
         }
         else
         {
-            hzIncrement = 1;
+            acceleratedDelta = 1;
         }
-        this->onChange(hzIncrement);
+        RotaryControl::lastEncoderMillis = currentMillis;
+        RotaryControl::RCInterruptHandler(RCC_COUNTERCLOCKWISE, acceleratedDelta, currentMillis);
     }
-    else if (delta < 0)
+}
+
+void IRAM_ATTR RotaryControl::clockWiseCallback(uint8_t pinA, uint8_t pinB)
+{
+    uint8_t enc_value_A = digitalRead(pinA);
+    uint8_t enc_value_B = digitalRead(pinB);
+    uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
+
+    if ((!RotaryControl::ccw1_fall) && (enc_value == 0b01))
     {
-        int32_t newEncoderValue = this->encoder->readEncoder();
-        int32_t hzDecrement = 0;
-        if (newEncoderValue < 4970)
+        RotaryControl::ccw1_fall = true;
+    }
+    if ((RotaryControl::cw1_fall) && (enc_value == 0b00))
+    {
+        RotaryControl::cw1_fall = false;
+        RotaryControl::ccw1_fall = false;
+        uint8_t acceleratedDelta = 0;
+        uint64_t currentMillis = millis();
+        if (currentMillis - RotaryControl::lastEncoderMillis < 5)
         {
-            hzDecrement = -1000;
+            acceleratedDelta = 20;
         }
-        else if (newEncoderValue < 4975)
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 10)
         {
-            hzDecrement = -100;
+            acceleratedDelta = 10;
         }
-        else if (newEncoderValue < 4985)
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 20)
         {
-            hzDecrement = -10;
+            acceleratedDelta = 5;
+        }
+        else if (currentMillis - RotaryControl::lastEncoderMillis < 50)
+        {
+            acceleratedDelta = 2;
         }
         else
         {
-            hzDecrement = -1;
+            acceleratedDelta = 1;
         }
-        this->onChange(hzDecrement);
+        RotaryControl::lastEncoderMillis = currentMillis;
+        RotaryControl::RCInterruptHandler(RCC_CLOCKWISE, acceleratedDelta, currentMillis);
     }
+}
+
+void RotaryControl::init(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback)
+{
+    RotaryControl::pinA = pinA;
+    RotaryControl::pinB = pinB;
+    pinMode(pinA, INPUT_PULLUP);
+    pinMode(pinB, INPUT_PULLUP);
+    RCCallbacks[RCC_CLOCKWISE] = clockWiseCallback;
+    RCCallbacks[RCC_COUNTERCLOCKWISE] = counterClockWiseCallback;
+
+    attachInterrupt(digitalPinToInterrupt(RotaryControl::pinA), []()
+                    { RotaryControl::counterClockWiseCallback(RotaryControl::pinA, RotaryControl::pinB); }, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(RotaryControl::pinB), []()
+                    { RotaryControl::clockWiseCallback(RotaryControl::pinA, RotaryControl::pinB); }, CHANGE);
 }

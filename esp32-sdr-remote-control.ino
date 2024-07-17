@@ -8,10 +8,6 @@
 // #define DISPLAY_ST7789_240x320
 #define DISPLAY_ILI9488_480x320
 
-// Ai Esp32 Rotary Encoder by Igor Antolic
-// https://github.com/igorantolic/ai-esp32-rotary-encoder
-#include <AiEsp32RotaryEncoder.h>
-
 #include "Arduino.h"
 #include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
 
@@ -19,6 +15,8 @@
 #include "Transceiver.hpp"
 
 #include "src/controls/Keypad8.hpp"
+
+#include "src/controls/RotaryControl.hpp"
 
 #define FUNCUBE_DONGLE_MIN_FREQ 150000     // 150 Khz
 #define FUNCUBE_DONGLE_MAX_FREQ 1900000000 // 1.9 Ghz
@@ -100,19 +98,14 @@ volatile uint64_t currentSMeterLevel = 0;
 // sdrRemoteTransceiver trx;
 Transceiver *trx = nullptr;
 
-static uint64_t lastEncoderMillis = millis();
-
-static bool ccw1_fall = false;
-static bool cw1_fall = false;
-
 SDRRadioTS2KSerialConnection *serialConnection;
 // SerialConnection *serialConnection;
 
-//  read & debounce rotary encoder
-//  code (with some changes) by MostlyMegan: https://reddit.com/r/raspberrypipico/comments/pacarb/sharing_some_c_code_to_read_a_rotary_encoder/
+uint64_t lastEncoderMillis = 0;
 
-void onEncoderIncrement(uint acceleratedDelta)
+void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
+  lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
     trx->incrementActiveVFOFrequency(acceleratedDelta);
@@ -131,8 +124,9 @@ void onEncoderIncrement(uint acceleratedDelta)
   trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
-void onEncoderDecrement(uint acceleratedDelta)
+void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
+  lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
     trx->decrementActiveVFOFrequency(acceleratedDelta);
@@ -151,102 +145,9 @@ void onEncoderDecrement(uint acceleratedDelta)
   trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
-void IRAM_ATTR encoder_callback_ccw(uint pinA, uint pinB)
-{
-  // trx->setLockedByControls(true);
-  uint8_t enc_value_A = digitalRead(pinA);
-  uint8_t enc_value_B = digitalRead(pinB);
-  uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
-
-  if ((!cw1_fall) && (enc_value == 0b10))
-  {
-    cw1_fall = true;
-  }
-  if ((ccw1_fall) && (enc_value == 0b00))
-  {
-    cw1_fall = false;
-    ccw1_fall = false;
-    uint8_t delta = 0;
-    uint8_t acceleratedDelta = 0;
-    uint64_t currentMillis = millis();
-    if (currentMillis - lastEncoderMillis < 5)
-    {
-      acceleratedDelta = 20;
-    }
-    else if (currentMillis - lastEncoderMillis < 10)
-    {
-      acceleratedDelta = 10;
-    }
-    else if (currentMillis - lastEncoderMillis < 20)
-    {
-      acceleratedDelta = 5;
-    }
-    else if (currentMillis - lastEncoderMillis < 50)
-    {
-      acceleratedDelta = 2;
-    }
-    else
-    {
-      acceleratedDelta = 1;
-    }
-    lastEncoderMillis = currentMillis;
-    onEncoderDecrement(acceleratedDelta);
-  }
-  // trx->setLockedByControls(false);
-}
-
-void IRAM_ATTR encoder_callback_cw(uint pinA, uint pinB)
-{
-  // trx->setLockedByControls(true);
-  uint8_t enc_value_A = digitalRead(pinA);
-  uint8_t enc_value_B = digitalRead(pinB);
-  uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
-
-  if ((!ccw1_fall) && (enc_value == 0b01))
-  {
-    ccw1_fall = true;
-  }
-  if ((cw1_fall) && (enc_value == 0b00))
-  {
-    cw1_fall = false;
-    ccw1_fall = false;
-    uint8_t acceleratedDelta = 0;
-    uint64_t currentMillis = millis();
-    if (currentMillis - lastEncoderMillis < 5)
-    {
-      acceleratedDelta = 20;
-    }
-    else if (currentMillis - lastEncoderMillis < 10)
-    {
-      acceleratedDelta = 10;
-    }
-    else if (currentMillis - lastEncoderMillis < 20)
-    {
-      acceleratedDelta = 5;
-    }
-    else if (currentMillis - lastEncoderMillis < 50)
-    {
-      acceleratedDelta = 2;
-    }
-    else
-    {
-      acceleratedDelta = 1;
-    }
-    lastEncoderMillis = currentMillis;
-    onEncoderIncrement(acceleratedDelta);
-  }
-  // trx->setLockedByControls(false);
-}
-
 void initRotaryEncoders(void)
 {
-  pinMode(ENC1_A, INPUT_PULLUP);
-  pinMode(ENC1_B, INPUT_PULLUP);
-
-  attachInterrupt(digitalPinToInterrupt(ENC1_A), []()
-                  { encoder_callback_ccw(ENC1_A, ENC1_B); }, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENC1_B), []()
-                  { encoder_callback_cw(ENC1_A, ENC1_B); }, CHANGE);
+  RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
 }
 
 void F1(void)
