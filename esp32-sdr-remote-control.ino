@@ -12,7 +12,7 @@
 #include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
 
 // #include "SerialConnection.hpp"
-#include "Transceiver.hpp"
+#include "src/Transceiver.hpp"
 
 #include "src/controls/Keypad8.hpp"
 
@@ -66,8 +66,7 @@
 #define ENC1_A 19
 #define ENC1_B 21
 
-#ifdef DISPLAY_DRIVER_FOUND
-#else
+#ifndef DISPLAY_DRIVER_FOUND
 #error NO_DISPLAY_DRIVER_FOUND
 #endif
 
