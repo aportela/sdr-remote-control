@@ -8,7 +8,7 @@
 #include "SSWAnimationILI9488.hpp"
 #include "SMeter-ILI9488-Digital.hpp"
 #include "Menu-ILI9498.hpp"
-#include "../../../Transceiver.hpp"
+#include "../../Transceiver.hpp"
 
 #include <Arduino.h>
 #include <String.h>

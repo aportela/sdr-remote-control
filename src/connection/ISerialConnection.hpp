@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../../Transceiver.hpp"
+#include "../Transceiver.hpp"
 
 class ISerialConnection
 {
