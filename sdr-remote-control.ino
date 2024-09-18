@@ -14,6 +14,8 @@
 // #include "SerialConnection.hpp"
 #include "src/Transceiver.hpp"
 
+#include "src/utils/FPS.hpp"
+
 #include "src/controls/Keypad8.hpp"
 
 #include "src/controls/RotaryControl.hpp"
@@ -46,6 +48,15 @@
 
 #ifdef DISPLAY_ILI9488_480x320
 #include "src/display/ILI9488/Display-ILI9488-320x480.hpp"
+#include "src/display/SizesAndOffsets-320x240.hpp"
+#include "src/display/ILI9488/LGFX.hpp"
+
+#define PIN_CS 15
+#define PIN_RST 4
+#define PIN_DC 2
+#define PIN_SDA 23
+#define PIN_SCL 18
+
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 480
 #define DISPLAY_ROTATION 1         // 0 = no rotate, 1 = 90 degrees, 2 = 180 degrees, 3 = 270 degrees (ILI9488 has resolution of 320x480, must rotate 90 degrees, or 270 if inversed to allow "panoramic view")
@@ -69,6 +80,9 @@
 #ifndef DISPLAY_DRIVER_FOUND
 #error NO_DISPLAY_DRIVER_FOUND
 #endif
+
+LGFX *screen = nullptr;
+bool screenMirrorFlipVertical = false;
 
 uint16_t freqChangeHzStepSize = 12500; // Hz
 
@@ -192,9 +206,14 @@ void setup()
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   //  TODO position bug after change connect->main screen
-  //  display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
-  //   display.hideConnectScreen();
-  display.showMainScreen();
+  // display.showConnectScreen(SERIAL_BAUD_RATE, CURRENT_VERSION);
+  // display.hideConnectScreen();
+  // display.showMainScreen();
+
+#ifdef DISPLAY_ILI9488_480x320
+  screen = new LGFX(PIN_SDA, PIN_SCL, PIN_CS, PIN_DC, PIN_RST, DISPLAY_DRIVER_LOVYANN_ILI9488_WIDTH, DISPLAY_DRIVER_LOVYANN_ILI9488_HEIGHT, !screenMirrorFlipVertical ? DISPLAY_DRIVER_LOVYANN_ILI9488_ROTATION : DISPLAY_DRIVER_LOVYANN_ILI9488_ROTATION_MIRROR_FLIP_VERTICAL);
+  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+#endif
 }
 
 bool transmitStatusChanged = true;
@@ -222,11 +241,19 @@ float fps = 0;
 
 void loop()
 {
+#ifdef DISPLAY_ILI9488_480x320
+  screen->Refresh();
+  FPS::Loop(999);
+#endif // DISPLAY_ILI9488_480x320
+}
+
+void loop2()
+{
   if (!trx->poweredOn)
   {
     display.refreshConnectScreen();
-    // clear screen & drawn default connect screen at start (ONLY)
     /*
+    // clear screen & drawn default connect screen at start (ONLY)
     if (serialConnection->tryConnection(trx))
     {
       trx->poweredOn = true;
