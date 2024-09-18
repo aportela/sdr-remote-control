@@ -2,7 +2,7 @@
 #define SDR_REMOTE_CONTROL_LGFX_SCREEN_H
 
 #include <LovyanGFX.hpp>
-#include "../IScreen.hpp"
+#include "IScreen.hpp"
 
 class LGFXScreen : public IScreen
 {

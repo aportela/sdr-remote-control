@@ -1,7 +1,7 @@
 #include "LGFXScreen.hpp"
-#include "../SizesAndOffsets-320x240.hpp"
+#include "../DisplayConfiguration.hpp"
 
-// #define DEBUG_SCREEN_TITLE_BOUNDS
+#define DEBUG_SCREEN_TITLE_BOUNDS
 
 LGFXScreen::LGFXScreen(LovyanGFX *display) : parentDisplay(display)
 {
@@ -9,7 +9,7 @@ LGFXScreen::LGFXScreen(LovyanGFX *display) : parentDisplay(display)
     {
         this->parentDisplay->fillScreen(TFT_BLACK);
         this->parentDisplay->setTextWrap(false);
-#ifdef DEBUG_SCREEN_TITLE_BOUNDS
+#ifdef DEBUG_SCREEN_BOUNDS
         this->parentDisplay->drawRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, TFT_WHITE);
 #endif
     }
