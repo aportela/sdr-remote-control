@@ -68,9 +68,11 @@ LGFXScreenConnectedILI9488::LGFXScreenConnectedILI9488(LovyanGFX *display) : LGF
         this->refreshVFOIndex(0, true);
         this->refreshVFOFreq(0, true, 7084125);
         this->refreshVFOMode(0, true, TRX_VFO_MD_LSB);
+        this->refreshVFOStep(0, true, 1);
         this->refreshVFOIndex(1, false);
         this->refreshVFOFreq(1, false, 144625000);
         this->refreshVFOMode(1, false, TRX_VFO_MD_FM);
+        this->refreshVFOStep(1, false, 1000);
     }
 }
 
@@ -192,6 +194,71 @@ void LGFXScreenConnectedILI9488::refreshVFOMode(uint8_t number, bool isActive, T
         break;
     }
 }
+
+void LGFXScreenConnectedILI9488::refreshVFOStep(uint8_t number, bool isActive, uint64_t step)
+{
+    uint16_t x = 0;
+    uint16_t y = 0;
+    // clear old step
+    if (number == 0)
+    {
+        x = VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE;
+        y = VFO_WIDGET_PRIMARY_STEP_START_Y_COORDINATE;
+    }
+    else
+    {
+        x = VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE;
+        y = VFO_WIDGET_SECONDARY_STEP_START_Y_COORDINATE;
+    }
+    this->parentDisplay->fillRect(x, y, 15 * (VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN), VFO_WIDGET_STEP_HEIGHT, TFT_BLACK);
+    if (step > 0)
+    {
+        switch (step)
+        {
+        case 1: // 1 hz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 14);
+            break;
+        case 10: // 10 hz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 13);
+            break;
+        case 100: // 100 hz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 12);
+            break;
+        case 1000: // 1 Khz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 10);
+            break;
+        case 10000: // 10 Khz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 9);
+            break;
+        case 100000: // 100 Khz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 8);
+            break;
+        case 1000000: // 1 Mhz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 6);
+            break;
+        case 10000000: // 10 Mhz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 5);
+            break;
+        case 100000000: // 100 Mhz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 4);
+            break;
+        case 1000000000: // 1 Ghz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + ((VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN) * 2);
+            break;
+        case 10000000000: // 10 Ghz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE) + (VFO_WIDGET_STEP_WIDTH + VFO_WIDGET_STEP_HORIZONTAL_MARGIN);
+            break;
+        case 100000000000: // 100 Ghz
+            x = (number == 0 ? VFO_WIDGET_PRIMARY_STEP_START_X_COORDINATE : VFO_WIDGET_SECONDARY_STEP_START_X_COORDINATE);
+            break;
+        default:
+            x = 0;
+            break;
+        }
+        this->parentDisplay->fillRect(x, y, VFO_WIDGET_STEP_WIDTH, VFO_WIDGET_STEP_HEIGHT, isActive ? COLOR_ACTIVE : COLOR_SECONDARY);
+    }
+}
+
 bool LGFXScreenConnectedILI9488::Refresh(bool force)
 {
     if (this->parentDisplay != nullptr)
