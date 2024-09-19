@@ -16,10 +16,6 @@ private:
     long lastPeakChange;
     LGFXDualVFOWidget *vfoWidget = nullptr;
 
-    void refreshVFOIndex(uint8_t number, bool isActive);
-    void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
-    void refreshVFOMode(uint8_t number, bool isActive, TrxVFOMode mode);
-    void refreshVFOStep(uint8_t number, bool isActive, uint64_t step);
     void createDigitalSMeter();
     void refreshDigitalSMeter(uint8_t newSignal);
 
