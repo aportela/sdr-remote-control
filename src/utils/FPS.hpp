@@ -1,7 +1,7 @@
 #ifndef APORTELA_MICROCONTROLLER_UTILS_FPS_H
 #define APORTELA_MICROCONTROLLER_UTILS_FPS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace aportela::microcontroller::utils
 {
