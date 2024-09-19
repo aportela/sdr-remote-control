@@ -60,7 +60,7 @@ bool LGFXScreenConnecting::Refresh(bool force)
         if (force || this->previousFPS != currentFPS)
         {
             char str[10];
-            snprintf(str, sizeof(str), "FPS: %04u", currentFPS);
+            snprintf(str, sizeof(str), "FPS: %03u", currentFPS);
             this->parentDisplay->drawString(str, LABEL_FPS_X_OFFSET, LABEL_FPS_Y_OFFSET);
             changed = true;
         }
