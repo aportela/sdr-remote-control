@@ -8,13 +8,14 @@
 class LGFXScreenConnectedILI9488 : public LGFXScreen
 {
 private:
+    Transceiver *trx;
     void refreshVFOIndex(uint8_t number, bool isActive);
     void refreshVFOFreq(uint8_t number, bool isActive, uint64_t frequency);
     void refreshVFOMode(uint8_t number, bool isActive, TRXVFOMode mode);
     void refreshVFOStep(uint8_t number, bool isActive, uint64_t step);
 
 public:
-    LGFXScreenConnectedILI9488(LovyanGFX *display);
+    LGFXScreenConnectedILI9488(LovyanGFX *display, Transceiver *trx);
     ~LGFXScreenConnectedILI9488();
     bool Refresh(bool force = false) override;
 };

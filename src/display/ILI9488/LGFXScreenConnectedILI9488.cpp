@@ -1,4 +1,9 @@
 #include "LGFXScreenConnectedILI9488.hpp"
+#include "../../DisplayConfiguration.hpp"
+
+#ifdef DEBUG_FPS
+#include "../../utils/FPS.hpp"
+#endif
 
 #define WIDGETS_VERTICAL_MARGIN 8
 
@@ -61,18 +66,13 @@
 #define COLOR_SECONDARY 0x528A
 #define COLOR_WARNING TFT_RED
 
-LGFXScreenConnectedILI9488::LGFXScreenConnectedILI9488(LovyanGFX *display) : LGFXScreen(display)
+using namespace aportela::microcontroller::utils;
+
+LGFXScreenConnectedILI9488::LGFXScreenConnectedILI9488(LovyanGFX *display, Transceiver *trx) : LGFXScreen(display), trx(trx)
 {
     if (display != nullptr)
     {
-        this->refreshVFOIndex(0, true);
-        this->refreshVFOFreq(0, true, 7084125);
-        this->refreshVFOMode(0, true, TRX_VFO_MD_LSB);
-        this->refreshVFOStep(0, true, 1);
-        this->refreshVFOIndex(1, false);
-        this->refreshVFOFreq(1, false, 144625000);
-        this->refreshVFOMode(1, false, TRX_VFO_MD_FM);
-        this->refreshVFOStep(1, false, 1000);
+        this->Refresh(true);
     }
 }
 
@@ -263,7 +263,93 @@ bool LGFXScreenConnectedILI9488::Refresh(bool force)
 {
     if (this->parentDisplay != nullptr)
     {
-        bool changed = true;
+        bool changed = this->trx->changed > 0;
+
+        // TODO: only refresh active VFO
+        if (this->trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS)
+        {
+            // this->refreshTransmitStatus(false);
+            this->trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_VFO_INDEX))
+        {
+            this->refreshVFOIndex(0, this->trx->activeVFOIndex == 0);
+            this->refreshVFOIndex(1, this->trx->activeVFOIndex == 1);
+            this->trx->changed &= ~TRX_CFLAG_VFO_INDEX;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY))
+        {
+            this->refreshVFOFreq(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].frequency);
+            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE))
+        {
+            this->refreshVFOMode(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].mode);
+            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP))
+        {
+            this->refreshVFOStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].customStep);
+            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW))
+        {
+            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
+            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
+        {
+            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
+            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FREQUENCY))
+        {
+            this->refreshVFOFreq(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].frequency);
+            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_MODE))
+        {
+            this->refreshVFOMode(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].mode);
+            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_MODE;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
+        {
+            this->refreshVFOStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].customStep);
+            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_LOW))
+        {
+            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
+            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH))
+        {
+            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
+            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+        }
+        if (force || (this->trx->changed & TRX_CFLAG_SIGNAL_METER_LEVEL))
+        {
+            // this->smeterDigitalPtr->refresh(this->trx->signalMeterLevel);
+            this->trx->changed &= ~TRX_CFLAG_SIGNAL_METER_LEVEL;
+        }
+        if (force || ((this->trx->changed & TRX_CFLAG_AF_GAIN) || (this->trx->changed & TRX_CFLAG_AUDIO_MUTE)))
+        {
+            // this->refreshVolume(this->trx->AFGain, this->trx->audioMuted);
+            this->trx->changed &= ~TRX_CFLAG_AF_GAIN;
+            this->trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
+        }
+#ifdef DEBUG_FPS
+        uint16_t currentFPS = FPS::GetFPS();
+        if (force || this->previousFPS != currentFPS)
+        {
+            this->parentDisplay->setTextColor(0xF85E, COLOR_BG);
+            this->parentDisplay->setCursor(VFO_BLOCK_START_X_COORDINATE, DISPLAY_HEIGHT - 16);
+            this->parentDisplay->setTextSize(1);
+            this->parentDisplay->printf("%03u FPS", currentFPS);
+            changed = true;
+        }
+#endif
+        // this->menuPtr->refresh(false);
         return (changed);
     }
     else
