@@ -2,7 +2,7 @@
 #define SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTING_H
 
 #include "LGFXScreen.hpp"
-#include "LGFXSSWAnimation.hpp"
+#include "widgets/LGFXSSWAnimation.hpp"
 
 class LGFXScreenConnecting : public LGFXScreen
 {

@@ -40,7 +40,7 @@ LGFXScreenConnecting::LGFXScreenConnecting(LovyanGFX *display) : LGFXScreen(disp
         this->parentDisplay->setTextSize(1);
         snprintf(str, sizeof(str), "Searching TS-2000 CAT connection (%d baud)", DEFAULT_SERIAL_SPEED);
         this->parentDisplay->drawString(str, DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 10);
-        this->animatedScreenPtr = new LGFXSSWAnimation(this->parentDisplay, SSWANIMATION_WIDTH);
+        this->animatedScreenPtr = new LGFXSSWAnimation(this->parentDisplay, SSWANIMATION_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT + SSWA_WATERFALL_HEIGHT + 4, SSWANIMATION_X_OFFSET, SSWANIMATION_Y_OFFSET);
     }
 }
 
@@ -54,7 +54,7 @@ bool LGFXScreenConnecting::Refresh(bool force)
     if (this->parentDisplay != nullptr)
     {
         bool changed = true;
-        this->animatedScreenPtr->refresh(SSWANIMATION_X_OFFSET, SSWANIMATION_Y_OFFSET);
+        this->animatedScreenPtr->refresh();
 #ifdef DEBUG_FPS
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)
