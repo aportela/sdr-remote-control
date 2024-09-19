@@ -31,7 +31,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
 {
     if (display != nullptr)
     {
-        this->vfoWidget = new LGFXDualVFOWidget(display, DISPLAY_WIDTH - (DISPLAY_PADDING * 2), VFO_WIDGETS_SINGLE_VFO_LINE_HEIGHT * 2, VFO_WIDGETS_X_OFFSET, VFO_WIDGETS_Y_OFFSET, trx);
+        this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, trx);
         //  this->createDigitalSMeter();
         //  this->Refresh(true);
     }
@@ -49,7 +49,7 @@ void LGFXScreenConnected::createDigitalSMeter()
 #ifdef DEBUG_SCREEN_BOUNDS
     this->parentDisplay->drawRect(
         DISPLAY_PADDING,
-        (DISPLAY_PADDING * 2) + (VFO_WIDGETS_SINGLE_VFO_LINE_HEIGHT * 2),
+        (DISPLAY_PADDING * 2) + (DUAL_VFO_WIDGET_SINGLE_VFO_TOTAL_HEIGHT * 2),
         DISPLAY_WIDTH - (DISPLAY_PADDING * 2),
         48,
         TFT_RED);

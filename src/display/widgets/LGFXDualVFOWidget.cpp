@@ -37,13 +37,13 @@ void LGFXDualVFOWidget::refreshVFOIndex(uint8_t number, bool isActive)
   this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND);
   if (number == 0)
   {
-    this->parentDisplayPtr->setCursor(PRIMARY_VFO_WIDGET_X_OFFSET, PRIMARY_VFO_WIDGET_Y_OFFSET);
+    this->parentDisplayPtr->setCursor(this->xOffset + 1, this->yOffset + 1);
   }
   else
   {
-    this->parentDisplayPtr->setCursor(SECONDARY_VFO_WIDGET_X_OFFSET, SECONDARY_VFO_WIDGET_Y_OFFSET);
+    this->parentDisplayPtr->setCursor(this->xOffset + 1, this->yOffset + DUAL_VFO_WIDGET_SINGLE_VFO_TOTAL_HEIGHT);
   }
-  this->parentDisplayPtr->setTextSize(VFO_WIDGETS_FONT_SIZE);
+  this->parentDisplayPtr->setTextSize(DUAL_VFO_WIDGET_FONT_SIZE);
   this->parentDisplayPtr->print(number == 0 ? "VFOA" : "VFOB");
 }
 
@@ -63,8 +63,8 @@ void LGFXDualVFOWidget::refreshVFOFreq(uint8_t number, bool isActive, uint64_t f
     }
   }
   formattedFrequency[resultIndex] = '\0';
-  this->parentDisplayPtr->setCursor(VFO_FREQUENCY_WIDGETS_X_OFFSET, number == 0 ? PRIMARY_VFO_WIDGET_Y_OFFSET : SECONDARY_VFO_WIDGET_Y_OFFSET);
-  this->parentDisplayPtr->setTextSize(VFO_WIDGETS_FONT_SIZE);
+  this->parentDisplayPtr->setCursor(this->xOffset + 1 + DUAL_VFO_WIDGET_FREQUENCY_X_OFFSET, number == 0 ? this->yOffset + 1 : this->yOffset + DUAL_VFO_WIDGET_SINGLE_VFO_TOTAL_HEIGHT);
+  this->parentDisplayPtr->setTextSize(DUAL_VFO_WIDGET_FONT_SIZE);
   if (isActive)
   {
     uint8_t firstNonZeroIndex = 0;
@@ -106,8 +106,8 @@ void LGFXDualVFOWidget::refreshVFOFreq(uint8_t number, bool isActive, uint64_t f
 void LGFXDualVFOWidget::refreshVFOMode(uint8_t number, bool isActive, TrxVFOMode mode)
 {
   this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND);
-  this->parentDisplayPtr->setCursor(VFO_MODE_WIDGETS_X_OFFSET, number == 0 ? PRIMARY_VFO_WIDGET_Y_OFFSET : SECONDARY_VFO_WIDGET_Y_OFFSET);
-  this->parentDisplayPtr->setTextSize(VFO_WIDGETS_FONT_SIZE);
+  this->parentDisplayPtr->setCursor(this->xOffset + 1 + DUAL_VFO_WIDGET_MODE_X_OFFSET, number == 0 ? this->yOffset + 1 : this->yOffset + DUAL_VFO_WIDGET_SINGLE_VFO_TOTAL_HEIGHT);
+  this->parentDisplayPtr->setTextSize(DUAL_VFO_WIDGET_FONT_SIZE);
   switch (mode)
   {
   case TRX_VFO_MD_DSB:
@@ -213,7 +213,6 @@ void LGFXDualVFOWidget::refreshVFOStep(uint8_t number, bool isActive, uint64_t s
 bool LGFXDualVFOWidget::refresh(bool force)
 {
   bool changed = force || this->transceiverPtr->changed > 0;
-
   if (changed)
   {
     if (force || (this->transceiverPtr->changed & TRX_CFLAG_VFO_INDEX))
@@ -237,5 +236,21 @@ bool LGFXDualVFOWidget::refresh(bool force)
       this->refreshVFOStep(0, this->transceiverPtr->activeVFOIndex == 0, this->transceiverPtr->VFO[0].customStep);
       this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
     }
+    if (force || (this->transceiverPtr->changed & TRX_CFLAG_SECONDARY_VFO_FREQUENCY))
+    {
+      this->refreshVFOFreq(1, this->transceiverPtr->activeVFOIndex == 1, this->transceiverPtr->VFO[1].frequency);
+      this->transceiverPtr->changed &= ~TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
+    }
+    if (force || (this->transceiverPtr->changed & TRX_CFLAG_SECONDARY_VFO_MODE))
+    {
+      this->refreshVFOMode(1, this->transceiverPtr->activeVFOIndex == 1, this->transceiverPtr->VFO[1].mode);
+      this->transceiverPtr->changed &= ~TRX_CFLAG_SECONDARY_VFO_MODE;
+    }
+    if (force || (this->transceiverPtr->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
+    {
+      this->refreshVFOStep(1, this->transceiverPtr->activeVFOIndex == 1, this->transceiverPtr->VFO[1].customStep);
+      this->transceiverPtr->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
+    }
   }
+  return (changed);
 }
