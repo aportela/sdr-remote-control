@@ -8,7 +8,12 @@
 #include <Arduino.h>
 #include "src/DisplayConfiguration.hpp"
 #include "src/CommonDefines.hpp"
+
+#ifdef DEBUG_FPS
+
 #include "src/utils/FPS.hpp"
+
+#endif
 
 #include "src/display/ScreenType.hpp"
 
@@ -35,8 +40,10 @@ void setup()
     delay(10);
   }
 #ifdef DISPLAY_DRIVER_LOVYANN
+
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS);
-  screen->InitScreen(SCREEN_TYPE_CONNECTED);
+  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+
 #else
 
 #error NO DISPLAY DRIVER DEFINED
@@ -47,8 +54,13 @@ void setup()
 void loop()
 {
 #ifdef DISPLAY_DRIVER_LOVYANN
+
   screen->Refresh();
+
+#ifdef DEBUG_FPS
   FPS::Loop(999);
+#endif // DEBUG_FPS
+
 #else
 
 #error NO DISPLAY DRIVER DEFINED
