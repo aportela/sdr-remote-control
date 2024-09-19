@@ -7,8 +7,6 @@
 class LGFXScreenConnectedST7789 : public LGFXScreen
 {
 private:
-    uint16_t previousFPS = 0;
-
 public:
     LGFXScreenConnectedST7789(LovyanGFX *display);
     ~LGFXScreenConnectedST7789();
