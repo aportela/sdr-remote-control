@@ -1,14 +1,7 @@
 #include "LGFX.hpp"
 #include "../DisplayConfiguration.hpp"
 #include "LGFXScreenConnecting.hpp"
-
-#ifdef DISPLAY_LOVYANN_ILI9488_480x320
-#include "ILI9488/LGFXScreenConnectedILI9488.hpp"
-#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
-#include "ST7789/LGFXScreenConnectedST7789.hpp"
-#else
-#error NO DISPLAY DEFINED
-#endif // DISPLAY_LOVYANN_ILI9488_480x320
+#include "LGFXScreenConnected.hpp"
 
 LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, Transceiver *trx) : trx(trx)
 {
@@ -76,13 +69,7 @@ void LGFX::InitScreen(SCREEN_TYPE screenType)
     case SCREEN_TYPE_CONNECTED:
         if (this->currentScreen == nullptr)
         {
-#ifdef DISPLAY_LOVYANN_ILI9488_480x320
-            this->currentScreen = new LGFXScreenConnectedILI9488(this, trx);
-#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
-            this->currentScreen = new LGFXScreenConnectedST7789(this, trx);
-#else
-#error NO DISPLAY DEFINED
-#endif // DISPLAY_LOVYANN_ILI9488_480x320
+            this->currentScreen = new LGFXScreenConnected(this, trx);
         }
         this->currentScreenType = screenType;
         break;
@@ -136,13 +123,13 @@ bool LGFX::ToggleScreen(void)
     return (success);
 }
 
-bool LGFX::Refresh(void)
+bool LGFX::Refresh(bool force)
 {
     if (this->currentScreenType != SCREEN_TYPE_NONE)
     {
         if (this->currentScreen != nullptr)
         {
-            return (this->currentScreen->Refresh(false));
+            return (this->currentScreen->Refresh(force));
         }
         else
         {

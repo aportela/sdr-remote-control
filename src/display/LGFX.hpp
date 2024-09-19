@@ -2,7 +2,7 @@
 #define SDR_REMOTE_CONTROL_LGFX_H
 
 #include <LovyanGFX.hpp>
-#include <stdint.h>
+#include <cstdint>
 #include "../DisplayConfiguration.hpp"
 #include "LGFXScreen.hpp"
 #include "ScreenType.hpp"
@@ -35,7 +35,7 @@ public:
     SCREEN_TYPE GetCurrentScreenType(void);
     bool FlipToScreen(SCREEN_TYPE scr);
     bool ToggleScreen(void);
-    bool Refresh(void);
+    bool Refresh(bool force = false);
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_H
