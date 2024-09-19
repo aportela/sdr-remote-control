@@ -8,7 +8,6 @@ class LGFXScreenConnecting : public LGFXScreen
 {
 private:
     LGFXSSWAnimation *animatedScreenPtr = nullptr;
-    uint16_t previousFPS = 0;
 
 public:
     LGFXScreenConnecting(LovyanGFX *display);
