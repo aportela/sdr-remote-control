@@ -20,12 +20,12 @@
 #define SSWA_MIN_SIGNAL_VALUE 80
 #define SSWA_MAX_SIGNAL_VALUE 255
 
-class LGFXSSWAnimation : public LGFXWidget
+class LGFXSSWAnimationWidget : public LGFXWidget
 {
 public:
-  LGFXSSWAnimation(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset);
-  ~LGFXSSWAnimation();
-  void refresh(void) override;
+  LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset);
+  ~LGFXSSWAnimationWidget();
+  bool refresh(bool force = false) override;
 
 private:
   lgfx::LGFX_Sprite *canvasSpectrumScope;

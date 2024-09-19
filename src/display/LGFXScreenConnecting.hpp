@@ -2,12 +2,12 @@
 #define SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTING_H
 
 #include "LGFXScreen.hpp"
-#include "widgets/LGFXSSWAnimation.hpp"
+#include "widgets/LGFXSSWAnimationWidget.hpp"
 
 class LGFXScreenConnecting : public LGFXScreen
 {
 private:
-    LGFXSSWAnimation *animatedScreenPtr = nullptr;
+    LGFXSSWAnimationWidget *animatedScreenPtr = nullptr;
 
 public:
     LGFXScreenConnecting(LovyanGFX *display);

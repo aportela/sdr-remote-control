@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include "LGFXSSWAnimation.hpp"
+#include "LGFXSSWAnimationWidget.hpp"
 
-LGFXSSWAnimation::LGFXSSWAnimation(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : LGFXWidget(displayPtr, width, height, xOffset, yOffset)
+LGFXSSWAnimationWidget::LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : LGFXWidget(displayPtr, width, height, xOffset, yOffset)
 {
   // init random seed
   randomSeed(analogRead(0) ^ (micros() * esp_random()));
@@ -21,7 +21,7 @@ LGFXSSWAnimation::LGFXSSWAnimation(LovyanGFX *displayPtr, uint16_t width, uint16
   }
 }
 
-LGFXSSWAnimation::~LGFXSSWAnimation()
+LGFXSSWAnimationWidget::~LGFXSSWAnimationWidget()
 {
   delete this->canvasSpectrumScope;
   this->canvasSpectrumScope = nullptr;
@@ -36,7 +36,7 @@ LGFXSSWAnimation::~LGFXSSWAnimation()
 }
 
 // generate random noise data
-void LGFXSSWAnimation::refreshNoise(void)
+void LGFXSSWAnimationWidget::refreshNoise(void)
 {
   const uint8_t MAX_VALUE = SSWA_MIN_SIGNAL_VALUE / 2;
   const uint8_t MIN_PEAK_INTERVAL = 10;
@@ -60,7 +60,7 @@ void LGFXSSWAnimation::refreshNoise(void)
 }
 
 // generate start/default signals levels
-void LGFXSSWAnimation::initSignals(void)
+void LGFXSSWAnimationWidget::initSignals(void)
 {
   // left block are "cw/morse" signals
   // random spacing between signals
@@ -173,7 +173,7 @@ void LGFXSSWAnimation::initSignals(void)
 }
 
 // regenerate signals levels
-void LGFXSSWAnimation::refreshSignals(void)
+void LGFXSSWAnimationWidget::refreshSignals(void)
 {
   // re/generate "noise"
   this->refreshNoise();
@@ -218,7 +218,7 @@ void LGFXSSWAnimation::refreshSignals(void)
 }
 
 // move canvas one line down
-void LGFXSSWAnimation::scrollDownWaterFallCanvas(lgfx::LGFX_Sprite *canvas)
+void LGFXSSWAnimationWidget::scrollDownWaterFallCanvas(lgfx::LGFX_Sprite *canvas)
 {
   uint16_t *buffer = static_cast<uint16_t *>(canvas->getBuffer());
   int16_t w = canvas->width();
@@ -233,7 +233,7 @@ void LGFXSSWAnimation::scrollDownWaterFallCanvas(lgfx::LGFX_Sprite *canvas)
 }
 
 // generate "blue gradient color" from signal (range value 0..255)
-uint16_t LGFXSSWAnimation::generateBlueGradientColorFromSignal(uint8_t value)
+uint16_t LGFXSSWAnimationWidget::generateBlueGradientColorFromSignal(uint8_t value)
 {
   uint8_t r, g, b;
   if (value <= 71)
@@ -254,7 +254,7 @@ uint16_t LGFXSSWAnimation::generateBlueGradientColorFromSignal(uint8_t value)
 }
 
 // paint spectrum scope & waterfall animation
-void LGFXSSWAnimation::draw(uint16_t xOffset, uint16_t yOffset)
+void LGFXSSWAnimationWidget::draw(uint16_t xOffset, uint16_t yOffset)
 {
   // clear old spectrum scope data
   this->canvasSpectrumScope->fillScreen(TFT_BLACK);
@@ -323,8 +323,9 @@ void LGFXSSWAnimation::draw(uint16_t xOffset, uint16_t yOffset)
 }
 
 // refresh animation
-void LGFXSSWAnimation::refresh(void)
+bool LGFXSSWAnimationWidget::refresh(bool force)
 {
   this->refreshSignals();
   this->draw(this->xOffset, this->yOffset);
+  return (true);
 }
