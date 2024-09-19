@@ -10,7 +10,7 @@
 #error NO DISPLAY DEFINED
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors)
+LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, Transceiver *trx) : trx(trx)
 {
     auto cfg = this->_bus_instance.config();
     cfg.spi_host = VSPI_HOST;  // Utilizar el SPI del hardware VSPI
@@ -77,9 +77,9 @@ void LGFX::InitScreen(SCREEN_TYPE screenType)
         if (this->currentScreen == nullptr)
         {
 #ifdef DISPLAY_LOVYANN_ILI9488_480x320
-            this->currentScreen = new LGFXScreenConnectedILI9488(this);
+            this->currentScreen = new LGFXScreenConnectedILI9488(this, trx);
 #elif defined(DISPLAY_LOVYANN_ST7789_240x320)
-            this->currentScreen = new LGFXScreenConnectedST7789(this);
+            this->currentScreen = new LGFXScreenConnectedST7789(this, trx);
 #else
 #error NO DISPLAY DEFINED
 #endif // DISPLAY_LOVYANN_ILI9488_480x320

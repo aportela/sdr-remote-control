@@ -6,6 +6,7 @@
 #include "../DisplayConfiguration.hpp"
 #include "LGFXScreen.hpp"
 #include "ScreenType.hpp"
+#include "../Transceiver.hpp"
 
 class LGFX : public lgfx::LGFX_Device
 {
@@ -23,10 +24,12 @@ private:
 
     LGFXScreen *currentScreen = nullptr;
 
+    Transceiver *trx = nullptr;
+
     void DeleteCurrentScreen(void);
 
 public:
-    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors = true);
+    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, Transceiver *trx);
     ~LGFX();
     void InitScreen(SCREEN_TYPE scr);
     SCREEN_TYPE GetCurrentScreenType(void);
