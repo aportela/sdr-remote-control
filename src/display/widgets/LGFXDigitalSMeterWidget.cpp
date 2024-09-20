@@ -65,11 +65,11 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
   this->parentDisplayPtr->print("1  3  5  7  9 +15 +30     +60");
   this->drawBars(MIN_DB + (DB_BAR_STEPS * 30));
-
-  //  this->parentDisplayPtr->setCursor(_DISPLAY_PADDING, 98);
-  // this->parentDisplayPtr->print("S");
-  // this->parentDisplayPtr->setCursor(370, 102);
-  // this->parentDisplayPtr->print("S9+60dB");
+  this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
+  this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+  this->parentDisplayPtr->print("S");
+  this->parentDisplayPtr->print("9");
 }
 
 /*
