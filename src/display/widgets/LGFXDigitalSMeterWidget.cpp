@@ -35,9 +35,9 @@ LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 
 void LGFXDigitalSMeterWidget::createSMeter(void)
 {
-  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TFT_RED);
-  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TFT_RED);
-  // this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_LENGTH, TFT_RED);
+  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_LENGTH, TEXT_COLOR_ACTIVE);
 
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND);
