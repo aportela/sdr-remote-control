@@ -5,6 +5,7 @@
 #include "LGFXScreen.hpp"
 #include "../Transceiver.hpp"
 #include "widgets/LGFXDualVFOWidget.hpp"
+#include "widgets/LGFXDigitalSMeterWidget.hpp"
 
 class LGFXScreenConnected : public LGFXScreen
 {
@@ -15,6 +16,7 @@ private:
     uint8_t peakSignal = 0;
     long lastPeakChange;
     LGFXDualVFOWidget *vfoWidget = nullptr;
+    LGFXDigitalSMeterWidget *digitalSMeterWidget = nullptr;
 
     void createDigitalSMeter();
     void refreshDigitalSMeter(uint8_t newSignal);
