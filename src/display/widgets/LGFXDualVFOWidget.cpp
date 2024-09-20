@@ -19,7 +19,7 @@
 #define TEXT_COLOR_ACTIVE TFT_WHITE
 #define TEXT_COLOR_SECONDARY 0x528A
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND TFT_BLACK
+#define TEXT_BACKGROUND_COLOR TFT_BLACK
 
 LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
 {
@@ -34,7 +34,7 @@ LGFXDualVFOWidget::~LGFXDualVFOWidget()
 
 void LGFXDualVFOWidget::refreshVFOIndex(uint8_t number, bool isActive)
 {
-  this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND);
+  this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding, (this->yOffset + this->padding) + (number == 0 ? 0 : DUAL_VFO_WIDGET_SECONDARY_VFO_Y_OFFSET));
   this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
   this->parentDisplayPtr->print(number == 0 ? "VFOA" : "VFOB");
@@ -98,7 +98,7 @@ void LGFXDualVFOWidget::refreshVFOFreq(uint8_t number, bool isActive, uint64_t f
 
 void LGFXDualVFOWidget::refreshVFOMode(uint8_t number, bool isActive, TrxVFOMode mode)
 {
-  this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND);
+  this->parentDisplayPtr->setTextColor(isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DUAL_VFO_WIDGET_MODE_X_OFFSET, (this->yOffset + this->padding) + (number == 0 ? 0 : DUAL_VFO_WIDGET_SECONDARY_VFO_Y_OFFSET));
   this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
   switch (mode)

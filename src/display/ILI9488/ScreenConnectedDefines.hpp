@@ -46,23 +46,28 @@
 
 #define _DIGITAL_SMETER_FONT_SIZE 2
 
-// smeter container lines
-#define _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH 32
-#define _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET 22
-#define _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET 0
-#define _DIGITAL_SEMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET 1 + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + (_DIGITAL_SMETER_WIDGET_BAR_COUNT * (_DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + SMETER_BAR_WIDTH))
-#define _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET
-#define _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH
-#define _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_LENGTH _DIGITAL_SEMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET
-
 // bars
-#define _DIGITAL_SMETER_WIDGET_BAR_COUNT 38
-#define _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN 4
-#define _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + 1
+#define _DIGITAL_SMETER_WIDGET_BAR_COUNT 38                                                    // total SMeter bars
+#define _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN 4                                         // horizontal margin (separation) between bars
+#define _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + 1  // bars start x offset
+#define _DIGITAL_SMETER_WIDGET_BAR_WIDTH 5                                                     // bar width
+#define _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT 24                                               // low bar height
+#define _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT + 4       // high bar height
+#define _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET 94                                           // high bar y offset
+#define _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET + 4 // low bar y offset
 
-// top value labels
-#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET 10
-#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET 0
+// smeter container lines
+#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH 32                                                                                                                                                                               // vertical line length
+#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET 22                                                                                                                                                                             // vertical lines y offset
+#define _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET 0                                                                                                                                                                          // left vertical line x offset
+#define _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET 1 + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + (_DIGITAL_SMETER_WIDGET_BAR_COUNT * (_DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + _DIGITAL_SMETER_WIDGET_BAR_WIDTH)) // right vertical line y offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET                                                                                                                            // horizontal line x offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH                                                                                 // horizontal line y offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_LENGTH _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET                                                                                                                             // horizontal line length
+
+// top value labels (numeric S units)
+#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET 10 // x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET 0  // y offset
 
 // public widget constants
 #define DIGITAL_SMETER_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
@@ -70,13 +75,6 @@
 #define DIGITAL_SMETER_WIDGET_X_OFFSET _DISPLAY_PADDING
 #define DIGITAL_SMETER_WIDGET_Y_OFFSET _DISPLAY_PADDING + DUAL_VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
 #define DIGITAL_SMETER_WIDGET_PADDING 1
-
-#define SMETER_HIGH_BARS_Y_OFFSET 94
-#define SMETER_LOW_BARS_Y_OFFSET SMETER_HIGH_BARS_Y_OFFSET + 4
-#define SMETER_BAR_WIDTH 5
-#define SMETER_LOW_BAR_HEIGHT 24
-#define SMETER_HIGH_BAR_HEIGHT SMETER_LOW_BAR_HEIGHT + 4
-#define SMETER_BAR_BG_COLOR 0x8410
 
 /* SMETER BLOCK END */
 

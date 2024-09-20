@@ -19,13 +19,13 @@
 #define TEXT_COLOR_ACTIVE TFT_WHITE
 #define TEXT_COLOR_SECONDARY 0x528A
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND TFT_BLACK
-
-#define TOTAL_SMETER_BARS 38
+#define TEXT_BACKGROUND_COLOR TFT_BLACK
 
 #define MIN_DB -54     // S0
 #define MAX_DB 60      // S9+60
-#define DB_BAR_STEPS 3 //
+#define DB_BAR_STEPS 3 // 3 db between each bar
+
+#define BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
 LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
 {
@@ -41,36 +41,30 @@ LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 
 void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
 {
-  uint16_t barColor = SMETER_BAR_BG_COLOR;
-  for (int i = 0; i < TOTAL_SMETER_BARS; i++)
+  for (int i = 0; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
   {
-    if (dB >= (MIN_DB + (DB_BAR_STEPS * (i + 1))))
+    int8_t currentdB = MIN_DB + (DB_BAR_STEPS * (i + 1)); // current bar dB
+    uint16_t barColor = BAR_DISABLED_BACKGROUND_COLOR;
+    if (dB >= currentdB)
     {
-      barColor = TFT_GREEN;
+      barColor = i < 19 ? TFT_GREEN : TFT_RED;
     }
-    else
-    {
-      barColor = SMETER_BAR_BG_COLOR;
-    }
-
-    uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN));
+    uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN));
     bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
-    this->parentDisplayPtr->fillRect(x, isCurrentLongBar ? SMETER_HIGH_BARS_Y_OFFSET : SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, isCurrentLongBar ? SMETER_HIGH_BAR_HEIGHT : SMETER_LOW_BAR_HEIGHT, barColor);
+    this->parentDisplayPtr->fillRect(x, isCurrentLongBar ? _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET : _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, isCurrentLongBar ? _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT : _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, barColor);
   }
 }
 
 void LGFXDigitalSMeterWidget::createSMeter(void)
 {
-  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
-  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
-  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_HORIZONTAL_LINE_LENGTH, TEXT_COLOR_ACTIVE);
-
+  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET, _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_LENGTH, TEXT_COLOR_ACTIVE);
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_FONT_SIZE);
-  this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND);
-
+  this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
   this->parentDisplayPtr->print("1  3  5  7  9 +15 +30     +60");
-  this->drawBars(MIN_DB);
+  this->drawBars(MIN_DB + (DB_BAR_STEPS * 30));
 
   //  this->parentDisplayPtr->setCursor(_DISPLAY_PADDING, 98);
   // this->parentDisplayPtr->print("S");

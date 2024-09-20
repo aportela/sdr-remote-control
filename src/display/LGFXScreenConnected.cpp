@@ -25,6 +25,8 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND TFT_BLACK
 
+#define _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR 0x8410
+
 using namespace aportela::microcontroller::utils;
 
 LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) : LGFXScreen(display), trx(trx)
@@ -71,14 +73,14 @@ void LGFXScreenConnected::createDigitalSMeter()
     */
     for (int i = 1; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
     {
-        int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i - 1) * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+        int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i - 1) * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
         if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 23 || i == 28 || i == 38)
         {
-            this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+            this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
         }
         else
         {
-            this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+            this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
         }
     }
 }
@@ -155,14 +157,14 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
         // BG
         for (int i = start; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
         {
-            int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+            int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
             if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
             {
-                this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+                this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
             }
             else
             {
-                this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+                this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
             }
         }
 
@@ -171,15 +173,15 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
         {
             if (i == this->peakSignal)
             {
-                int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+                int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
                 // set more height on marked values
                 if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
                 {
-                    this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, TFT_WHITE);
+                    this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, TFT_WHITE);
                 }
                 else
                 {
-                    this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, TFT_WHITE);
+                    this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, TFT_WHITE);
                 }
             }
         }
@@ -190,15 +192,15 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
             // real value draw
             if (i < this->currentSignal)
             {
-                int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+                int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
                 // set more height on marked values
                 if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
                 {
-                    this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, i <= 18 ? TFT_GREEN : TFT_RED);
+                    this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, i <= 18 ? TFT_GREEN : TFT_RED);
                 }
                 else
                 {
-                    this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, i <= 18 ? TFT_GREEN : TFT_RED);
+                    this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, i <= 18 ? TFT_GREEN : TFT_RED);
                 }
             }
         }
@@ -218,14 +220,14 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
 
                     for (int i = this->peakSignal + 1; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
                     {
-                        int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+                        int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
                         if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
                         {
-                            this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+                            this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
                         }
                         else
                         {
-                            this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
+                            this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR);
                         }
                     }
 
@@ -233,15 +235,15 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
                     {
                         if (i == this->peakSignal)
                         {
-                            int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
+                            int x = _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN);
                             // set more height on marked values
                             if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 22 || i == 26 || i == 30 || i == 34 || i == 38 || i == 42)
                             {
-                                this->parentDisplay->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, TFT_WHITE);
+                                this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT, TFT_WHITE);
                             }
                             else
                             {
-                                this->parentDisplay->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, TFT_WHITE);
+                                this->parentDisplay->fillRect(x, _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET, _DIGITAL_SMETER_WIDGET_BAR_WIDTH, _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT, TFT_WHITE);
                             }
                         }
                     }
