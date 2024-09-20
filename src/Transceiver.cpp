@@ -4,7 +4,7 @@ Transceiver::Transceiver(void)
 {
   this->lockedByControls = false;
   this->poweredOn = false;
-  this->poweredOn = true;
+  // this->poweredOn = true;
   this->activeVFOIndex = 0;
   this->VFO[0].frequency = 7050123;
   this->VFO[0].mode = TRX_VFO_MD_LSB;
@@ -13,7 +13,7 @@ Transceiver::Transceiver(void)
   this->VFO[1].mode = TRX_VFO_MD_FM;
   this->VFO[1].customStep = 1000;
   this->changed = ((uint16_t)1 << 16) - 1; // ALL (uint16_t) flags active
-  this->signalMeterLevel = 0;
+  this->signalMeterdBLevel = 0;
   this->AFGain = 50;
   this->audioMuted = TRX_AUDIO_NOT_MUTED;
 }
@@ -70,14 +70,14 @@ void Transceiver::setSecondaryVFOFrequency(uint64_t frequency)
 }
 
 // set (active) vfo mode
-void Transceiver::setActiveVFOMode(TRXVFOMode mode)
+void Transceiver::setActiveVFOMode(TrxVFOMode mode)
 {
   this->VFO[0].mode = mode;
   this->changed |= TRX_CFLAG_ACTIVE_VFO_MODE;
 }
 
 // set (secondary) vfo mode
-void Transceiver::setSecondaryVFOMode(TRXVFOMode mode)
+void Transceiver::setSecondaryVFOMode(TrxVFOMode mode)
 {
   this->VFO[1].mode = mode;
   this->changed |= TRX_CFLAG_SECONDARY_VFO_MODE;
@@ -130,10 +130,22 @@ void Transceiver::setSecondaryVFOHighFilterHz(uint32_t hz)
 }
 
 // set signal level meter
-void Transceiver::setSignalMeterLevel(uint8_t level)
+void Transceiver::setSignalMeter(TRXSMeterUnitType unitType, uint8_t units)
 {
-  this->signalMeterLevel = level;
-  this->changed |= TRX_CFLAG_SIGNAL_METER_LEVEL;
+  switch (unitType)
+  {
+  case SIGNAL_METER_TS2K_SDR_RADIO_LEVEL:
+    this->signalMeterTS2KSDRRadioUnits = units;
+    this->signalMeterdBLevel = units * 3;
+    break;
+  case SIGNAL_METER_DB_UNITS:
+    this->signalMeterTS2KSDRRadioUnits = units / 3;
+    this->signalMeterdBLevel = units;
+    break;
+  default:
+    break;
+  }
+  this->changed |= TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
 }
 
 // set af gain

@@ -1,9 +1,8 @@
 #ifndef SDR_REMOTE_CONTROL_TRANSCEIVER_H
 #define SDR_REMOTE_CONTROL_TRANSCEIVER_H
 
-#include <stdint.h>
-#include <stddef.h>
-#include <string>
+#include <cstdint>
+#include <cstdbool>
 
 // bitmask definitions for checking changed values
 #define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
@@ -19,7 +18,7 @@
 #define TRX_CFLAG_SECONDARY_VFO_STEP (1 << 10)           // 1024
 #define TRX_CFLAG_SECONDARY_VFO_FILTER_LOW (1 << 11)     // 2048
 #define TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH (1 << 12)    // 4096
-#define TRX_CFLAG_SIGNAL_METER_LEVEL (1 << 13)           // 8192
+#define TRX_CFLAG_SIGNAL_METER_DB_LEVEL (1 << 13)        // 8192
 #define TRX_CFLAG_AUDIO_MUTE (1 << 14)                   // 16384
 #define TRX_CFLAG_AF_GAIN (1 << 15)                      // 32768
 #define TRX_CFLAG_SEND_CAT (1 << 16)                     // 65536
@@ -47,17 +46,23 @@ typedef enum
   TRX_VFO_MD_WFM = 8,
   TRX_VFO_MD_BFM = 9,
   TRX_VFO_MODE_ERROR = 10
-} TRXVFOMode;
+} TrxVFOMode;
 
 typedef struct
 {
   uint64_t frequency;
-  TRXVFOMode mode;
+  TrxVFOMode mode;
   uint32_t LF;         // low filter
   uint32_t HF;         // high filter
   uint32_t BW;         // bandwith
   uint64_t customStep; // hz
-} TRXVFO;
+} TrxVFO;
+
+typedef enum
+{
+  SIGNAL_METER_TS2K_SDR_RADIO_LEVEL = 1,
+  SIGNAL_METER_DB_UNITS = 2
+} TRXSMeterUnitType;
 
 class Transceiver
 {
@@ -69,8 +74,9 @@ public:
   bool poweredOn;
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex;
-  TRXVFO VFO[2];
-  uint8_t signalMeterLevel;
+  TrxVFO VFO[2];
+  uint8_t signalMeterdBLevel;
+  uint8_t signalMeterTS2KSDRRadioUnits;
   uint8_t AFGain;
   TRxAudioMuteStatus audioMuted;
 
@@ -98,10 +104,10 @@ public:
   void setSecondaryVFOFrequency(uint64_t frequency);
 
   // set (active) vfo mode
-  void setActiveVFOMode(TRXVFOMode mode);
+  void setActiveVFOMode(TrxVFOMode mode);
 
   // set (secondary) vfo mode
-  void setSecondaryVFOMode(TRXVFOMode mode);
+  void setSecondaryVFOMode(TrxVFOMode mode);
 
   // set (active) vfo custom step size (hz)
   void setActiveVFOHzCustomStep(uint64_t hz);
@@ -122,7 +128,7 @@ public:
   void setSecondaryVFOHighFilterHz(uint32_t hz);
 
   // set signal level meter
-  void setSignalMeterLevel(uint8_t level);
+  void setSignalMeter(TRXSMeterUnitType unitType, uint8_t units);
 
   // set af gain
   void setAFGain(uint8_t value);
