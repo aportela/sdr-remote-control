@@ -21,6 +21,12 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND TFT_BLACK
 
+#define TOTAL_SMETER_BARS 38
+
+#define MIN_DB -54     // S0
+#define MAX_DB 60      // S9+60
+#define DB_BAR_STEPS 3 //
+
 LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
 {
   if (displayPtr != nullptr)
@@ -33,6 +39,26 @@ LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 {
 }
 
+void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
+{
+  uint16_t barColor = SMETER_BAR_BG_COLOR;
+  for (int i = 0; i < TOTAL_SMETER_BARS; i++)
+  {
+    if (dB >= (MIN_DB + (DB_BAR_STEPS * (i + 1))))
+    {
+      barColor = TFT_GREEN;
+    }
+    else
+    {
+      barColor = SMETER_BAR_BG_COLOR;
+    }
+
+    uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN));
+    bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
+    this->parentDisplayPtr->fillRect(x, isCurrentLongBar ? SMETER_HIGH_BARS_Y_OFFSET : SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, isCurrentLongBar ? SMETER_HIGH_BAR_HEIGHT : SMETER_LOW_BAR_HEIGHT, barColor);
+  }
+}
+
 void LGFXDigitalSMeterWidget::createSMeter(void)
 {
   this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SEMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SEMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
@@ -43,28 +69,59 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND);
 
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
-  this->parentDisplayPtr->print("1  3  5  7  9 +15 +30    +60");
+  this->parentDisplayPtr->print("1  3  5  7  9 +15 +30     +60");
+  this->drawBars(MIN_DB);
+
   //  this->parentDisplayPtr->setCursor(_DISPLAY_PADDING, 98);
-  //  this->parentDisplayPtr->print("S");
+  // this->parentDisplayPtr->print("S");
   // this->parentDisplayPtr->setCursor(370, 102);
   // this->parentDisplayPtr->print("S9+60dB");
-
-  for (int i = 1; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
-  {
-    uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + ((i - 1) * (SMETER_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN));
-    if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 23 || i == 28 || i == 38)
-    {
-      this->parentDisplayPtr->fillRect(x, SMETER_HIGH_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_HIGH_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
-    }
-    else
-    {
-      this->parentDisplayPtr->fillRect(x, SMETER_LOW_BARS_Y_OFFSET, SMETER_BAR_WIDTH, SMETER_LOW_BAR_HEIGHT, SMETER_BAR_BG_COLOR);
-    }
-  }
 }
 
-void LGFXDigitalSMeterWidget::refreshSMeter(uint8_t level)
+/*
+  SMeter ranges
+  S0     -54 dB
+         -51 dB
+  S1     –48 dB
+         -45 dB
+  S2     –42 dB
+         -39 dB
+  S3 	   –36 dB
+         -33 dB
+  S4 	   –30 dB
+         -27 dB
+  S5 	   –24 dB
+         -21 dB
+  S6 	   –18 dB
+         -15 dB
+  S7 	   –12 dB
+          -9 dB
+  S8 	    –6 dB
+          -3 dB
+  S9 	     0 dB
+  S9+10   10 dB
+  ...
+  S9+30 	30 dB
+  ...
+  S9+60 	60 dB
+*/
+void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
 {
+  int8_t minDB = -51;
+  int8_t maxDB = 60;
+  uint8_t activeBars = 0;
+  if (dB < minDB)
+  {
+    activeBars = 0;
+  }
+  else if (dB >= maxDB)
+  {
+    activeBars = 38;
+  }
+  else
+  {
+    activeBars = dB - minDB;
+  }
 }
 
 bool LGFXDigitalSMeterWidget::refresh(bool force)
@@ -74,7 +131,7 @@ bool LGFXDigitalSMeterWidget::refresh(bool force)
   {
     if (force || (this->transceiverPtr->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL))
     {
-      this->refreshSMeter(this->transceiverPtr->signalMeterdBLevel);
+      this->refreshSMeter(-51);
       this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
     }
   }

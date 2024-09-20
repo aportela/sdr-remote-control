@@ -9,8 +9,10 @@ class LGFXDigitalSMeterWidget : public LGFXWidget
 {
 private:
   Transceiver *transceiverPtr;
+  int8_t previousDB = -57;
+  void drawBars(int8_t dB);
   void createSMeter(void);
-  void refreshSMeter(uint8_t level);
+  void refreshSMeter(int8_t dB);
 
 public:
   LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr);
