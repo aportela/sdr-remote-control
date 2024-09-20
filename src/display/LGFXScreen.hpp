@@ -1,6 +1,7 @@
 #ifndef SDR_REMOTE_CONTROL_LGFX_SCREEN_H
 #define SDR_REMOTE_CONTROL_LGFX_SCREEN_H
 
+#include <cstdint>
 #include <LovyanGFX.hpp>
 #include "IScreen.hpp"
 #include "../DisplayConfiguration.hpp"
