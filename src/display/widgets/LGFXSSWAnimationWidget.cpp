@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "LGFXSSWAnimationWidget.hpp"
 
-LGFXSSWAnimationWidget::LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : LGFXWidget(displayPtr, width, height, xOffset, yOffset)
+LGFXSSWAnimationWidget::LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   // init random seed
   randomSeed(analogRead(0) ^ (micros() * esp_random()));

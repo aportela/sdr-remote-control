@@ -31,7 +31,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
 {
     if (display != nullptr)
     {
-        this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, trx);
+        this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, DUAL_VFO_WIDGET_PADDING, trx);
         //  this->createDigitalSMeter();
         //  this->Refresh(true);
     }
@@ -48,9 +48,9 @@ void LGFXScreenConnected::createDigitalSMeter()
 {
 #ifdef DEBUG_SCREEN_BOUNDS
     this->parentDisplay->drawRect(
-        DISPLAY_PADDING,
-        (DISPLAY_PADDING * 2) + (DUAL_VFO_WIDGET_SINGLE_VFO_TOTAL_HEIGHT * 2),
-        DISPLAY_WIDTH - (DISPLAY_PADDING * 2),
+        _DISPLAY_PADDING,
+        (_DISPLAY_PADDING * 2) + (_DUAL_VFO_WIDGET_SINGLE_LINE_HEIGHT * 2),
+        DISPLAY_WIDTH - (_DISPLAY_PADDING * 2),
         48,
         TFT_RED);
 #endif
@@ -59,7 +59,7 @@ void LGFXScreenConnected::createDigitalSMeter()
 
     // this->parentDisplay->setCursor(SMETER_VALUES_LABEL_X_OFFSET, SMETER_VALUES_LABEL_Y_OFFSET);
     // this->parentDisplay->print("1  3  5  7  9 +15 +30    +60");
-    //  this->parentDisplay->setCursor(DISPLAY_PADDING, 98);
+    //  this->parentDisplay->setCursor(_DISPLAY_PADDING, 98);
     //  this->parentDisplay->print("S");
     // this->parentDisplay->setCursor(370, 102);
     // this->parentDisplay->print("S9+60dB");
@@ -283,7 +283,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         }
         if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP))
         {
-            this->refreshVFOStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].customStep);
+            this->refreshVFOFrequencyStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].customStep);
             this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
         }
         if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW))
@@ -308,7 +308,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         }
         if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
         {
-            this->refreshVFOStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].customStep);
+            this->refreshVFOFrequencyStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].customStep);
             this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
         }
         if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_LOW))
@@ -337,7 +337,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         if (force || this->previousFPS != currentFPS)
         {
             this->parentDisplay->setTextColor(0xF85E, TEXT_BACKGROUND);
-            this->parentDisplay->setCursor(DISPLAY_PADDING, DISPLAY_HEIGHT - 16);
+            this->parentDisplay->setCursor(_DISPLAY_PADDING, DISPLAY_HEIGHT - 16);
             this->parentDisplay->setTextSize(1);
             this->parentDisplay->printf("%03u FPS", currentFPS);
             changed = true;
