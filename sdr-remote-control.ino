@@ -8,12 +8,16 @@
 #include <Arduino.h>
 #include "src/DisplayConfiguration.hpp"
 #include "src/CommonDefines.hpp"
+#include "src/controls/RotaryControl.hpp"
+#include "src/Transceiver.hpp"
 
 #ifdef DEBUG_FPS
 
 #include "src/utils/FPS.hpp"
 
 #endif
+
+using namespace aportela::microcontroller::utils;
 
 #include "src/display/ScreenType.hpp"
 
@@ -29,7 +33,65 @@ LGFX *screen = nullptr;
 
 #endif // DISPLAY_DRIVER_LOVYANN
 
-using namespace aportela::microcontroller::utils;
+Transceiver *trx;
+
+// ROTARY ENCODER PINS
+
+#define ENC1_A 19
+#define ENC1_B 21
+
+// bitmask definitions for encoder changes
+#define ENCODER_CHANGE_TUNE (1 << 0)        // 1
+#define ENCODER_CHANGE_VOLUME (1 << 1)      // 2
+#define ENCODER_CHANGE_FILTER_BOTH (1 << 2) // 4
+#define ENCODER_CHANGE_FILTER_LOW (1 << 3)  // 8
+#define ENCODER_CHANGE_FILTER_HIGH (1 << 4) // 16
+
+volatile uint8_t encoderChangeBitmask = 0;
+
+uint64_t lastEncoderMillis = 0;
+
+void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
+{
+  lastEncoderMillis = millis();
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    trx->incrementActiveVFOFrequency(acceleratedDelta);
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    trx->incrementAFGain(1);
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+  {
+    trx->VFO[trx->activeVFOIndex].LF += acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].HF += acceleratedDelta;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+  }
+  trx->changed |= TRX_CFLAG_SEND_CAT;
+}
+
+void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
+{
+  lastEncoderMillis = millis();
+  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  {
+    trx->decrementActiveVFOFrequency(acceleratedDelta);
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+  {
+    trx->decrementAFGain(1);
+  }
+  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+  {
+    trx->VFO[trx->activeVFOIndex].LF -= acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].HF -= acceleratedDelta;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
+    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+  }
+  trx->changed |= TRX_CFLAG_SEND_CAT;
+}
 
 void setup()
 {
@@ -39,10 +101,13 @@ void setup()
     yield();
     delay(10);
   }
+  RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
+  encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
+  trx = new Transceiver();
 #ifdef DISPLAY_DRIVER_LOVYANN
 
-  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS);
-  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
+  screen->InitScreen(SCREEN_TYPE_CONNECTED);
 
 #else
 
