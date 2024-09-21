@@ -31,7 +31,7 @@ LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t
 {
   if (displayPtr != nullptr)
   {
-    this->createSMeter();
+    this->refresh(true);
   }
 }
 
@@ -63,7 +63,7 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
-  this->parentDisplayPtr->print("1  3  5  7  9 +15 +30     +60");
+  this->parentDisplayPtr->print("1  3  5  7  9  +15 +30    +60");
   this->drawBars(MIN_DB);
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
@@ -119,6 +119,10 @@ void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
 
 bool LGFXDigitalSMeterWidget::refresh(bool force)
 {
+  if (force)
+  {
+    this->createSMeter();
+  }
   bool changed = force || (this->transceiverPtr->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL);
   if (changed)
   {

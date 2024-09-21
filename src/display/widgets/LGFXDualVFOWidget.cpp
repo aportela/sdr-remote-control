@@ -25,6 +25,7 @@ LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint
 {
   if (displayPtr != nullptr)
   {
+    this->refresh(true);
   }
 }
 
