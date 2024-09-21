@@ -259,6 +259,7 @@ bool LGFXScreenConnected::Refresh(bool force)
     {
         bool changed = this->trx->changed > 0;
         this->vfoWidget->refresh(force);
+        this->digitalSMeterWidget->refresh(force);
         /*
 
 
