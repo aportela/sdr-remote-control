@@ -64,7 +64,7 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
   this->parentDisplayPtr->print("1  3  5  7  9 +15 +30     +60");
-  this->drawBars(MIN_DB + (DB_BAR_STEPS * 30));
+  this->drawBars(MIN_DB);
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
@@ -101,33 +101,29 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
 */
 void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
 {
-  int8_t minDB = -51;
-  int8_t maxDB = 60;
   uint8_t activeBars = 0;
-  if (dB < minDB)
+  if (dB < MIN_DB)
   {
     activeBars = 0;
   }
-  else if (dB >= maxDB)
+  else if (dB >= MAX_DB)
   {
     activeBars = 38;
   }
   else
   {
-    activeBars = dB - minDB;
+    activeBars = dB - MIN_DB;
   }
+  this->drawBars(dB);
 }
 
 bool LGFXDigitalSMeterWidget::refresh(bool force)
 {
-  bool changed = force || this->transceiverPtr->changed > 0;
+  bool changed = force || (this->transceiverPtr->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL);
   if (changed)
   {
-    if (force || (this->transceiverPtr->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL))
-    {
-      this->refreshSMeter(-51);
-      this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
-    }
+    this->refreshSMeter(this->transceiverPtr->signalMeterdBLevel);
+    this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
   }
   return (changed);
 }
