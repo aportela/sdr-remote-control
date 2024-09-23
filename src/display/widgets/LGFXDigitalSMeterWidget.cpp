@@ -39,6 +39,7 @@ LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 {
 }
 
+// TODO: PEAKS
 void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
 {
   for (int i = 0; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
@@ -60,7 +61,7 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
   this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET, _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH, TEXT_COLOR_ACTIVE);
   this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET, _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_LENGTH, TEXT_COLOR_ACTIVE);
-  this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_FONT_SIZE);
+  this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
   this->parentDisplayPtr->print("1  3  5  7  9  +15 +30    +60");
