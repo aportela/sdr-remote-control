@@ -35,6 +35,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
     {
         this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, DUAL_VFO_WIDGET_PADDING, trx);
         this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, trx);
+        this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, trx);
         //  this->createDigitalSMeter();
         //  this->Refresh(true);
     }
@@ -44,20 +45,16 @@ LGFXScreenConnected::~LGFXScreenConnected()
 {
     delete this->vfoWidget;
     this->vfoWidget = nullptr;
+    delete this->digitalSMeterWidget;
+    this->digitalSMeterWidget = nullptr;
+    delete this->volumeSquelchWidget;
+    this->volumeSquelchWidget = nullptr;
     this->parentDisplay = nullptr;
 }
 
 void LGFXScreenConnected::createDigitalSMeter()
 {
-#ifdef DEBUG_SCREEN_BOUNDS
-    this->parentDisplay->drawRect(
-        _DISPLAY_PADDING,
-        (_DISPLAY_PADDING * 2) + (_DUAL_VFO_WIDGET_SINGLE_LINE_HEIGHT * 2),
-        DISPLAY_WIDTH - (_DISPLAY_PADDING * 2),
-        48,
-        TFT_RED);
-#endif
-    this->parentDisplay->setTextSize(_DIGITAL_SMETER_FONT_SIZE);
+    this->parentDisplay->setTextSize(_DIGITAL_SMETER_WIDGET_FONT_SIZE);
     this->parentDisplay->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND);
 
     // this->parentDisplay->setCursor(_DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);

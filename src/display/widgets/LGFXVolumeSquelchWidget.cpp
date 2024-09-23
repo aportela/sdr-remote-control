@@ -24,10 +24,43 @@ LGFXVolumeSquelchWidget::LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t
 {
   if (displayPtr != nullptr)
   {
+    this->refresh(true);
   }
 }
 
 LGFXVolumeSquelchWidget::~LGFXVolumeSquelchWidget()
+{
+}
+
+void LGFXVolumeSquelchWidget::refreshVolume(bool force, uint8_t value)
+{
+  this->parentDisplayPtr->setTextSize(_VOLUME_SQUELCH_WIDGET_FONT_SIZE);
+  this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+#define _VOLUME_SQUELCH_WIDGET_LABELS_Y_OFFSET 2
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding, this->yOffset + this->padding);
+  this->parentDisplayPtr->print("VOLUME");
+
+  this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
+
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_VOLUME_VALUE_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->printf("%03d", value);
+
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_SQUELCH_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->print("SQUELCH");
+
+  this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
+
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_SQUELCH_VALUE_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->printf("%03d", value);
+}
+
+void LGFXVolumeSquelchWidget::refreshSquelch(bool force, uint8_t value)
+{
+}
+
+void LGFXVolumeSquelchWidget::setMuted(bool force, uint8_t value)
 {
 }
 
@@ -38,11 +71,7 @@ bool LGFXVolumeSquelchWidget::refresh(bool force)
   {
     if (force || (this->transceiverPtr->changed & TRX_CFLAG_AF_GAIN))
     {
-      this->transceiverPtr->changed &= ~TRX_CFLAG_AF_GAIN;
-      changed = true;
-    }
-    if (force || (this->transceiverPtr->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH))
-    {
+      this->refreshVolume(force, this->transceiverPtr->AFGain);
       this->transceiverPtr->changed &= ~TRX_CFLAG_AF_GAIN;
       changed = true;
     }

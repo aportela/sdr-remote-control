@@ -10,6 +10,10 @@ class LGFXVolumeSquelchWidget : public LGFXWidget
 private:
   Transceiver *transceiverPtr;
 
+  void refreshVolume(bool force, uint8_t value);
+  void refreshSquelch(bool force, uint8_t value);
+  void setMuted(bool force, uint8_t value);
+
 public:
   LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr);
   ~LGFXVolumeSquelchWidget();
