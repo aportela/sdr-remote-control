@@ -1,21 +1,20 @@
-#ifndef SDR_REMOTE_CONTROL_MENU_BUTTON_ILI9488_DIGITAL_H
-#define SDR_REMOTE_CONTROL_MENU_BUTTON_ILI9488_DIGITAL_H
+#ifndef SDR_REMOTE_CONTROL_LGFX_MENU_BUTTON_H
+#define SDR_REMOTE_CONTROL_LGFX_MENU_BUTTON_H
 
-#include <stdio.h>
-#include "LGFX.hpp"
+#include <LovyanGFX.hpp>
 #include "../MenuButton.hpp"
 
 // #define BAR_GROW_LINEAL
 
-class MenuButtonILI9488 : public MenuButton
+class LGFXMenuButton : public MenuButton
 {
-public:
-    MenuButtonILI9488(LGFX *existingDisplay, uint8_t index, uint16_t x, uint16_t y, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
-    ~MenuButtonILI9488();
-    void draw(void) override;
-
 private:
-    LGFX *display;
+    LovyanGFX *parentDisplayPtr;
+
+public:
+    LGFXMenuButton(LovyanGFX *displayPtr, uint8_t index, uint16_t xOffset, uint16_t yOffset, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
+    ~LGFXMenuButton();
+    void draw(void) override;
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_LGFX_MENU_BUTTON_H
