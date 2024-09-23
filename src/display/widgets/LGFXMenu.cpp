@@ -1,4 +1,4 @@
-#include "Menu-ILI9498.hpp"
+#include "LGFXMenu.hpp"
 
 #define DEFAULT_COLOR 0xFFFF
 #define DEFAULT_BG 0x0000
@@ -69,11 +69,11 @@ const ButtonCallback buttonCallbacks[] = {
     defaultCallBack,
 };
 
-MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : Menu()
+LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : Menu()
 {
-    if (existingDisplay != nullptr)
+    if (displayPtr != nullptr)
     {
-        this->display = existingDisplay;
+        this->parentDisplayPtr = displayPtr;
         this->width = width;
         this->height = height;
         this->xOffset = xOffset;
@@ -87,16 +87,16 @@ MenuILI9488::MenuILI9488(LGFX *existingDisplay, uint16_t width, uint16_t height,
     //   3: refresh (draw from start to end)
 }
 
-MenuILI9488::~MenuILI9488()
+LGFXMenu::~LGFXMenu()
 {
     for (uint8_t i = 0; i < TOTAL_MENU_BUTTONS; i++)
     {
         delete (this->buttons[i]);
     }
-    this->display = nullptr;
+    this->parentDisplayPtr = nullptr;
 }
 
-void MenuILI9488::initMenu(void)
+void LGFXMenu::initMenu(void)
 {
     for (uint8_t i = 0, f = 1, row = 0, col = 0; i < TOTAL_MENU_BUTTONS; i++, f++)
     {
@@ -108,8 +108,8 @@ void MenuILI9488::initMenu(void)
         sprintf(topLabel, "F%d", f);
         char mainLabel[24];
         sprintf(mainLabel, buttonLabels[i]);
-        this->buttons[i] = new MenuButtonILI9488(
-            this->display,
+        this->buttons[i] = new LGFXMenuButton(
+            this->parentDisplayPtr,
             i,                                                         // index
             (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
             (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
@@ -131,7 +131,7 @@ void MenuILI9488::initMenu(void)
     }
 }
 
-void MenuILI9488::refresh(bool forceAll)
+void LGFXMenu::refresh(bool forceAll)
 {
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
     uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
@@ -146,7 +146,7 @@ void MenuILI9488::refresh(bool forceAll)
     }
 }
 
-void MenuILI9488::setButtonEnabled(uint8_t btnIndex)
+void LGFXMenu::setButtonEnabled(uint8_t btnIndex)
 {
     if (btnIndex < BUTTONS_PER_PAGE)
     {
@@ -154,7 +154,7 @@ void MenuILI9488::setButtonEnabled(uint8_t btnIndex)
     }
 }
 
-void MenuILI9488::setButtonDisabled(uint8_t btnIndex)
+void LGFXMenu::setButtonDisabled(uint8_t btnIndex)
 {
     if (btnIndex < BUTTONS_PER_PAGE)
     {
@@ -162,7 +162,7 @@ void MenuILI9488::setButtonDisabled(uint8_t btnIndex)
     }
 }
 
-void MenuILI9488::previousPage(void)
+void LGFXMenu::previousPage(void)
 {
     if (this->currentPage > 0)
     {
@@ -171,7 +171,7 @@ void MenuILI9488::previousPage(void)
     }
 }
 
-void MenuILI9488::nextPage(void)
+void LGFXMenu::nextPage(void)
 {
     if (this->currentPage < this->totalPages)
     {
