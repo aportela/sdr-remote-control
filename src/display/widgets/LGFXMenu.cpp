@@ -1,4 +1,19 @@
 #include "LGFXMenu.hpp"
+#include "../../DisplayConfiguration.hpp"
+
+#ifdef DISPLAY_LOVYANN_ILI9488_480x320
+
+#include "../ILI9488/ScreenConnectedDefines.hpp"
+
+#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
+
+#include "../ST7789/ScreenConnectedDefines.hpp"
+
+#else
+
+#error NO DISPLAY DEFINED
+
+#endif // DISPLAY_LOVYANN_ILI9488_480x320
 
 #define DEFAULT_COLOR 0xFFFF
 #define DEFAULT_BG 0x0000
@@ -69,18 +84,10 @@ const ButtonCallback buttonCallbacks[] = {
     defaultCallBack,
 };
 
-LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : Menu()
+LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
     if (displayPtr != nullptr)
     {
-        this->parentDisplayPtr = displayPtr;
-#ifdef DEBUG_SCREEN_WIDGETS_BOUNDS
-        this->parentDisplayPtr->drawRect(xOffset, yOffset, width, height, TFT_WHITE);
-#endif
-        this->width = width;
-        this->height = height;
-        this->xOffset = xOffset;
-        this->yOffset = yOffset;
         this->totalPages = TOTAL_MENU_PAGES;
         this->initMenu();
         this->refresh(true);
@@ -95,6 +102,7 @@ LGFXMenu::~LGFXMenu()
     for (uint8_t i = 0; i < TOTAL_MENU_BUTTONS; i++)
     {
         delete (this->buttons[i]);
+        this->buttons[i] = nullptr;
     }
     this->parentDisplayPtr = nullptr;
 }
@@ -113,9 +121,12 @@ void LGFXMenu::initMenu(void)
         sprintf(mainLabel, buttonLabels[i]);
         this->buttons[i] = new LGFXMenuButton(
             this->parentDisplayPtr,
-            i,                                                         // index
+            MENU_BUTTON_WIDGET_WIDTH,
+            MENU_BUTTON_WIDGET_HEIGHT,
             (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
             (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
+            MENU_BUTTON_WIDGET_PADDING,                                // padding
+            i,                                                         // index
             topLabel,                                                  // top label
             mainLabel,                                                 // bottom label
             i == 0,                                                    // active
@@ -134,8 +145,9 @@ void LGFXMenu::initMenu(void)
     }
 }
 
-void LGFXMenu::refresh(bool force)
+bool LGFXMenu::refresh(bool force)
 {
+    bool changed = force;
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
     uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
     for (uint8_t i = startIndex; i < endIndex; i++)
@@ -145,8 +157,9 @@ void LGFXMenu::refresh(bool force)
             this->buttons[i]->onChange();
         }
         // TODO: save/restore active flag on page changes ???
-        this->buttons[i]->draw();
+        this->buttons[i]->refresh(force);
     }
+    return (changed);
 }
 
 void LGFXMenu::setButtonEnabled(uint8_t btnIndex)

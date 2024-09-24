@@ -37,8 +37,8 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
         this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, trx);
         this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, trx);
         this->menuWidget = new LGFXMenu(display, MENU_WIDGET_WIDTH, MENU_WIDGET_HEIGHT, MENU_WIDGET_X_OFFSET, MENU_WIDGET_Y_OFFSET, MENU_WIDGET_PADDING);
-        //  this->createDigitalSMeter();
-        //  this->Refresh(true);
+        //   this->createDigitalSMeter();
+        //   this->Refresh(true);
     }
 }
 
@@ -260,7 +260,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         bool changed = this->trx->changed > 0;
         this->vfoWidget->refresh(force);
         this->digitalSMeterWidget->refresh(force);
-        this->menuWidget->refresh(force);
+        // this->menuWidget->refresh(force);
         /*
 
 

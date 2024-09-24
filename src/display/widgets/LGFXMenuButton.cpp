@@ -1,4 +1,19 @@
 #include "LGFXMenuButton.hpp"
+#include "../../DisplayConfiguration.hpp"
+
+#ifdef DISPLAY_LOVYANN_ILI9488_480x320
+
+#include "../ILI9488/ScreenConnectedDefines.hpp"
+
+#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
+
+#include "../ST7789/ScreenConnectedDefines.hpp"
+
+#else
+
+#error NO DISPLAY DEFINED
+
+#endif // DISPLAY_LOVYANN_ILI9488_480x320
 
 #define BUTTON_WIDTH 111
 #define BUTTON_HEIGHT 46
@@ -9,23 +24,21 @@
 #define BUTTON_NOT_ACTIVE_LABEL_COLOR 0xFFFF
 #define BUTTON_ACTIVE_LABEL_COLOR 0x0000
 
-LGFXMenuButton::LGFXMenuButton(LovyanGFX *displayPtr, uint8_t index, uint16_t xOffset, uint16_t yOffset, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick)
-    : MenuButton(index, xOffset, yOffset, BUTTON_WIDTH, BUTTON_HEIGHT, const_cast<char *>(topLabel), const_cast<char *>(bottomLabel), active, onClick)
+LGFXMenuButton::LGFXMenuButton(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick)
+    : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), index(index), active(active), onClick(onClick), changed(true)
 {
-    if (displayPtr != nullptr)
-    {
-        this->parentDisplayPtr = displayPtr;
-    }
+    snprintf(this->topLabel, sizeof(this->topLabel), "%s", strlen(topLabel) == MENU_BUTTON_TOP_LABEL_LENGTH ? topLabel : "LE");
+    snprintf(this->bottomLabel, sizeof(this->bottomLabel), "%s", strlen(bottomLabel) == MENU_BUTTON_BOTTOM_LABEL_LENGTH ? bottomLabel : "LEN  ERR");
 }
 
 LGFXMenuButton::~LGFXMenuButton()
 {
-    this->parentDisplayPtr = nullptr;
 }
 
-void LGFXMenuButton::draw(void)
+bool LGFXMenuButton::refresh(bool force)
 {
-    if (this->changed)
+    bool changed = force || this->changed;
+    if (changed)
     {
         if (!this->active)
         {
@@ -50,5 +63,25 @@ void LGFXMenuButton::draw(void)
         this->parentDisplayPtr->setCursor(this->xOffset + 8, this->yOffset + 26);
         this->parentDisplayPtr->print(this->bottomLabel);
         this->changed = false;
+    }
+    return (changed);
+}
+
+void LGFXMenuButton::onChange(void)
+{
+    this->changed = true;
+}
+
+void LGFXMenuButton::setActive(bool flag)
+{
+    this->active = flag;
+    this->onChange();
+}
+
+void LGFXMenuButton::click(void)
+{
+    if (this->onClick)
+    {
+        this->onClick();
     }
 }
