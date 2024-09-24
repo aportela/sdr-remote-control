@@ -5,9 +5,8 @@
 #include <LovyanGFX.hpp>
 #include "LGFXWidget.hpp"
 #include "LGFXMenuButton.hpp"
+#include "../../MenuConfiguration.hpp"
 #include <string.h>
-
-#define TOTAL_MENU_BUTTONS 16
 
 class LGFXMenu : public LGFXWidget
 {

@@ -18,33 +18,7 @@
 #define DEFAULT_COLOR 0xFFFF
 #define DEFAULT_BG 0x0000
 
-// TODO: ADJUST WIDH & MARGIN
-#define BUTTON_MARGIN_X 10
-#define BUTTON_MARGIN_Y 4
-
-#define BUTTON_WIDTH 111
-#define BUTTON_HEIGHT 48
-
-// TWO DIGITS TOP LABEL (Fx)
-#define TOP_BUTTON_LABEL_X 42
-#define TOP_BUTTON_LABEL_Y 5
-
-// MAIN LABEL (Fn DESCRIPTION)
-#define MAIN_BUTTON_LABEL_X 9
-#define MAIN_BUTTON_LABEL_Y 28
-
-#define COLS_PER_PAGE 4
-#define ROWS_PER_PAGE 2
-
-#define BUTTONS_PER_PAGE (COLS_PER_PAGE * ROWS_PER_PAGE)
-
-#define TOTAL_MENU_PAGES 2
-
-void defaultCallBack(void)
-{
-}
-
-const char *buttonLabels[] = {
+const char *buttonLabels[TOTAL_MENU_BUTTONS] = {
     "  TUNE  ",
     " VOLUME ",
     " FILTER ",
@@ -64,7 +38,11 @@ const char *buttonLabels[] = {
     "<<<<<<<<",
 };
 
-const ButtonCallback buttonCallbacks[] = {
+void defaultCallBack(void)
+{
+}
+
+const ButtonCallback buttonCallbacks[TOTAL_MENU_BUTTONS] = {
     defaultCallBack,
     defaultCallBack,
     defaultCallBack,
@@ -111,7 +89,7 @@ void LGFXMenu::initMenu(void)
 {
     for (uint8_t i = 0, f = 1, row = 0, col = 0; i < TOTAL_MENU_BUTTONS; i++, f++)
     {
-        char topLabel[24];
+        char topLabel[8];
         if (f > BUTTONS_PER_PAGE)
         {
             f = 1;
@@ -121,16 +99,16 @@ void LGFXMenu::initMenu(void)
         sprintf(mainLabel, buttonLabels[i]);
         this->buttons[i] = new LGFXMenuButton(
             this->parentDisplayPtr,
-            MENU_BUTTON_WIDGET_WIDTH,
-            MENU_BUTTON_WIDGET_HEIGHT,
-            (col * (BUTTON_WIDTH + BUTTON_MARGIN_X)) + this->xOffset,  // x
-            (row * (BUTTON_HEIGHT + BUTTON_MARGIN_Y)) + this->yOffset, // y
-            MENU_BUTTON_WIDGET_PADDING,                                // padding
-            i,                                                         // index
-            topLabel,                                                  // top label
-            mainLabel,                                                 // bottom label
-            i == 0,                                                    // active
-            buttonCallbacks[i]                                         // callback
+            MENU_BUTTON_WIDGET_WIDTH,                                                                                   // width
+            MENU_BUTTON_WIDGET_HEIGHT,                                                                                  // height
+            (col * (MENU_BUTTON_WIDGET_WIDTH + _MENU_BUTTON_WIDGET_HORIZONTAL_MARGIN)) + this->xOffset + this->padding, // x offset
+            (row * (MENU_BUTTON_WIDGET_HEIGHT + _MENU_BUTTON_WIDGET_VERTICAL_MARGIN)) + this->yOffset + this->padding,  // y offset
+            MENU_BUTTON_WIDGET_PADDING,                                                                                 // padding
+            i,                                                                                                          // index
+            topLabel,                                                                                                   // top label
+            mainLabel,                                                                                                  // bottom label
+            i == 0,                                                                                                     // active
+            buttonCallbacks[i]                                                                                          // callback
         );
         col++;
         if (col == COLS_PER_PAGE)
