@@ -7,6 +7,7 @@
 #include "widgets/LGFXDualVFOWidget.hpp"
 #include "widgets/LGFXDigitalSMeterWidget.hpp"
 #include "widgets/LGFXVolumeSquelchWidget.hpp"
+#include "widgets/LGFXMenu.hpp"
 
 class LGFXScreenConnected : public LGFXScreen
 {
@@ -19,6 +20,7 @@ private:
     LGFXDualVFOWidget *vfoWidget = nullptr;
     LGFXDigitalSMeterWidget *digitalSMeterWidget = nullptr;
     LGFXVolumeSquelchWidget *volumeSquelchWidget = nullptr;
+    LGFXMenu *menuWidget = nullptr;
 
     void createDigitalSMeter();
     void refreshDigitalSMeter(uint8_t newSignal);

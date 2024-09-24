@@ -36,6 +36,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
         this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, DUAL_VFO_WIDGET_PADDING, trx);
         this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, trx);
         this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, trx);
+        this->menuWidget = new LGFXMenu(display, MENU_WIDGET_WIDTH, MENU_WIDGET_HEIGHT, MENU_WIDGET_X_OFFSET, MENU_WIDGET_Y_OFFSET, MENU_WIDGET_PADDING);
         //  this->createDigitalSMeter();
         //  this->Refresh(true);
     }
@@ -50,6 +51,8 @@ LGFXScreenConnected::~LGFXScreenConnected()
     delete this->volumeSquelchWidget;
     this->volumeSquelchWidget = nullptr;
     this->parentDisplay = nullptr;
+    delete this->menuWidget;
+    this->menuWidget = nullptr;
 }
 
 void LGFXScreenConnected::createDigitalSMeter()
@@ -257,6 +260,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         bool changed = this->trx->changed > 0;
         this->vfoWidget->refresh(force);
         this->digitalSMeterWidget->refresh(force);
+        this->menuWidget->refresh(force);
         /*
 
 

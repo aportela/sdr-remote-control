@@ -19,9 +19,9 @@ private:
     void initMenu(void);
 
 public:
-    LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset);
+    LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding);
     ~LGFXMenu();
-    void refresh(bool forceAll) override;
+    void refresh(bool force) override;
     void setButtonEnabled(uint8_t btnIndex);
     void setButtonDisabled(uint8_t btnIndex);
     void previousPage(void) override;

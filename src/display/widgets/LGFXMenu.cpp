@@ -4,7 +4,7 @@
 #define DEFAULT_BG 0x0000
 
 // TODO: ADJUST WIDH & MARGIN
-#define BUTTON_MARGIN_X 12
+#define BUTTON_MARGIN_X 10
 #define BUTTON_MARGIN_Y 4
 
 #define BUTTON_WIDTH 111
@@ -69,11 +69,14 @@ const ButtonCallback buttonCallbacks[] = {
     defaultCallBack,
 };
 
-LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset) : Menu()
+LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : Menu()
 {
     if (displayPtr != nullptr)
     {
         this->parentDisplayPtr = displayPtr;
+#ifdef DEBUG_SCREEN_WIDGETS_BOUNDS
+        this->parentDisplayPtr->drawRect(xOffset, yOffset, width, height, TFT_WHITE);
+#endif
         this->width = width;
         this->height = height;
         this->xOffset = xOffset;
@@ -131,13 +134,13 @@ void LGFXMenu::initMenu(void)
     }
 }
 
-void LGFXMenu::refresh(bool forceAll)
+void LGFXMenu::refresh(bool force)
 {
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
     uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
     for (uint8_t i = startIndex; i < endIndex; i++)
     {
-        if (forceAll)
+        if (force)
         {
             this->buttons[i]->onChange();
         }
