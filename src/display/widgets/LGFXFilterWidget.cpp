@@ -36,12 +36,14 @@ LGFXFilterWidget::~LGFXFilterWidget()
 void LGFXFilterWidget::refreshPlot(uint64_t minLowCut, uint64_t minHighCut, uint64_t maxLowCut, uint64_t maxHighCut, uint64_t currentLowCut, uint64_t currentHighCut)
 {
   uint8_t topHLineLength = (maxLowCut + maxHighCut) * 100 / currentHighCut + currentLowCut;
+  uint8_t centerCutXOffset = (maxLowCut + maxHighCut) * 100 / currentLowCut;
   // top
   this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + 60, this->yOffset + this->padding + 8, topHLineLength, TEXT_COLOR_ACTIVE);
   // bottom
   this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding, this->yOffset + this->padding + 50, 240, TEXT_COLOR_ACTIVE);
   // center
-  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + 120, this->yOffset + this->padding + 8, 42, TEXT_COLOR_ACTIVE);
+
+  this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + 60 + centerCutXOffset, this->yOffset + this->padding + 8, 42, TEXT_COLOR_ACTIVE);
 }
 
 void LGFXFilterWidget::refreshLabels(uint64_t lowCut, uint64_t highCut)
