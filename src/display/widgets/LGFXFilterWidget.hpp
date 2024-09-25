@@ -10,7 +10,8 @@ class LGFXFilterWidget : public LGFXWidget
 private:
   Transceiver *transceiverPtr;
 
-  void refreshPlot(void);
+  void refreshPlot(uint64_t minLowCut, uint64_t minHighCut, uint64_t maxLowCut, uint64_t maxHighCut, uint64_t currentLowCut, uint64_t currentHighCut);
+  void refreshLabels(uint64_t lowCut, uint64_t highCut);
 
 public:
   LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr);
