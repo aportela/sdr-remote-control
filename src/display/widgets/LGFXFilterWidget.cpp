@@ -36,42 +36,41 @@ LGFXFilterWidget::~LGFXFilterWidget()
 
 void LGFXFilterWidget::refreshPlot(uint64_t minLowCut, uint64_t minHighCut, uint64_t maxLowCut, uint64_t maxHighCut, uint64_t currentLowCut, uint64_t currentHighCut)
 {
-#define TOP_LINE_MAX_LENGTH 120
-#define BOTTOM_LINE_LENGTH 180
-#define TOP_LINE_X_OFFSET (BOTTOM_LINE_LENGTH - TOP_LINE_MAX_LENGTH) / 2
-#define TOP_LINE_Y_OFFSET 8
-#define BOTTOM_LINE_Y_OFFSET 50
-#define LINE_OFFSET TOP_LINE_X_OFFSET / 2
+  uint8_t topHLineLength = (currentHighCut + currentLowCut) * _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_MAX_LENGTH / (maxLowCut + maxHighCut);
+  uint8_t topHLineXOffset = this->xOffset + this->padding + (_FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH / 2) - (topHLineLength / 2);
+  uint8_t topHLineYOffset = this->yOffset + this->padding + _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_Y_OFFSET;
 
-  uint8_t topHLineLength = (currentHighCut + currentLowCut) * TOP_LINE_MAX_LENGTH / (maxLowCut + maxHighCut);
   // top horizontal line
-  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + TOP_LINE_X_OFFSET, this->yOffset + this->padding + TOP_LINE_Y_OFFSET, topHLineLength, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastHLine(topHLineXOffset, topHLineYOffset, topHLineLength, TEXT_COLOR_ACTIVE);
   // bottom horizontal line
-  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding, this->yOffset + this->padding + BOTTOM_LINE_Y_OFFSET, BOTTOM_LINE_LENGTH, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding, this->yOffset + this->padding + _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET, _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH, TEXT_COLOR_ACTIVE);
+
   // left line
-  this->parentDisplayPtr->drawLine(this->xOffset + this->padding + LINE_OFFSET, this->yOffset + this->padding + BOTTOM_LINE_Y_OFFSET, this->xOffset + this->padding + TOP_LINE_X_OFFSET, this->yOffset + this->padding + TOP_LINE_Y_OFFSET, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawLine(topHLineXOffset - _FILTER_WIDGET_TRAPEZIUM_LR_LINES_HORIZONTAL_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET, topHLineXOffset, topHLineYOffset, TEXT_COLOR_ACTIVE);
   // right line
-  this->parentDisplayPtr->drawLine(this->xOffset + this->padding + TOP_LINE_X_OFFSET + topHLineLength, this->yOffset + this->padding + TOP_LINE_Y_OFFSET, this->xOffset + this->padding + TOP_LINE_X_OFFSET + topHLineLength + LINE_OFFSET, this->yOffset + this->padding + BOTTOM_LINE_Y_OFFSET, TEXT_COLOR_ACTIVE);
+  this->parentDisplayPtr->drawLine(topHLineXOffset + topHLineLength, topHLineYOffset, topHLineXOffset + topHLineLength + _FILTER_WIDGET_TRAPEZIUM_LR_LINES_HORIZONTAL_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET, TEXT_COLOR_ACTIVE);
   // vertical center line
-  if (currentLowCut == currentHighCut)
-  {
-    this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + (BOTTOM_LINE_LENGTH / 2), this->yOffset + this->padding + TOP_LINE_Y_OFFSET, 42, TEXT_COLOR_ACTIVE);
-  }
-  else
-  {
-    this->parentDisplayPtr->drawFastVLine(this->xOffset + this->padding + (BOTTOM_LINE_LENGTH / 2), this->yOffset + this->padding + TOP_LINE_Y_OFFSET, 42, TEXT_COLOR_ACTIVE);
-  }
+  uint8_t centerVLineXOffset = currentLowCut == currentHighCut ? this->xOffset + this->padding + (_FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH / 2) : this->xOffset + this->padding + (_FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH / 2) - (topHLineLength / 2) + ((currentLowCut)*_FILTER_WIDGET_TRAPEZIUM_TOP_LINE_MAX_LENGTH / (maxLowCut + maxHighCut));
+  uint8_t centerVLineYOffset = this->yOffset + this->padding + _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_Y_OFFSET;
+  this->parentDisplayPtr->drawFastVLine(centerVLineXOffset, centerVLineYOffset, _FILTER_WIDGET_TRAPEZIUM_CENTER_V_LINE_LENGTH, TEXT_COLOR_ACTIVE);
 }
 
 void LGFXFilterWidget::refreshLabels(uint64_t lowCut, uint64_t highCut)
 {
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setTextSize(_FILTER_WIDGET_FONT_SIZE);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET);
+
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET);
+  this->parentDisplayPtr->print("FILTER");
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
+  this->parentDisplayPtr->print("PRESET");
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
+  this->parentDisplayPtr->print(" 1/8");
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET);
   this->parentDisplayPtr->printf("BANDWITH:%" PRIu64 "Hz", lowCut + highCut);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
   this->parentDisplayPtr->printf(" LOW CUT:%" PRIu64 "Hz", lowCut);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + _FILTER_WIDGET_LABELS_Y_OFFSET + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
   this->parentDisplayPtr->printf("  HI CUT:%" PRIu64 "Hz", highCut);
 }
 
@@ -82,11 +81,8 @@ bool LGFXFilterWidget::refresh(bool force)
   {
     if (force || (this->transceiverPtr->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW) || (this->transceiverPtr->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
     {
-      // this->refreshPlot(100, 2400, 200, 3700, 200, 2400);
-      // this->refreshPlot(0, 0, 3000, 3000, 1200, 1200);
-      this->refreshPlot(0, 0, 3000, 3000, 3000, 3000);
-      // this->refreshLabels(200, 2400);
-      this->refreshLabels(1200, 1200);
+      this->refreshPlot(0, 0, 3800, 3800, 100, 2900);
+      this->refreshLabels(100, 2900);
       this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
       this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
       changed = true;
