@@ -125,20 +125,24 @@ void setup()
 
 void loop()
 {
-  if (!trx->poweredOn)
+  TransceiverStatus trxStatus;
+  if (trx->getCurrentStatus(trxStatus))
   {
-    if (serialConnection->tryConnection(trx))
+    if (!trxStatus.poweredOn)
     {
-      trx->poweredOn = true;
-      screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
+      if (serialConnection->tryConnection(trx))
+      {
+        trx->setPowerOnStatus(true);
+        screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
+      }
     }
-  }
-  else
-  {
-    if (serialConnection->isDisconnectedByTimeout())
+    else
     {
-      trx->poweredOn = false;
-      screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
+      if (serialConnection->isDisconnectedByTimeout())
+      {
+        trx->setPowerOnStatus(false);
+        screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
+      }
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN

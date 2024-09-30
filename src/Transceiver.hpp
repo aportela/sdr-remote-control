@@ -6,9 +6,13 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
+#define TRANSCEIVER_VFO_COUNT 2
+
 struct TransceiverStatus
 {
   bool poweredOn = false;
+  char radioName[32] = "unknown";
+  uint8_t activeVFOIndex = 0;
   TransceiverStatus() = default;
 };
 
@@ -83,7 +87,7 @@ public:
   bool poweredOn;
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex;
-  TrxVFO VFO[2];
+  TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
   uint8_t signalMeterdBLevel;
   uint8_t signalMeterTS2KSDRRadioUnits;
   uint8_t AFGain;
@@ -93,8 +97,16 @@ public:
 
   ~Transceiver();
 
+  bool getCurrentStatus(TransceiverStatus &status);
+
   bool isPoweredOn(void);
-  bool setPowerOnStatus(bool status);
+  bool setPowerOnStatus(bool powerOnStatus);
+
+  bool getRadioName(char *buffer, size_t bufferSize);
+  bool setRadioName(const char *radioName);
+
+  uint8_t getActiveVFOIndex(void);
+  bool setActiveVFOIndex(uint8_t index);
 
   // check if data is locked by external controls
   bool isLockedByControls();

@@ -26,6 +26,12 @@ Transceiver::~Transceiver()
   vQueueDelete(this->statusQueue);
 }
 
+bool Transceiver::getCurrentStatus(TransceiverStatus &status)
+{
+  TransceiverStatus currentStatus;
+  return (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS);
+}
+
 bool Transceiver::isPoweredOn(void)
 {
   TransceiverStatus currentStatus;
@@ -39,13 +45,75 @@ bool Transceiver::isPoweredOn(void)
   }
 }
 
-bool Transceiver::setPowerOnStatus(bool status)
+bool Transceiver::setPowerOnStatus(bool powerOnStatus)
 {
   TransceiverStatus currentStatus;
   if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
   {
-    currentStatus.poweredOn = status;
+    currentStatus.poweredOn = powerOnStatus;
     return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::getRadioName(char *buffer, size_t bufferSize)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    snprintf(buffer, bufferSize, "%s", currentStatus.radioName);
+    return (true);
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setRadioName(const char *radioName)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    snprintf(currentStatus.radioName, sizeof(currentStatus.radioName), "%s", radioName);
+    return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+uint8_t Transceiver::getActiveVFOIndex(void)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    return (currentStatus.activeVFOIndex);
+  }
+  else
+  {
+    return (0);
+  }
+}
+
+bool Transceiver::setActiveVFOIndex(uint8_t index)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (index < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.activeVFOIndex = index;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
