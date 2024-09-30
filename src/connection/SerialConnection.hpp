@@ -19,7 +19,7 @@ public:
 
     virtual void loop(Transceiver *trx) = 0;
     virtual void syncLocalToRemote(Transceiver *trx) = 0;
-
+    virtual bool tryConnection(Transceiver *trx) = 0;
     bool isDisconnectedByTimeout(void);
 
 protected:
@@ -31,7 +31,6 @@ protected:
     void flush(void);
     void rxFlush(void);
     void send(String str);
-    virtual bool tryConnection(Transceiver *trx) = 0;
 };
 
 #endif

@@ -69,7 +69,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                             }
                             else
                             {
-                                trx->setActiveVFOFrequency(f);
+                                // trx->setActiveVFOFrequency(f);
                                 trx->changed &= ~TRX_CFLAG_SEND_CAT;
                             }
                         }
@@ -77,25 +77,25 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                         {
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
-                            trx->setActiveVFOMode((TRXVFOMode)receivedData.substring(2).toInt());
+                            // trx->setActiveVFOMode((TRXVFOMode)receivedData.substring(2).toInt());
                         }
                         else if (receivedData.startsWith("SL") && receivedData != "SL")
                         {
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
-                            trx->setActiveVFOLowFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
+                            // trx->setActiveVFOLowFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
                         }
                         else if (receivedData.startsWith("SH") && receivedData != "SH")
                         {
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
-                            trx->setActiveVFOHighFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
+                            // trx->setActiveVFOHighFilterHz((TRXVFOMode)receivedData.substring(2).toInt());
                         }
                         else if (receivedData.startsWith("AG") && receivedData != "AG")
                         {
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
-                            trx->setAFGain(receivedData.substring(2).toInt());
+                            // trx->setAFGain(receivedData.substring(2).toInt());
                         }
                         else if (receivedData.startsWith("MU") && receivedData != "MU")
                         {
@@ -104,18 +104,18 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                             uint8_t newMutedStatus = receivedData.substring(2).toInt();
                             if (trx->audioMuted == TRX_AUDIO_MUTED && newMutedStatus == 0)
                             {
-                                trx->setAudioMuted();
+                                // trx->setAudioMuted();
                             }
                             else if (trx->audioMuted == TRX_AUDIO_NOT_MUTED && newMutedStatus == 1)
                             {
-                                trx->setAudioMuted();
+                                // trx->setAudioMuted();
                             }
                         }
                         else if (receivedData.startsWith("SM") && receivedData != "SM")
                         {
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
-                            trx->setSignalMeterLevel(receivedData.substring(2).toInt());
+                            // trx->setSignalMeterLevel(receivedData.substring(2).toInt());
                         }
                     }
                 }

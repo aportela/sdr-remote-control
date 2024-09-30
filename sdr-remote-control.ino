@@ -19,6 +19,8 @@
 
 using namespace aportela::microcontroller::utils;
 
+#include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
+
 #include "src/display/ScreenType.hpp"
 
 #ifdef DISPLAY_DRIVER_LOVYANN
@@ -50,6 +52,8 @@ Transceiver *trx;
 volatile uint8_t encoderChangeBitmask = 0;
 
 uint64_t lastEncoderMillis = 0;
+
+SDRRadioTS2KSerialConnection *serialConnection;
 
 void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
@@ -95,19 +99,22 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 void setup()
 {
-  Serial.begin(DEFAULT_SERIAL_SPEED);
+  /*
+  Serial.begin(SERIAL_DEFAULT_BAUD_RATE);
   while (!Serial)
   {
     yield();
     delay(10);
   }
+  */
+  serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
 #ifdef DISPLAY_DRIVER_LOVYANN
 
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
-  screen->InitScreen(SCREEN_TYPE_CONNECTED);
+  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
 
 #else
 
@@ -118,12 +125,30 @@ void setup()
 
 void loop()
 {
+  if (!trx->poweredOn)
+  {
+    if (serialConnection->tryConnection(trx))
+    {
+      trx->poweredOn = true;
+      screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
+    }
+  }
+  else
+  {
+    if (serialConnection->isDisconnectedByTimeout())
+    {
+      trx->poweredOn = false;
+      screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
+    }
+  }
 #ifdef DISPLAY_DRIVER_LOVYANN
 
   screen->Refresh();
 
 #ifdef DEBUG_FPS
+
   FPS::Loop(999);
+
 #endif // DEBUG_FPS
 
 #else

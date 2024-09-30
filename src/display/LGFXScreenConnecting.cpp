@@ -38,7 +38,7 @@ LGFXScreenConnecting::LGFXScreenConnecting(LovyanGFX *display) : LGFXScreen(disp
         this->parentDisplay->drawString(str, DISPLAY_WIDTH / 2, LABEL_VERSION_Y_OFFSET);
 
         this->parentDisplay->setTextSize(1);
-        snprintf(str, sizeof(str), "Searching TS-2000 CAT connection (%d baud)", DEFAULT_SERIAL_SPEED);
+        snprintf(str, sizeof(str), "Searching TS-2000 CAT connection (%d baud)", SERIAL_DEFAULT_BAUD_RATE);
         this->parentDisplay->drawString(str, DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 10);
         this->animatedScreenPtr = new LGFXSSWAnimationWidget(this->parentDisplay, SSWANIMATION_WIDTH, SSWA_SPECTRUM_SCOPE_HEIGHT + SSWA_WATERFALL_HEIGHT + 4, SSWANIMATION_X_OFFSET, SSWANIMATION_Y_OFFSET);
     }

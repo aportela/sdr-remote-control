@@ -14,8 +14,6 @@ public:
     void loop(Transceiver *trx) override;
 
     void syncLocalToRemote(Transceiver *trx) override;
-
-protected:
     bool tryConnection(Transceiver *trx) override;
 };
 
