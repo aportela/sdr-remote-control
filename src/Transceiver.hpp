@@ -8,14 +8,6 @@
 
 #define TRANSCEIVER_VFO_COUNT 2
 
-struct TransceiverStatus
-{
-  bool poweredOn = false;
-  char radioName[32] = "unknown";
-  uint8_t activeVFOIndex = 0;
-  TransceiverStatus() = default;
-};
-
 // bitmask definitions for checking changed values
 #define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
 #define TRX_CFLAG_TRANSMIT_RECEIVE_STATUS (1 << 1)       // 2
@@ -75,6 +67,16 @@ typedef enum
   SIGNAL_METER_TS2K_SDR_RADIO_LEVEL = 1,
   SIGNAL_METER_DB_UNITS = 2
 } TRXSMeterUnitType;
+
+struct TransceiverStatus
+{
+  uint32_t changed = 0;
+  bool poweredOn = false;
+  char radioName[32] = "unknown";
+  uint8_t activeVFOIndex = 0;
+  TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
+  TransceiverStatus() = default;
+};
 
 class Transceiver
 {
