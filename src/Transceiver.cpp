@@ -1,7 +1,10 @@
 #include "Transceiver.hpp"
 
+#define QUEUE_PEEK_MS_TO_TICKS_TIMEOUT 5
+
 Transceiver::Transceiver(void)
 {
+  this->statusQueue = xQueueCreate(1, sizeof(TransceiverStatus));
   this->lockedByControls = false;
   this->poweredOn = false;
   // this->poweredOn = true;
@@ -16,6 +19,38 @@ Transceiver::Transceiver(void)
   this->signalMeterdBLevel = 0;
   this->AFGain = 50;
   this->audioMuted = TRX_AUDIO_NOT_MUTED;
+}
+
+Transceiver::~Transceiver()
+{
+  vQueueDelete(this->statusQueue);
+}
+
+bool Transceiver::isPoweredOn(void)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    return (currentStatus.poweredOn);
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setPowerOnStatus(bool status)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    currentStatus.poweredOn = status;
+    return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 // check if data is locked by external controls

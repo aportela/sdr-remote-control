@@ -3,6 +3,14 @@
 
 #include <cstdint>
 #include <cstdbool>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
+struct TransceiverStatus
+{
+  bool poweredOn = false;
+  TransceiverStatus() = default;
+};
 
 // bitmask definitions for checking changed values
 #define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
@@ -67,6 +75,7 @@ typedef enum
 class Transceiver
 {
 private:
+  QueueHandle_t statusQueue = nullptr;
   bool lockedByControls;
 
 public:
@@ -81,6 +90,11 @@ public:
   TRxAudioMuteStatus audioMuted;
 
   Transceiver();
+
+  ~Transceiver();
+
+  bool isPoweredOn(void);
+  bool setPowerOnStatus(bool status);
 
   // check if data is locked by external controls
   bool isLockedByControls();
