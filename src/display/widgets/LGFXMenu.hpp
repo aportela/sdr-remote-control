@@ -20,7 +20,7 @@ private:
 public:
     LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding);
     ~LGFXMenu();
-    bool refresh(bool force = false) override;
+    bool refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override;
     void setButtonEnabled(uint8_t btnIndex);
     void setButtonDisabled(uint8_t btnIndex);
     void previousPage(void);

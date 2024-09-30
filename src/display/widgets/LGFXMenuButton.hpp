@@ -22,7 +22,7 @@ private:
 public:
     LGFXMenuButton(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
     ~LGFXMenuButton();
-    bool refresh(bool force = false) override;
+    bool refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override;
     void onChange(void);
     void setActive(bool flag);
     void click(void);

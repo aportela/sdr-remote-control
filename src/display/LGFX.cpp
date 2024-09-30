@@ -123,13 +123,13 @@ bool LGFX::ToggleScreen(void)
     return (success);
 }
 
-bool LGFX::Refresh(bool force)
+bool LGFX::Refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
     if (this->currentScreenType != SCREEN_TYPE_NONE)
     {
         if (this->currentScreen != nullptr)
         {
-            return (this->currentScreen->Refresh(force));
+            return (this->currentScreen->Refresh(force, currentTrxStatus));
         }
         else
         {

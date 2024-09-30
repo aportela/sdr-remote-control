@@ -118,17 +118,19 @@ void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
   this->drawBars(dB);
 }
 
-bool LGFXDigitalSMeterWidget::refresh(bool force)
+bool LGFXDigitalSMeterWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
   if (force)
   {
     this->createSMeter();
   }
-  bool changed = force || (this->transceiverPtr->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL);
+  TransceiverStatus trxStatus;
+  this->transceiverPtr->getCurrentStatus(&trxStatus);
+  bool changed = force || (trxStatus.changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL);
   if (changed)
   {
-    this->refreshSMeter(this->transceiverPtr->signalMeterdBLevel);
-    this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
+    this->refreshSMeter(trxStatus.signalMeterdBLevel);
+    // this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
   }
   return (changed);
 }

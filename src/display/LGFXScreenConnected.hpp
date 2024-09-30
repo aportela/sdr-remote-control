@@ -30,7 +30,7 @@ private:
 public:
     LGFXScreenConnected(LovyanGFX *display, Transceiver *trx);
     ~LGFXScreenConnected();
-    bool Refresh(bool force = false) override;
+    bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTED_H

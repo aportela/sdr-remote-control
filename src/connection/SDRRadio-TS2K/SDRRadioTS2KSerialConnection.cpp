@@ -16,7 +16,7 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
         String receivedData = this->serial->readStringUntil(';');
         if (receivedData.startsWith("NA") && receivedData != "NA")
         {
-            strcpy(trx->radioName, receivedData.substring(2).c_str());
+            trx->setRadioName(receivedData.substring(2).c_str());
             this->lastRXValidCommand = millis();
             trx->incSerialCommandCount();
             break;
@@ -33,15 +33,15 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
     return (connected);
 }
 
-void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
+void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
 {
-    if (!trx->isLockedByControls())
+    if (!currentTrxStatus->lockedByControls)
     {
         if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
         {
             if (trx != nullptr)
             {
-                if (trx->poweredOn)
+                if (currentTrxStatus->poweredOn)
                 {
                     // connected => main
                     /*
@@ -64,13 +64,13 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                             this->lastRXValidCommand = millis();
                             uint64_t f = receivedData.substring(2).toInt();
                             trx->incSerialCommandCount();
-                            if ((trx->changed & TRX_CFLAG_SEND_CAT) && trx->VFO[trx->activeVFOIndex].frequency != f)
+                            if ((currentTrxStatus->changed & TRX_CFLAG_SEND_CAT) && currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency != f)
                             {
                             }
                             else
                             {
                                 // trx->setActiveVFOFrequency(f);
-                                trx->changed &= ~TRX_CFLAG_SEND_CAT;
+                                // trx->changed &= ~TRX_CFLAG_SEND_CAT;
                             }
                         }
                         else if (receivedData.startsWith("MD") && receivedData != "MD")
@@ -102,11 +102,11 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                             this->lastRXValidCommand = millis();
                             trx->incSerialCommandCount();
                             uint8_t newMutedStatus = receivedData.substring(2).toInt();
-                            if (trx->audioMuted == TRX_AUDIO_MUTED && newMutedStatus == 0)
+                            if (currentTrxStatus->audioMuted && newMutedStatus == 0)
                             {
                                 // trx->setAudioMuted();
                             }
-                            else if (trx->audioMuted == TRX_AUDIO_NOT_MUTED && newMutedStatus == 1)
+                            else if (!currentTrxStatus->audioMuted && newMutedStatus == 1)
                             {
                                 // trx->setAudioMuted();
                             }
@@ -128,11 +128,11 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
     }
 }
 
-void SDRRadioTS2KSerialConnection::syncLocalToRemote(Transceiver *trx)
+void SDRRadioTS2KSerialConnection::syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
 {
-    if (trx != nullptr)
+    if (currentTrxStatus != nullptr)
     {
-        if (trx->poweredOn)
+        if (currentTrxStatus->poweredOn)
         {
             // connected => main
             /*
@@ -146,7 +146,7 @@ void SDRRadioTS2KSerialConnection::syncLocalToRemote(Transceiver *trx)
             */
             // this works BETTER than sending separated commands (with own delay)
             char customCMD[256];
-            sprintf(customCMD, "FA%011llu;MD;SL;SH;AG0;MU;SM0;", trx->VFO[trx->activeVFOIndex].frequency);
+            sprintf(customCMD, "FA%011llu;MD;SL;SH;AG0;MU;SM0;", currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency);
             this->send(customCMD);
             this->rxFlush();
             this->lastCATActivity = millis();

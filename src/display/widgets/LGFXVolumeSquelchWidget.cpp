@@ -64,15 +64,16 @@ void LGFXVolumeSquelchWidget::setMuted(bool force, uint8_t value)
 {
 }
 
-bool LGFXVolumeSquelchWidget::refresh(bool force)
+bool LGFXVolumeSquelchWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
   bool changed = force;
-  if (changed || this->transceiverPtr->changed > 0)
+  if (changed || currentTrxStatus->changed > 0)
   {
-    if (force || (this->transceiverPtr->changed & TRX_CFLAG_AF_GAIN))
+    if (force || (currentTrxStatus->changed & TRX_CFLAG_AF_GAIN))
     {
-      this->refreshVolume(force, this->transceiverPtr->AFGain);
-      this->transceiverPtr->changed &= ~TRX_CFLAG_AF_GAIN;
+      this->refreshVolume(force, currentTrxStatus->AFGain);
+      // TODO
+      // currentTrxStatus->changed &= ~TRX_CFLAG_AF_GAIN;
       changed = true;
     }
   }

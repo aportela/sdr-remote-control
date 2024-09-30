@@ -5,39 +5,42 @@
 Transceiver::Transceiver(void)
 {
   this->statusQueue = xQueueCreate(1, sizeof(TransceiverStatus));
-  this->lockedByControls = false;
+  /*
+  //this->lockedByControls = false;
   this->poweredOn = false;
   // this->poweredOn = true;
   this->activeVFOIndex = 0;
   this->VFO[0].frequency = 7050123;
   this->VFO[0].mode = TRX_VFO_MD_LSB;
-  this->VFO[0].customStep = 1;
+  this->VFO[0].frequencyStep = 1;
   this->VFO[1].frequency = 145625000;
   this->VFO[1].mode = TRX_VFO_MD_FM;
-  this->VFO[1].customStep = 1000;
+  this->VFO[1].frequencyStep = 1000;
   this->changed = ((uint16_t)1 << 16) - 1; // ALL (uint16_t) flags active
   this->signalMeterdBLevel = 0;
   this->AFGain = 50;
-  this->audioMuted = TRX_AUDIO_NOT_MUTED;
+  this->audioMuted = false;
+  */
 }
 
+// TODO: add xQueuePeekFromISR / xQueueOverwriteFromISR methods
 Transceiver::~Transceiver()
 {
   vQueueDelete(this->statusQueue);
 }
 
-bool Transceiver::getCurrentStatus(TransceiverStatus &status)
+bool Transceiver::getCurrentStatus(TransceiverStatus *status, bool fromISR)
 {
-  TransceiverStatus currentStatus;
-  return (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS);
-}
-
-bool Transceiver::isPoweredOn(void)
-{
-  TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->statusQueue != nullptr)
   {
-    return (currentStatus.poweredOn);
+    if (!fromISR)
+    {
+      return (xQueuePeek(this->statusQueue, status, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) == pdPASS);
+    }
+    else
+    {
+      return (xQueuePeekFromISR(this->statusQueue, status) == pdPASS);
+    }
   }
   else
   {
@@ -45,13 +48,38 @@ bool Transceiver::isPoweredOn(void)
   }
 }
 
-bool Transceiver::setPowerOnStatus(bool powerOnStatus)
+bool Transceiver::setCurrentStatus(const TransceiverStatus *status, bool fromISR)
+{
+  if (this->statusQueue != nullptr)
+  {
+    if (!fromISR)
+    {
+      return (xQueueOverwrite(this->statusQueue, status) != pdPASS);
+    }
+    else
+    {
+      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+      bool result = xQueueOverwriteFromISR(this->statusQueue, status, &xHigherPriorityTaskWoken) != pdPASS;
+      if (xHigherPriorityTaskWoken == pdTRUE)
+      {
+        portYIELD_FROM_ISR();
+      }
+      return (result);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setPowerOnStatus(bool powerOnStatus, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.poweredOn = powerOnStatus;
-    return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -59,13 +87,13 @@ bool Transceiver::setPowerOnStatus(bool powerOnStatus)
   }
 }
 
-bool Transceiver::setRadioName(const char *radioName)
+bool Transceiver::setRadioName(const char *radioName, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     snprintf(currentStatus.radioName, sizeof(currentStatus.radioName), "%s", radioName);
-    return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -73,15 +101,16 @@ bool Transceiver::setRadioName(const char *radioName)
   }
 }
 
-bool Transceiver::setActiveVFO(uint8_t VFOIndex)
+bool Transceiver::setActiveVFO(uint8_t VFOIndex, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
       currentStatus.activeVFOIndex = VFOIndex;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.changed |= TRX_CFLAG_VFO_INDEX;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -94,15 +123,23 @@ bool Transceiver::setActiveVFO(uint8_t VFOIndex)
   }
 }
 
-bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency)
+bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex]->frequency = frequency;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.VFO[VFOIndex].frequency = frequency;
+      if (VFOIndex == currentStatus.activeVFOIndex)
+      {
+        currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+      }
+      else
+      {
+        currentStatus.changed |= TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
+      }
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -115,15 +152,60 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency)
   }
 }
 
-bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode)
+bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
+    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
+    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
+    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex]->mode = mode;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.VFO[VFOIndex].mode = mode;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -136,15 +218,15 @@ bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode)
   }
 }
 
-bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF)
+bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex]->LF = LF;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.VFO[VFOIndex].LF = LF;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -157,15 +239,15 @@ bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF)
   }
 }
 
-bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF)
+bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex]->HF = HF;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.VFO[VFOIndex].HF = HF;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -178,15 +260,15 @@ bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF)
   }
 }
 
-bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t customStep)
+bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex]->customStep = customStep;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+      currentStatus.VFO[VFOIndex].frequencyStep = frequencyStep;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
@@ -199,21 +281,13 @@ bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t customStep)
   }
 }
 
-// set lock
-void Transceiver::setLockedByControls(bool locked)
+bool Transceiver::setLockedByControls(bool locked, bool fromISR)
 {
   TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
-    {
-      currentStatus.lockedByControls = locked;
-      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
-    }
-    else
-    {
-      return (false);
-    }
+    currentStatus.lockedByControls = locked;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -221,170 +295,120 @@ void Transceiver::setLockedByControls(bool locked)
   }
 }
 
-// change current active VFO
-void Transceiver::setVFOIndex(uint8_t VFOIndex)
+bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, uint8_t units, bool fromISR)
 {
-  if (VFOIndex == 0 || VFOIndex == 1)
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    this->activeVFOIndex = VFOIndex;
-    this->changed |= TRX_CFLAG_VFO_INDEX;
-  }
-}
-
-// set (active) vfo frequency
-void Transceiver::setActiveVFOFrequency(uint64_t frequency)
-{
-  this->VFO[0].frequency = frequency;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-}
-
-// increment (active) vfo frequency by specified hz
-void Transceiver::incrementActiveVFOFrequency(uint64_t hz)
-{
-  this->VFO[0].frequency += hz;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-}
-
-// decrement (active) vfo frequency by specified hz
-void Transceiver::decrementActiveVFOFrequency(uint64_t hz)
-{
-  this->VFO[0].frequency -= hz;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-}
-
-// set (secondary) vfo frequency
-void Transceiver::setSecondaryVFOFrequency(uint64_t frequency)
-{
-  this->VFO[1].frequency = frequency;
-  this->changed |= TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
-}
-
-// set (active) vfo mode
-void Transceiver::setActiveVFOMode(TrxVFOMode mode)
-{
-  this->VFO[0].mode = mode;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_MODE;
-}
-
-// set (secondary) vfo mode
-void Transceiver::setSecondaryVFOMode(TrxVFOMode mode)
-{
-  this->VFO[1].mode = mode;
-  this->changed |= TRX_CFLAG_SECONDARY_VFO_MODE;
-}
-
-// set (active) vfo custom step size (hz)
-void Transceiver::setActiveVFOHzCustomStep(uint64_t hz)
-{
-  this->VFO[0].customStep = hz;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_STEP;
-}
-
-// set (secondary) vfo custom step size (hz)
-void Transceiver::setSecondaryVFOHzCustomStep(uint64_t hz)
-{
-  this->VFO[1].customStep = hz;
-  this->changed |= TRX_CFLAG_SECONDARY_VFO_STEP;
-}
-
-// set (active) vfo low filter size (hz)
-void Transceiver::setActiveVFOLowFilterHz(uint32_t hz)
-{
-  this->VFO[0].LF = hz;
-  this->VFO[0].BW = this->VFO[0].LF + this->VFO[0].HF;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
-}
-
-// set (secondary) vfo low filter size (hz)
-void Transceiver::setSecondaryVFOLowFilterHz(uint32_t hz)
-{
-  this->VFO[1].LF = hz;
-  this->VFO[1].BW = this->VFO[1].LF + this->VFO[1].HF;
-  this->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
-}
-
-// set (active) vfo high filter size (hz)
-void Transceiver::setActiveVFOHighFilterHz(uint32_t hz)
-{
-  this->VFO[0].HF = hz;
-  this->VFO[0].BW = this->VFO[0].LF + this->VFO[0].HF;
-  this->changed |= TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
-}
-
-// set (secondary) vfo high filter size (hz)
-void Transceiver::setSecondaryVFOHighFilterHz(uint32_t hz)
-{
-  this->VFO[1].HF = hz;
-  this->VFO[1].BW = this->VFO[1].LF + this->VFO[1].HF;
-  this->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
-}
-
-// set signal level meter
-void Transceiver::setSignalMeter(TRXSMeterUnitType unitType, uint8_t units)
-{
-  switch (unitType)
-  {
-  case SIGNAL_METER_TS2K_SDR_RADIO_LEVEL:
-    this->signalMeterTS2KSDRRadioUnits = units;
-    this->signalMeterdBLevel = units * 3;
-    break;
-  case SIGNAL_METER_DB_UNITS:
-    this->signalMeterTS2KSDRRadioUnits = units / 3;
-    this->signalMeterdBLevel = units;
-    break;
-  default:
-    break;
-  }
-  this->changed |= TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
-}
-
-// set af gain
-void Transceiver::setAFGain(uint8_t value)
-{
-  this->AFGain = value;
-  this->changed |= TRX_CFLAG_AF_GAIN;
-}
-
-// increment ag gain by specified units
-void Transceiver::incrementAFGain(uint8_t units)
-{
-  if ((this->AFGain + units) <= 100)
-  {
-    this->AFGain += units;
+    switch (unitType)
+    {
+    case SIGNAL_METER_TS2K_SDR_RADIO_LEVEL:
+      currentStatus.signalMeterTS2KSDRRadioUnits = units;
+      currentStatus.signalMeterdBLevel = units * 3;
+      break;
+    case SIGNAL_METER_DB_UNITS:
+      currentStatus.signalMeterTS2KSDRRadioUnits = units / 3;
+      currentStatus.signalMeterdBLevel = units;
+      break;
+    default:
+      break;
+    }
+    currentStatus.changed |= TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
-    this->AFGain = 100;
+    return (false);
   }
-  this->changed |= TRX_CFLAG_AF_GAIN;
 }
 
-// decrement ag gain by specified units
-void Transceiver::decrementAFGain(uint8_t units)
+bool Transceiver::setAFGain(uint8_t value, bool fromISR)
 {
-  if ((this->AFGain - units) >= 0)
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    this->AFGain -= units;
+    currentStatus.AFGain = value;
+    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
-    this->AFGain = 0;
+    return (false);
   }
-  this->changed |= TRX_CFLAG_AF_GAIN;
 }
 
-// set audio status to muted
-void Transceiver::setAudioMuted()
+bool Transceiver::incrementAFGain(uint8_t units, bool fromISR)
 {
-  this->audioMuted = TRX_AUDIO_MUTED;
-  this->changed |= TRX_CFLAG_AUDIO_MUTE;
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if ((currentStatus.AFGain + units) <= 100)
+    {
+      currentStatus.AFGain += units;
+    }
+    else
+    {
+      currentStatus.AFGain = 100;
+    }
+    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
 }
 
-// set audio status to unmuted
-void Transceiver::setAudioUnMuted()
+bool Transceiver::decrementAFGain(uint8_t units, bool fromISR)
 {
-  this->audioMuted = TRX_AUDIO_NOT_MUTED;
-  this->changed |= TRX_CFLAG_AUDIO_MUTE;
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if ((currentStatus.AFGain - units) >= 0)
+    {
+      currentStatus.AFGain -= units;
+    }
+    else
+    {
+      currentStatus.AFGain = 0;
+    }
+    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setAudioMuted(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.audioMuted = true;
+    currentStatus.changed |= TRX_CFLAG_AUDIO_MUTE;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setAudioUnMuted(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.audioMuted = false;
+    currentStatus.changed |= TRX_CFLAG_AUDIO_MUTE;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 void Transceiver::incSerialCommandCount(void)

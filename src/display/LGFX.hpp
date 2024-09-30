@@ -35,7 +35,7 @@ public:
     SCREEN_TYPE GetCurrentScreenType(void);
     bool FlipToScreen(SCREEN_TYPE scr);
     bool ToggleScreen(void);
-    bool Refresh(bool force = false);
+    bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr);
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_H

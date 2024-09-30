@@ -49,12 +49,12 @@ LGFXScreenConnecting::~LGFXScreenConnecting()
     this->parentDisplay = nullptr;
 }
 
-bool LGFXScreenConnecting::Refresh(bool force)
+bool LGFXScreenConnecting::Refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
     if (this->parentDisplay != nullptr)
     {
         bool changed = true;
-        this->animatedScreenPtr->refresh();
+        this->animatedScreenPtr->refresh(currentTrxStatus);
 #ifdef DEBUG_FPS
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)

@@ -32,7 +32,7 @@ LGFXMenuButton::~LGFXMenuButton()
 {
 }
 
-bool LGFXMenuButton::refresh(bool force)
+bool LGFXMenuButton::refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
     bool changed = force || this->changed;
     if (changed)

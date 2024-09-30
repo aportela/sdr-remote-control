@@ -27,14 +27,8 @@
 #define TRX_CFLAG_AF_GAIN (1 << 15)                      // 32768
 #define TRX_CFLAG_SEND_CAT (1 << 16)                     // 65536
 
-typedef enum
-{
-  TRX_AUDIO_NOT_MUTED = 0,
-  TRX_AUDIO_MUTED = 1
-} TRxAudioMuteStatus;
-
 // SDR Radio Console (by Simon Brown / G4ELI) Serial CAT https://www.sdr-radio.com/SerialPort
-typedef enum
+enum TrxVFOMode
 {
   TRX_VFO_MD_DSB = 0,
   TRX_VFO_MD_LSB = 1,
@@ -50,32 +44,36 @@ typedef enum
   TRX_VFO_MD_WFM = 8,
   TRX_VFO_MD_BFM = 9,
   TRX_VFO_MODE_ERROR = 10
-} TrxVFOMode;
+};
 
-typedef struct
+struct TrxVFO
 {
   uint64_t frequency;
   TrxVFOMode mode;
-  uint32_t LF;         // low filter
-  uint32_t HF;         // high filter
-  uint32_t BW;         // bandwith
-  uint64_t customStep; // hz
-} TrxVFO;
+  uint32_t LF;            // low filter
+  uint32_t HF;            // high filter
+  uint32_t BW;            // bandwith
+  uint64_t frequencyStep; // hz
+};
 
-typedef enum
+enum TRXSMeterUnitType
 {
   SIGNAL_METER_TS2K_SDR_RADIO_LEVEL = 1,
   SIGNAL_METER_DB_UNITS = 2
-} TRXSMeterUnitType;
+};
 
 struct TransceiverStatus
 {
   bool lockedByControls = false;
-  uint32_t changed = 0;
+  uint32_t changed = UINT32_MAX;
   bool poweredOn = false;
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
+  uint8_t signalMeterdBLevel;
+  uint8_t signalMeterTS2KSDRRadioUnits;
+  uint8_t AFGain;
+  bool audioMuted = false;
   TransceiverStatus() = default;
 };
 
@@ -83,100 +81,40 @@ class Transceiver
 {
 private:
   QueueHandle_t statusQueue = nullptr;
-  bool lockedByControls;
+  uint64_t serialCommandCount = 0;
 
 public:
-  uint32_t changed;
-  bool poweredOn;
-  char radioName[32] = "unknown";
-  uint8_t activeVFOIndex;
-  TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
-  uint8_t signalMeterdBLevel;
-  uint8_t signalMeterTS2KSDRRadioUnits;
-  uint8_t AFGain;
-  TRxAudioMuteStatus audioMuted;
-
   Transceiver();
 
   ~Transceiver();
 
-  bool getCurrentStatus(TransceiverStatus &status);
+  bool getCurrentStatus(TransceiverStatus *status, bool fromISR = false);
+  bool setCurrentStatus(const TransceiverStatus *status, bool fromISR = false);
 
-  bool setPowerOnStatus(bool powerOnStatus);
-  bool setRadioName(const char *radioName);
-  bool setActiveVFO(uint8_t VFOIndex);
-  bool setVFOFrequency(uint8_t VFOIndex, uint64_t frequency);
-  bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode);
-  bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF);
-  bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF);
-  bool setVFOCustomStep(uint8_t VFOIndex, uint64_t customStep);
-  void setLockedByControls(bool locked);
+  bool setPowerOnStatus(bool powerOnStatus, bool fromISR = false);
+  bool setRadioName(const char *radioName, bool fromISR = false);
+  bool setActiveVFO(uint8_t VFOIndex, bool fromISR = false);
+  bool setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR = false);
+  bool setActiveVFOFrequency(uint64_t frequency, bool fromISR = false);
+  bool incrementActiveVFOFrequency(uint64_t hz, bool fromISR = false);
+  bool decrementActiveVFOFrequency(uint64_t hz, bool fromISR = false);
+  bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR = false);
+  bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR = false);
+  bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR = false);
+  bool setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR = false);
+  bool setLockedByControls(bool locked, bool fromISR = false);
 
-  /*
+  bool setSignalMeter(TRXSMeterUnitType unitType, uint8_t units, bool fromISR = false);
 
-    // change current active VFO
-    void setVFOIndex(uint8_t VFOIndex);
+  bool setAFGain(uint8_t value, bool fromISR = false);
+  bool incrementAFGain(uint8_t units, bool fromISR = false);
+  bool decrementAFGain(uint8_t units, bool fromISR = false);
 
-    // set (active) vfo frequency
-    void setActiveVFOFrequency(uint64_t frequency, uint64_t frequency);
+  bool setAudioMuted(bool fromISR = false);
+  bool setAudioUnMuted(bool fromISR = false);
 
-    // increment (active) vfo frequency by specified hz
-    void incrementActiveVFOFrequency(uint64_t hz);
-
-    // decrement (active) vfo frequency by specified hz
-    void decrementActiveVFOFrequency(uint64_t hz);
-
-    // set (secondary) vfo frequency
-    void setSecondaryVFOFrequency(uint64_t frequency);
-
-    // set (active) vfo mode
-    void setActiveVFOMode(TrxVFOMode mode);
-
-    // set (secondary) vfo mode
-    void setSecondaryVFOMode(TrxVFOMode mode);
-
-    // set (active) vfo custom step size (hz)
-    void setActiveVFOHzCustomStep(uint64_t hz);
-
-    // set (secondary) vfo custom step size (hz)
-    void setSecondaryVFOHzCustomStep(uint64_t hz);
-
-    // set (active) vfo low filter size (hz)
-    void setActiveVFOLowFilterHz(uint32_t hz);
-
-    // set (secondary) vfo low filter size (hz)
-    void setSecondaryVFOLowFilterHz(uint32_t hz);
-
-    // set (active) vfo high filter size (hz)
-    void setActiveVFOHighFilterHz(uint32_t hz);
-
-    // set (secondary) vfo high filter size (hz)
-    void setSecondaryVFOHighFilterHz(uint32_t hz);
-
-    // set signal level meter
-    void setSignalMeter(TRXSMeterUnitType unitType, uint8_t units);
-
-    // set af gain
-    void setAFGain(uint8_t value);
-
-    // increment ag gain by specified units
-    void incrementAFGain(uint8_t units);
-
-    // decrement ag gain by specified units
-    void decrementAFGain(uint8_t units);
-
-    // set audio status to muted
-    void setAudioMuted();
-
-    // set audio status to unmuted
-    void setAudioUnMuted();
-
-    void incSerialCommandCount(void);
-
-    uint64_t getSerialCommandCount(void);
-  */
-private:
-  uint64_t serialCommandCount = 0;
+  void incSerialCommandCount(void);
+  uint64_t getSerialCommandCount(void);
 };
 
 #endif

@@ -39,7 +39,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, Transceiver *trx) :
         this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, trx);
         this->filterWidget = new LGFXFilterWidget(display, FILTER_WIDGET_WIDTH, FILTER_WIDGET_HEIGHT, FILTER_WIDGET_X_OFFSET, FILTER_WIDGET_Y_OFFSET, FILTER_WIDGET_PADDING, trx);
         this->menuWidget = new LGFXMenu(display, MENU_WIDGET_WIDTH, MENU_WIDGET_HEIGHT, MENU_WIDGET_X_OFFSET, MENU_WIDGET_Y_OFFSET, MENU_WIDGET_PADDING);
-        this->Refresh(true);
+        this->Refresh(true, nullptr);
     }
 }
 
@@ -256,15 +256,15 @@ void LGFXScreenConnected::refreshDigitalSMeter(uint8_t newSignal)
     }
 }
 
-bool LGFXScreenConnected::Refresh(bool force)
+bool LGFXScreenConnected::Refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
     if (this->parentDisplay != nullptr)
     {
-        bool changed = this->trx->changed > 0;
-        this->vfoWidget->refresh(force);
-        this->digitalSMeterWidget->refresh(force);
-        this->filterWidget->refresh(force);
-        this->menuWidget->refresh(force);
+        bool changed = currentTrxStatus->changed > 0;
+        this->vfoWidget->refresh(force, currentTrxStatus);
+        this->digitalSMeterWidget->refresh(force, currentTrxStatus);
+        this->filterWidget->refresh(force, currentTrxStatus);
+        this->menuWidget->refresh(force, currentTrxStatus);
         /*
 
 
@@ -292,7 +292,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         }
         if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP))
         {
-            this->refreshVFOFrequencyStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].customStep);
+            this->refreshVFOFrequencyStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].frequencyStep);
             this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
         }
         if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW))
@@ -317,7 +317,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         }
         if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
         {
-            this->refreshVFOFrequencyStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].customStep);
+            this->refreshVFOFrequencyStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].frequencyStep);
             this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
         }
         if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_LOW))

@@ -74,17 +74,18 @@ void LGFXFilterWidget::refreshLabels(uint64_t lowCut, uint64_t highCut)
   this->parentDisplayPtr->printf("  HI CUT:%" PRIu64 "Hz", highCut);
 }
 
-bool LGFXFilterWidget::refresh(bool force)
+bool LGFXFilterWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
 {
   bool changed = force;
-  if (changed || this->transceiverPtr->changed > 0)
+  if (changed || currentTrxStatus->changed > 0)
   {
-    if (force || (this->transceiverPtr->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW) || (this->transceiverPtr->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
+    if (force || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW) || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
     {
       this->refreshPlot(0, 0, 3800, 3800, 100, 2900);
       this->refreshLabels(100, 2900);
-      this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
-      this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
+      // TODO
+      // this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
+      // this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
       changed = true;
     }
   }

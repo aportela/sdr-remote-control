@@ -60,20 +60,22 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    trx->incrementActiveVFOFrequency(acceleratedDelta);
+    // trx->incrementActiveVFOFrequency(acceleratedDelta);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    trx->incrementAFGain(1);
+    // trx->incrementAFGain(1);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
+    /*
     trx->VFO[trx->activeVFOIndex].LF += acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].HF += acceleratedDelta;
     trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
     trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+    */
   }
-  trx->changed |= TRX_CFLAG_SEND_CAT;
+  // trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
 void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
@@ -81,20 +83,22 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    trx->decrementActiveVFOFrequency(acceleratedDelta);
+    // trx->decrementActiveVFOFrequency(acceleratedDelta);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    trx->decrementAFGain(1);
+    // trx->decrementAFGain(1);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
+    /*
     trx->VFO[trx->activeVFOIndex].LF -= acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].HF -= acceleratedDelta;
     trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
     trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
+    */
   }
-  trx->changed |= TRX_CFLAG_SEND_CAT;
+  // trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
 void setup()
@@ -126,7 +130,7 @@ void setup()
 void loop()
 {
   TransceiverStatus trxStatus;
-  if (trx->getCurrentStatus(trxStatus))
+  if (trx->getCurrentStatus(&trxStatus))
   {
     if (!trxStatus.poweredOn)
     {
@@ -143,11 +147,15 @@ void loop()
         trx->setPowerOnStatus(false);
         screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
       }
+      else
+      {
+        serialConnection->loop(trx, &trxStatus);
+      }
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN
 
-  screen->Refresh();
+  screen->Refresh(false, &trxStatus);
 
 #ifdef DEBUG_FPS
 
