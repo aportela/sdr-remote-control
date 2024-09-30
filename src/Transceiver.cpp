@@ -59,20 +59,6 @@ bool Transceiver::setPowerOnStatus(bool powerOnStatus)
   }
 }
 
-bool Transceiver::getRadioName(char *buffer, size_t bufferSize)
-{
-  TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
-  {
-    snprintf(buffer, bufferSize, "%s", currentStatus.radioName);
-    return (true);
-  }
-  else
-  {
-    return (false);
-  }
-}
-
 bool Transceiver::setRadioName(const char *radioName)
 {
   TransceiverStatus currentStatus;
@@ -87,27 +73,14 @@ bool Transceiver::setRadioName(const char *radioName)
   }
 }
 
-uint8_t Transceiver::getActiveVFOIndex(void)
+bool Transceiver::setActiveVFO(uint8_t VFOIndex)
 {
   TransceiverStatus currentStatus;
   if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
   {
-    return (currentStatus.activeVFOIndex);
-  }
-  else
-  {
-    return (0);
-  }
-}
-
-bool Transceiver::setActiveVFOIndex(uint8_t index)
-{
-  TransceiverStatus currentStatus;
-  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
-  {
-    if (index < TRANSCEIVER_VFO_COUNT)
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.activeVFOIndex = index;
+      currentStatus.activeVFOIndex = VFOIndex;
       return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
     }
     else
@@ -121,17 +94,131 @@ bool Transceiver::setActiveVFOIndex(uint8_t index)
   }
 }
 
-// check if data is locked by external controls
-bool Transceiver::isLockedByControls()
+bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency)
 {
-  return (false);
-  return (this->lockedByControls);
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex]->frequency = frequency;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex]->mode = mode;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex]->LF = LF;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex]->HF = HF;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t customStep)
+{
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex]->customStep = customStep;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 // set lock
-void Transceiver::setLockedByControls(bool status)
+void Transceiver::setLockedByControls(bool locked)
 {
-  this->lockedByControls = status;
+  TransceiverStatus currentStatus;
+  if (this->statusQueue != nullptr && xQueuePeek(this->statusQueue, &currentStatus, pdMS_TO_TICKS(QUEUE_PEEK_MS_TO_TICKS_TIMEOUT)) != pdPASS)
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.lockedByControls = locked;
+      return (xQueueOverwrite(this->statusQueue, &currentStatus) == pdPASS);
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 // change current active VFO

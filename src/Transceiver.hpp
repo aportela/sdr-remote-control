@@ -70,6 +70,7 @@ typedef enum
 
 struct TransceiverStatus
 {
+  bool lockedByControls = false;
   uint32_t changed = 0;
   bool poweredOn = false;
   char radioName[32] = "unknown";
@@ -101,82 +102,79 @@ public:
 
   bool getCurrentStatus(TransceiverStatus &status);
 
-  bool isPoweredOn(void);
   bool setPowerOnStatus(bool powerOnStatus);
-
-  bool getRadioName(char *buffer, size_t bufferSize);
   bool setRadioName(const char *radioName);
+  bool setActiveVFO(uint8_t VFOIndex);
+  bool setVFOFrequency(uint8_t VFOIndex, uint64_t frequency);
+  bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode);
+  bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF);
+  bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF);
+  bool setVFOCustomStep(uint8_t VFOIndex, uint64_t customStep);
+  void setLockedByControls(bool locked);
 
-  uint8_t getActiveVFOIndex(void);
-  bool setActiveVFOIndex(uint8_t index);
+  /*
 
-  // check if data is locked by external controls
-  bool isLockedByControls();
+    // change current active VFO
+    void setVFOIndex(uint8_t VFOIndex);
 
-  // set lock
-  void setLockedByControls(bool status);
+    // set (active) vfo frequency
+    void setActiveVFOFrequency(uint64_t frequency, uint64_t frequency);
 
-  // change current active VFO
-  void setVFOIndex(uint8_t VFOIndex);
+    // increment (active) vfo frequency by specified hz
+    void incrementActiveVFOFrequency(uint64_t hz);
 
-  // set (active) vfo frequency
-  void setActiveVFOFrequency(uint64_t frequency);
+    // decrement (active) vfo frequency by specified hz
+    void decrementActiveVFOFrequency(uint64_t hz);
 
-  // increment (active) vfo frequency by specified hz
-  void incrementActiveVFOFrequency(uint64_t hz);
+    // set (secondary) vfo frequency
+    void setSecondaryVFOFrequency(uint64_t frequency);
 
-  // decrement (active) vfo frequency by specified hz
-  void decrementActiveVFOFrequency(uint64_t hz);
+    // set (active) vfo mode
+    void setActiveVFOMode(TrxVFOMode mode);
 
-  // set (secondary) vfo frequency
-  void setSecondaryVFOFrequency(uint64_t frequency);
+    // set (secondary) vfo mode
+    void setSecondaryVFOMode(TrxVFOMode mode);
 
-  // set (active) vfo mode
-  void setActiveVFOMode(TrxVFOMode mode);
+    // set (active) vfo custom step size (hz)
+    void setActiveVFOHzCustomStep(uint64_t hz);
 
-  // set (secondary) vfo mode
-  void setSecondaryVFOMode(TrxVFOMode mode);
+    // set (secondary) vfo custom step size (hz)
+    void setSecondaryVFOHzCustomStep(uint64_t hz);
 
-  // set (active) vfo custom step size (hz)
-  void setActiveVFOHzCustomStep(uint64_t hz);
+    // set (active) vfo low filter size (hz)
+    void setActiveVFOLowFilterHz(uint32_t hz);
 
-  // set (secondary) vfo custom step size (hz)
-  void setSecondaryVFOHzCustomStep(uint64_t hz);
+    // set (secondary) vfo low filter size (hz)
+    void setSecondaryVFOLowFilterHz(uint32_t hz);
 
-  // set (active) vfo low filter size (hz)
-  void setActiveVFOLowFilterHz(uint32_t hz);
+    // set (active) vfo high filter size (hz)
+    void setActiveVFOHighFilterHz(uint32_t hz);
 
-  // set (secondary) vfo low filter size (hz)
-  void setSecondaryVFOLowFilterHz(uint32_t hz);
+    // set (secondary) vfo high filter size (hz)
+    void setSecondaryVFOHighFilterHz(uint32_t hz);
 
-  // set (active) vfo high filter size (hz)
-  void setActiveVFOHighFilterHz(uint32_t hz);
+    // set signal level meter
+    void setSignalMeter(TRXSMeterUnitType unitType, uint8_t units);
 
-  // set (secondary) vfo high filter size (hz)
-  void setSecondaryVFOHighFilterHz(uint32_t hz);
+    // set af gain
+    void setAFGain(uint8_t value);
 
-  // set signal level meter
-  void setSignalMeter(TRXSMeterUnitType unitType, uint8_t units);
+    // increment ag gain by specified units
+    void incrementAFGain(uint8_t units);
 
-  // set af gain
-  void setAFGain(uint8_t value);
+    // decrement ag gain by specified units
+    void decrementAFGain(uint8_t units);
 
-  // increment ag gain by specified units
-  void incrementAFGain(uint8_t units);
+    // set audio status to muted
+    void setAudioMuted();
 
-  // decrement ag gain by specified units
-  void decrementAFGain(uint8_t units);
+    // set audio status to unmuted
+    void setAudioUnMuted();
 
-  // set audio status to muted
-  void setAudioMuted();
+    void incSerialCommandCount(void);
 
-  // set audio status to unmuted
-  void setAudioUnMuted();
-
-  void incSerialCommandCount(void);
-
-  uint64_t getSerialCommandCount(void);
-
+    uint64_t getSerialCommandCount(void);
+  */
 private:
   uint64_t serialCommandCount = 0;
 };
