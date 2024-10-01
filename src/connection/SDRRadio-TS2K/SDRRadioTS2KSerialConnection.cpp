@@ -7,11 +7,15 @@ SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *seria
 
 bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
 {
-    this->flush();
-    this->send("NA;PS;");
+    if (millis() - this->lastTXActivity > MILLISECONDS_WAITED_BEFORE_CONNECTION_TRIES)
+    {
+        this->flush();
+        this->send("NA;PS;");
+    }
     bool connected = false;
     while (this->serial->available() > 0 && !connected)
     {
+        /*
         this->lastRXActivity = millis();
         String receivedData = this->serial->readStringUntil(';');
         if (receivedData.startsWith("NA") && receivedData != "NA")
@@ -29,6 +33,7 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
             connected = true;
             break;
         }
+        */
     }
     return (connected);
 }
@@ -64,6 +69,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                             this->lastRXValidCommand = millis();
                             uint64_t f = receivedData.substring(2).toInt();
                             trx->incSerialCommandCount();
+                            /*
                             if ((currentTrxStatus->changed & TRX_CFLAG_SEND_CAT) && currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency != f)
                             {
                             }
@@ -72,6 +78,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                                 // trx->setActiveVFOFrequency(f);
                                 // trx->changed &= ~TRX_CFLAG_SEND_CAT;
                             }
+                            */
                         }
                         else if (receivedData.startsWith("MD") && receivedData != "MD")
                         {
