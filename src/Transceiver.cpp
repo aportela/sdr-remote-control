@@ -1,4 +1,5 @@
 #include "Transceiver.hpp"
+#include <cstdint>
 
 #include <Arduino.h>
 
@@ -111,13 +112,21 @@ bool Transceiver::setActiveVFO(uint8_t VFOIndex, bool fromISR)
 
 bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR)
 {
-  TransceiverStatus currentStatus;
-  if (this->getCurrentStatus(&currentStatus, fromISR))
+  if (frequency >= 0 && frequency <= UINT64_MAX)
   {
-    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    TransceiverStatus currentStatus;
+    if (this->getCurrentStatus(&currentStatus, fromISR))
     {
-      currentStatus.VFO[VFOIndex].frequency = frequency;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+      {
+
+        currentStatus.VFO[VFOIndex].frequency = frequency;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -132,11 +141,18 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fro
 
 bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
 {
-  TransceiverStatus currentStatus;
-  if (this->getCurrentStatus(&currentStatus, fromISR))
+  if (frequency >= 0 && frequency <= UINT64_MAX)
   {
-    currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    TransceiverStatus currentStatus;
+    if (this->getCurrentStatus(&currentStatus, fromISR))
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -149,8 +165,15 @@ bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency + hz <= UINT64_MAX)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -163,8 +186,15 @@ bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency > 0 && hz <= currentStatus.VFO[currentStatus.activeVFOIndex].frequency)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
