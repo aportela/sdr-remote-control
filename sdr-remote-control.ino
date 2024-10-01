@@ -145,7 +145,6 @@ void loop()
     }
     else
     {
-      /*
       if (serialConnection->isDisconnectedByTimeout())
       {
         trx->setPowerOnStatus(false);
@@ -154,8 +153,7 @@ void loop()
       else
       {
         serialConnection->loop(trx, &trxStatus);
-      }^
-      */
+      }
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN
