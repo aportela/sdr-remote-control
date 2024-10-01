@@ -49,6 +49,8 @@ Transceiver *trx;
 #define ENCODER_CHANGE_FILTER_LOW (1 << 3)  // 8
 #define ENCODER_CHANGE_FILTER_HIGH (1 << 4) // 16
 
+#define USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE // uncomment this for use acceleration on encoder changes with VFO frequency
+
 volatile uint8_t encoderChangeBitmask = 0;
 
 uint64_t lastEncoderMillis = 0;
@@ -60,7 +62,11 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
+#ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
     trx->incrementActiveVFOFrequency(acceleratedDelta, true);
+#else
+    trx->incrementActiveVFOFrequency(1, true);
+#endif
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
@@ -83,7 +89,11 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
+#ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
     trx->decrementActiveVFOFrequency(acceleratedDelta, true);
+#else
+    trx->decrementActiveVFOFrequency(1, true);
+#endif
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
@@ -118,7 +128,7 @@ void setup()
 #ifdef DISPLAY_DRIVER_LOVYANN
 
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
-  screen->InitScreen(SCREEN_TYPE_CONNECTED);
+  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
 #else
 
 #error NO DISPLAY DRIVER DEFINED
@@ -135,8 +145,8 @@ void loop()
     {
       if (serialConnection->tryConnection(trx))
       {
-        // trx->setPowerOnStatus(true);
-        // screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
+        trx->setPowerOnStatus(true);
+        screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
       }
     }
     else
