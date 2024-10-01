@@ -67,23 +67,37 @@ enum TRXSMeterUnitType
 struct TransceiverStatus
 {
   bool lockedByControls = false;
-  uint32_t changed = UINT32_MAX;
   bool poweredOn = false;
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
   int8_t signalMeterdBLevel = -54;
-  uint8_t signalMeterTS2KSDRRadioUnits = -18;
+  int8_t signalMeterTS2KSDRRadioUnits = -18;
   uint8_t AFGain = 0;
   uint8_t squelch = 0;
   bool audioMuted = false;
   TransceiverStatus() = default;
 };
 
+struct SourceDataQueueUptimeValue
+{
+  bool lockedByControls = false;
+  bool poweredOn = false;
+  char radioName[32] = "unknown";
+  uint8_t activeVFOIndex = 0;
+  TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
+  int8_t signalMeterdBLevel = -54;
+  int8_t signalMeterTS2KSDRRadioUnits = -18;
+  uint8_t AFGain = 0;
+  uint8_t squelch = 0;
+  bool audioMuted = false;
+  SourceDataQueueUptimeValue() = default;
+};
+
 class Transceiver
 {
 private:
-  QueueHandle_t statusQueue = nullptr;
+  QueueHandle_t statusQueue;
   uint64_t serialCommandCount = 0;
 
 public:
@@ -107,7 +121,7 @@ public:
   bool setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR = false);
   bool setLockedByControls(bool locked, bool fromISR = false);
 
-  bool setSignalMeter(TRXSMeterUnitType unitType, uint8_t units, bool fromISR = false);
+  bool setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool fromISR = false);
 
   bool setAFGain(uint8_t value, bool fromISR = false);
   bool incrementAFGain(uint8_t units, bool fromISR = false);

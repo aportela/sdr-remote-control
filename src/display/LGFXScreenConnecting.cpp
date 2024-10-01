@@ -54,7 +54,7 @@ bool LGFXScreenConnecting::Refresh(bool force, const TransceiverStatus *currentT
     if (this->parentDisplay != nullptr)
     {
         bool changed = true;
-        this->animatedScreenPtr->refresh(force);
+        this->animatedScreenPtr->refresh();
 #ifdef DEBUG_FPS
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)

@@ -27,6 +27,9 @@
 
 #define _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
+#define LABEL_FPS_X_OFFSET DISPLAY_WIDTH - 54
+#define LABEL_FPS_Y_OFFSET 70
+
 using namespace aportela::microcontroller::utils;
 
 LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXScreen(display)
@@ -284,95 +287,18 @@ bool LGFXScreenConnected::Refresh(bool force, const TransceiverStatus *currentTr
         {
             changed = true;
         }
-        /*
-
-
-        // TODO: only refresh active VFO
-        if (this->trx->changed & TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS)
-        {
-            // this->refreshTransmitStatus(false);
-            this->trx->changed &= ~TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_VFO_INDEX))
-        {
-            this->refreshVFOIndex(0, this->trx->activeVFOIndex == 0);
-            this->refreshVFOIndex(1, this->trx->activeVFOIndex == 1);
-            this->trx->changed &= ~TRX_CFLAG_VFO_INDEX;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY))
-        {
-            this->refreshVFOFreq(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].frequency);
-            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_MODE))
-        {
-            this->refreshVFOMode(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].mode);
-            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_STEP))
-        {
-            this->refreshVFOFrequencyStep(0, this->trx->activeVFOIndex == 0, this->trx->VFO[0].frequencyStep);
-            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW))
-        {
-            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
-            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
-        {
-            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
-            this->trx->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FREQUENCY))
-        {
-            this->refreshVFOFreq(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].frequency);
-            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_MODE))
-        {
-            this->refreshVFOMode(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].mode);
-            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_MODE;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
-        {
-            this->refreshVFOFrequencyStep(1, this->trx->activeVFOIndex == 1, this->trx->VFO[1].frequencyStep);
-            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_LOW))
-        {
-            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
-            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH))
-        {
-            // this->refreshPassBandFilter(this->trx->VFO[this->trx->activeVFOIndex].LF, this->trx->VFO[this->trx->activeVFOIndex].HF, this->trx->VFO[this->trx->activeVFOIndex].BW);
-            this->trx->changed &= ~TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
-        }
-        if (force || (this->trx->changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL))
-        {
-            // this->smeterDigitalPtr->refresh(this->trx->signalMeterLevel);
-            this->trx->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
-        }
-        if (force || ((this->trx->changed & TRX_CFLAG_AF_GAIN) || (this->trx->changed & TRX_CFLAG_AUDIO_MUTE)))
-        {
-            // this->refreshVolume(this->trx->AFGain, this->trx->audioMuted);
-            this->trx->changed &= ~TRX_CFLAG_AF_GAIN;
-            this->trx->changed &= ~TRX_CFLAG_AUDIO_MUTE;
-        }
 #ifdef DEBUG_FPS
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)
         {
-            this->parentDisplay->setTextColor(0xF85E, TEXT_BACKGROUND);
-            this->parentDisplay->setCursor(_DISPLAY_PADDING, DISPLAY_HEIGHT - 16);
+            char str[10];
+            snprintf(str, sizeof(str), "FPS: %03u", currentFPS);
             this->parentDisplay->setTextSize(1);
-            this->parentDisplay->printf("%03u FPS", currentFPS);
+            this->parentDisplay->drawString(str, LABEL_FPS_X_OFFSET, LABEL_FPS_Y_OFFSET);
             changed = true;
         }
 #endif
-        // this->menuPtr->refresh(false);
-        */
+
         return (changed);
     }
     else

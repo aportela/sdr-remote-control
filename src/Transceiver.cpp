@@ -1,29 +1,16 @@
 #include "Transceiver.hpp"
 
+#include <Arduino.h>
+
 #define QUEUE_PEEK_MS_TO_TICKS_TIMEOUT 5
 
 Transceiver::Transceiver(void)
 {
   this->statusQueue = xQueueCreate(1, sizeof(TransceiverStatus));
-  /*
-  //this->lockedByControls = false;
-  this->poweredOn = false;
-  // this->poweredOn = true;
-  this->activeVFOIndex = 0;
-  this->VFO[0].frequency = 7050123;
-  this->VFO[0].mode = TRX_VFO_MD_LSB;
-  this->VFO[0].frequencyStep = 1;
-  this->VFO[1].frequency = 145625000;
-  this->VFO[1].mode = TRX_VFO_MD_FM;
-  this->VFO[1].frequencyStep = 1000;
-  this->changed = ((uint16_t)1 << 16) - 1; // ALL (uint16_t) flags active
-  this->signalMeterdBLevel = 0;
-  this->AFGain = 50;
-  this->audioMuted = false;
-  */
+  TransceiverStatus trxStatus;
+  this->setCurrentStatus(&trxStatus, false);
 }
 
-// TODO: add xQueuePeekFromISR / xQueueOverwriteFromISR methods
 Transceiver::~Transceiver()
 {
   vQueueDelete(this->statusQueue);
@@ -31,7 +18,7 @@ Transceiver::~Transceiver()
 
 bool Transceiver::getCurrentStatus(TransceiverStatus *status, bool fromISR)
 {
-  if (this->statusQueue != nullptr)
+  if (this->statusQueue != nullptr && status != nullptr)
   {
     if (!fromISR)
     {
@@ -50,7 +37,7 @@ bool Transceiver::getCurrentStatus(TransceiverStatus *status, bool fromISR)
 
 bool Transceiver::setCurrentStatus(const TransceiverStatus *status, bool fromISR)
 {
-  if (this->statusQueue != nullptr)
+  if (this->statusQueue != nullptr && status != nullptr)
   {
     if (!fromISR)
     {
@@ -283,7 +270,7 @@ bool Transceiver::setLockedByControls(bool locked, bool fromISR)
   }
 }
 
-bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, uint8_t units, bool fromISR)
+bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool fromISR)
 {
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))

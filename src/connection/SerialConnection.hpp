@@ -2,12 +2,13 @@
 #define SDR_REMOTE_CONTROL_SERIAL_CONNECTION_H
 
 #include <Arduino.h>
-#include <String.h>
+#include <string>
 #include "ISerialConnection.hpp"
 
 #define MILLISECONDS_BETWEEN_LOOP 10 // WARNING: this (10ms) transfer/process THOUSANDS of commands per second, set a higher value if you notice saturation on the serial port (data refresh rates will be reduced)
 #define MILLISECONDS_WAITED_AFTER_FLUSH 2
 #define MILLISECONDS_WAITED_AFTER_SEND 5
+#define MILLISECONDS_WAITED_BEFORE_CONNECTION_TRIES 1000
 #define MILLISECONDS_TO_WAIT_BEFORE_TIMEOUT 5000
 
 class SerialConnection : public ISerialConnection
