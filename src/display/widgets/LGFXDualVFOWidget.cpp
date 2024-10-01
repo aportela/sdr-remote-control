@@ -126,7 +126,7 @@ void LGFXDualVFOWidget::refreshVFOMode(uint8_t number, bool isActive, TrxVFOMode
     this->parentDisplayPtr->print("SAM"); // (synchronous AM, includes ECSS)
     break;
   case TRX_VFO_MD_RESERVED:
-    this->parentDisplayPtr->print("  "); // reserved / not used
+    this->parentDisplayPtr->print("   "); // reserved / not used
     break;
   case TRX_VFO_MD_CW_L:
     this->parentDisplayPtr->print("CWL"); // CW (lower sideband)
