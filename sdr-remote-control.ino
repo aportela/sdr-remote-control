@@ -103,13 +103,15 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 void setup()
 {
+  /*
   Serial.begin(SERIAL_DEFAULT_BAUD_RATE);
   while (!Serial)
   {
     yield();
     delay(10);
   }
-  // serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
+  */
+  serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
@@ -117,7 +119,6 @@ void setup()
 
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
   screen->InitScreen(SCREEN_TYPE_CONNECTED);
-
 #else
 
 #error NO DISPLAY DRIVER DEFINED
@@ -134,8 +135,8 @@ void loop()
     {
       if (serialConnection->tryConnection(trx))
       {
-        trx->setPowerOnStatus(true);
-        screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
+        // trx->setPowerOnStatus(true);
+        // screen->FlipToScreen(SCREEN_TYPE_CONNECTED);
       }
     }
     else
@@ -149,7 +150,7 @@ void loop()
       else
       {
         serialConnection->loop(trx, &trxStatus);
-      }
+      }^
       */
     }
   }
