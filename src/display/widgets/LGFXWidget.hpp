@@ -12,7 +12,7 @@ protected:
 public:
     LGFXWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding = 0);
     ~LGFXWidget();
-    bool refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override = 0;
+    // bool refresh(bool force = false) override = 0;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_WIDGET_H

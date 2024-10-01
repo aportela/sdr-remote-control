@@ -26,13 +26,14 @@ LGFXMenuButton::LGFXMenuButton(LovyanGFX *displayPtr, uint16_t width, uint16_t h
 {
     snprintf(this->topLabel, sizeof(this->topLabel), "%s", strlen(topLabel) == MENU_BUTTON_TOP_LABEL_LENGTH ? topLabel : "LE");
     snprintf(this->bottomLabel, sizeof(this->bottomLabel), "%s", strlen(bottomLabel) == MENU_BUTTON_BOTTOM_LABEL_LENGTH ? bottomLabel : "LEN  ERR");
+    this->refresh(true);
 }
 
 LGFXMenuButton::~LGFXMenuButton()
 {
 }
 
-bool LGFXMenuButton::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXMenuButton::refresh(bool force)
 {
     bool changed = force || this->changed;
     if (changed)

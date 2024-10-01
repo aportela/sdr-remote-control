@@ -27,11 +27,14 @@
 
 #define BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
-LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
+LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   if (displayPtr != nullptr)
   {
-    this->refresh(true);
+    if (currentTransceiverStatusPtr != nullptr)
+    {
+      this->refresh(true, currentTransceiverStatusPtr);
+    }
   }
 }
 
@@ -66,13 +69,15 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
   this->parentDisplayPtr->print("1  3  5  7  9  +15 +30    +60");
   this->drawBars(MIN_DB);
+}
+
+void LGFXDigitalSMeterWidget::refreshSMeterDBLabel(void)
+{
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-  this->parentDisplayPtr->print("S");
-  this->parentDisplayPtr->print("9");
+  this->parentDisplayPtr->print("S0dB");
 }
-
 /*
   SMeter ranges
   S0     -54 dB
@@ -118,19 +123,18 @@ void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
   this->drawBars(dB);
 }
 
-bool LGFXDigitalSMeterWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXDigitalSMeterWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
 {
+  bool changed = force;
   if (force)
   {
     this->createSMeter();
   }
-  TransceiverStatus trxStatus;
-  this->transceiverPtr->getCurrentStatus(&trxStatus);
-  bool changed = force || (trxStatus.changed & TRX_CFLAG_SIGNAL_METER_DB_LEVEL);
-  if (changed)
+  if (force || this->previousDBValue != currentTransceiverStatusPtr->signalMeterdBLevel)
   {
-    this->refreshSMeter(trxStatus.signalMeterdBLevel);
-    // this->transceiverPtr->changed &= ~TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
+    this->refreshSMeterDBLabel();
+    this->refreshSMeter(currentTransceiverStatusPtr->signalMeterdBLevel);
+    changed = true;
   }
   return (changed);
 }

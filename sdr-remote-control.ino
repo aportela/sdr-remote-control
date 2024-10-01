@@ -60,11 +60,11 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    // trx->incrementActiveVFOFrequency(acceleratedDelta);
+    trx->incrementActiveVFOFrequency(acceleratedDelta, true);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    // trx->incrementAFGain(1);
+    trx->incrementAFGain(1, true);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
@@ -83,11 +83,11 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
-    // trx->decrementActiveVFOFrequency(acceleratedDelta);
+    trx->decrementActiveVFOFrequency(acceleratedDelta, true);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
-    // trx->decrementAFGain(1);
+    trx->decrementAFGain(1, true);
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
@@ -103,22 +103,20 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 void setup()
 {
-  /*
   Serial.begin(SERIAL_DEFAULT_BAUD_RATE);
   while (!Serial)
   {
     yield();
     delay(10);
   }
-  */
-  serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
+  // serialConnection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
 #ifdef DISPLAY_DRIVER_LOVYANN
 
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
-  screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+  screen->InitScreen(SCREEN_TYPE_CONNECTED);
 
 #else
 
@@ -142,6 +140,7 @@ void loop()
     }
     else
     {
+      /*
       if (serialConnection->isDisconnectedByTimeout())
       {
         trx->setPowerOnStatus(false);
@@ -151,6 +150,7 @@ void loop()
       {
         serialConnection->loop(trx, &trxStatus);
       }
+      */
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN

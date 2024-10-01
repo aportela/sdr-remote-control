@@ -25,7 +25,7 @@ class LGFXSSWAnimationWidget : public LGFXWidget
 public:
   LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding = 0);
   ~LGFXSSWAnimationWidget();
-  bool refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override;
+  bool refresh(bool force);
 
 private:
   lgfx::LGFX_Sprite *canvasSpectrumScope;

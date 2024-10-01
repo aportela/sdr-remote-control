@@ -7,7 +7,7 @@ class IScreen
 {
 public:
     virtual ~IScreen() {}
-    virtual bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) = 0;
+    virtual bool Refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr = nullptr) = 0;
 };
 
 #endif // SDR_REMOTE_CONTROL_SCREEN_INTERFACE_H

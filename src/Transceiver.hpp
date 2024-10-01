@@ -25,7 +25,8 @@
 #define TRX_CFLAG_SIGNAL_METER_DB_LEVEL (1 << 13)        // 8192
 #define TRX_CFLAG_AUDIO_MUTE (1 << 14)                   // 16384
 #define TRX_CFLAG_AF_GAIN (1 << 15)                      // 32768
-#define TRX_CFLAG_SEND_CAT (1 << 16)                     // 65536
+#define TRX_CFLAG_SQUELCH (1 << 16)                      // 65536
+#define TRX_CFLAG_SEND_CAT (1 << 17)                     // 131072
 
 // SDR Radio Console (by Simon Brown / G4ELI) Serial CAT https://www.sdr-radio.com/SerialPort
 enum TrxVFOMode
@@ -48,12 +49,13 @@ enum TrxVFOMode
 
 struct TrxVFO
 {
-  uint64_t frequency;
-  TrxVFOMode mode;
-  uint32_t LF;            // low filter
-  uint32_t HF;            // high filter
-  uint32_t BW;            // bandwith
-  uint64_t frequencyStep; // hz
+  uint64_t frequency = 0;
+  TrxVFOMode mode = TRX_VFO_MODE_ERROR;
+  uint32_t LF = 0;            // low filter
+  uint32_t HF = 0;            // high filter
+  uint32_t BW = 0;            // bandwith
+  uint64_t frequencyStep = 1; // hz
+  TrxVFO() = default;
 };
 
 enum TRXSMeterUnitType
@@ -70,9 +72,10 @@ struct TransceiverStatus
   char radioName[32] = "unknown";
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
-  uint8_t signalMeterdBLevel;
-  uint8_t signalMeterTS2KSDRRadioUnits;
-  uint8_t AFGain;
+  int8_t signalMeterdBLevel = -54;
+  uint8_t signalMeterTS2KSDRRadioUnits = -18;
+  uint8_t AFGain = 0;
+  uint8_t squelch = 0;
   bool audioMuted = false;
   TransceiverStatus() = default;
 };
@@ -109,6 +112,10 @@ public:
   bool setAFGain(uint8_t value, bool fromISR = false);
   bool incrementAFGain(uint8_t units, bool fromISR = false);
   bool decrementAFGain(uint8_t units, bool fromISR = false);
+
+  bool setSquelch(uint8_t value, bool fromISR = false);
+  bool incrementSquelch(uint8_t units, bool fromISR = false);
+  bool decrementSquelch(uint8_t units, bool fromISR = false);
 
   bool setAudioMuted(bool fromISR = false);
   bool setAudioUnMuted(bool fromISR = false);

@@ -13,7 +13,7 @@
 class LGFXScreenConnected : public LGFXScreen
 {
 private:
-    Transceiver *trx;
+    // Transceiver *trx;
     uint8_t oldSignal;
     uint8_t currentSignal = 0;
     uint8_t peakSignal = 0;
@@ -28,9 +28,9 @@ private:
     void refreshDigitalSMeter(uint8_t newSignal);
 
 public:
-    LGFXScreenConnected(LovyanGFX *display, Transceiver *trx);
+    LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr);
     ~LGFXScreenConnected();
-    bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) override;
+    bool Refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr = nullptr) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTED_H

@@ -17,7 +17,7 @@ protected:
 public:
     LGFXScreen(LovyanGFX *display);
     ~LGFXScreen();
-    virtual bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr) = 0;
+    virtual bool Refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr = nullptr) = 0;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_SCREEN_H

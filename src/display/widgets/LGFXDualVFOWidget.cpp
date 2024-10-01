@@ -21,11 +21,14 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR TFT_BLACK
 
-LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
+LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   if (displayPtr != nullptr)
   {
-    this->refresh(true);
+    if (currentTransceiverStatusPtr != nullptr)
+    {
+      this->refresh(true, currentTransceiverStatusPtr);
+    }
   }
 }
 
@@ -192,61 +195,51 @@ void LGFXDualVFOWidget::refreshVFOFrequencyStep(uint8_t number, bool isActive, u
   }
 }
 
-bool LGFXDualVFOWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXDualVFOWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
 {
   bool changed = force;
-  if (changed || currentTrxStatus->changed > 0)
+  if (force || (currentTransceiverStatusPtr->activeVFOIndex != this->previousActiveVFOIndexValue))
   {
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_VFO_INDEX))
-    {
-      this->refreshVFOIndex(0, currentTrxStatus->activeVFOIndex == 0);
-      this->refreshVFOIndex(1, currentTrxStatus->activeVFOIndex == 1);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_VFO_INDEX;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_FREQUENCY))
-    {
-      this->refreshVFOFreq(0, currentTrxStatus->activeVFOIndex == 0, currentTrxStatus->VFO[0].frequency);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_MODE))
-    {
-      this->refreshVFOMode(0, currentTrxStatus->activeVFOIndex == 0, currentTrxStatus->VFO[0].mode);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_ACTIVE_VFO_MODE;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_STEP))
-    {
-      this->refreshVFOFrequencyStep(0, currentTrxStatus->activeVFOIndex == 0, currentTrxStatus->VFO[0].frequencyStep);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_ACTIVE_VFO_STEP;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_SECONDARY_VFO_FREQUENCY))
-    {
-      this->refreshVFOFreq(1, currentTrxStatus->activeVFOIndex == 1, currentTrxStatus->VFO[1].frequency);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_SECONDARY_VFO_MODE))
-    {
-      this->refreshVFOMode(1, currentTrxStatus->activeVFOIndex == 1, currentTrxStatus->VFO[1].mode);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_SECONDARY_VFO_MODE;
-      changed = true;
-    }
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_SECONDARY_VFO_STEP))
-    {
-      this->refreshVFOFrequencyStep(1, currentTrxStatus->activeVFOIndex == 1, currentTrxStatus->VFO[1].frequencyStep);
-      // TODO
-      // currentTrxStatus->changed &= ~TRX_CFLAG_SECONDARY_VFO_STEP;
-      changed = true;
-    }
+    this->refreshVFOIndex(0, currentTransceiverStatusPtr->activeVFOIndex == 0);
+    this->refreshVFOIndex(1, currentTransceiverStatusPtr->activeVFOIndex == 1);
+    this->previousActiveVFOIndexValue = currentTransceiverStatusPtr->activeVFOIndex;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[0].frequency != this->previousActiveVFOFrequency))
+  {
+    this->refreshVFOFreq(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].frequency);
+    this->previousActiveVFOFrequency = currentTransceiverStatusPtr->VFO[0].frequency;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[0].mode != this->previousActiveVFOMode))
+  {
+    this->refreshVFOMode(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].mode);
+    this->previousActiveVFOMode = currentTransceiverStatusPtr->VFO[0].mode;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[0].frequencyStep != this->previousActiveVFOFrequencyStep))
+  {
+    this->refreshVFOFrequencyStep(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].frequencyStep);
+    this->previousActiveVFOFrequencyStep = currentTransceiverStatusPtr->VFO[0].frequencyStep;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[1].frequency != this->previousSecondaryVFOFrequency))
+  {
+    this->refreshVFOFreq(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].frequency);
+    this->previousSecondaryVFOFrequency = currentTransceiverStatusPtr->VFO[1].frequency;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[1].mode != this->previousSecondaryVFOMode))
+  {
+    this->refreshVFOMode(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].mode);
+    this->previousSecondaryVFOMode = currentTransceiverStatusPtr->VFO[1].mode;
+    changed = true;
+  }
+  if (force || (currentTransceiverStatusPtr->VFO[1].frequencyStep != this->previousSecondaryVFOFrequencyStep))
+  {
+    this->refreshVFOFrequencyStep(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].frequencyStep);
+    this->previousSecondaryVFOFrequencyStep = currentTransceiverStatusPtr->VFO[1].frequencyStep;
+    changed = true;
   }
   return (changed);
 }

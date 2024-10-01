@@ -68,11 +68,12 @@ LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint1
     {
         this->totalPages = TOTAL_MENU_PAGES;
         this->initMenu();
-        this->refresh(true, nullptr);
+        this->refresh(true);
+
+        //   1: define buttons (index, labels, callbacks)
+        //   2: set default menu start/end indexes
+        //   3: refresh (draw from start to end)
     }
-    //   1: define buttons (index, labels, callbacks)
-    //   2: set default menu start/end indexes
-    //   3: refresh (draw from start to end)
 }
 
 LGFXMenu::~LGFXMenu()
@@ -123,7 +124,7 @@ void LGFXMenu::initMenu(void)
     }
 }
 
-bool LGFXMenu::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXMenu::refresh(bool force)
 {
     bool changed = force;
     uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
@@ -135,7 +136,7 @@ bool LGFXMenu::refresh(bool force, const TransceiverStatus *currentTrxStatus)
             this->buttons[i]->onChange();
         }
         // TODO: save/restore active flag on page changes ???
-        this->buttons[i]->refresh(force, currentTrxStatus);
+        this->buttons[i]->refresh(force);
     }
     return (changed);
 }
@@ -161,7 +162,7 @@ void LGFXMenu::previousPage(void)
     if (this->currentPage > 0)
     {
         this->currentPage--;
-        this->refresh(true, nullptr);
+        this->refresh(true);
     }
 }
 
@@ -170,6 +171,6 @@ void LGFXMenu::nextPage(void)
     if (this->currentPage < this->totalPages)
     {
         this->currentPage++;
-        this->refresh(true, nullptr);
+        this->refresh(true);
     }
 }

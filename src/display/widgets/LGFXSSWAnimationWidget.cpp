@@ -338,7 +338,7 @@ void LGFXSSWAnimationWidget::draw(uint16_t xOffset, uint16_t yOffset)
 }
 
 // refresh animation
-bool LGFXSSWAnimationWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXSSWAnimationWidget::refresh(bool force)
 {
   this->refreshSignals();
   this->draw(this->xOffset, this->yOffset);

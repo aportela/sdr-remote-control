@@ -22,11 +22,14 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR TFT_BLACK
 
-LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Transceiver *transceiverPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), transceiverPtr(transceiverPtr)
+LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   if (displayPtr != nullptr)
   {
-    this->refresh(true);
+    if (currentTransceiverStatusPtr != nullptr)
+    {
+      this->refresh(true, currentTransceiverStatusPtr);
+    }
   }
 }
 
@@ -74,20 +77,14 @@ void LGFXFilterWidget::refreshLabels(uint64_t lowCut, uint64_t highCut)
   this->parentDisplayPtr->printf("  HI CUT:%" PRIu64 "Hz", highCut);
 }
 
-bool LGFXFilterWidget::refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFXFilterWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
 {
   bool changed = force;
-  if (changed || currentTrxStatus->changed > 0)
+  if (force || (this->oldLFValue != currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF || this->oldHFValue != currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF))
   {
-    if (force || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_LOW) || (currentTrxStatus->changed & TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH))
-    {
-      this->refreshPlot(0, 0, 3800, 3800, 100, 2900);
-      this->refreshLabels(100, 2900);
-      // TODO
-      // this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_LOW;
-      // this->transceiverPtr->changed &= ~TRX_CFLAG_ACTIVE_VFO_FILTER_HIGH;
-      changed = true;
-    }
+    this->refreshPlot(0, 0, 3800, 3800, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    this->refreshLabels(currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    changed = true;
   }
   return (changed);
 }

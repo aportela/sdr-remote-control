@@ -109,7 +109,6 @@ bool Transceiver::setActiveVFO(uint8_t VFOIndex, bool fromISR)
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
       currentStatus.activeVFOIndex = VFOIndex;
-      currentStatus.changed |= TRX_CFLAG_VFO_INDEX;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -131,14 +130,6 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fro
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
       currentStatus.VFO[VFOIndex].frequency = frequency;
-      if (VFOIndex == currentStatus.activeVFOIndex)
-      {
-        currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
-      }
-      else
-      {
-        currentStatus.changed |= TRX_CFLAG_SECONDARY_VFO_FREQUENCY;
-      }
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -158,7 +149,6 @@ bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
-    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -173,7 +163,6 @@ bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
-    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -188,7 +177,6 @@ bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
-    currentStatus.changed |= TRX_CFLAG_ACTIVE_VFO_FREQUENCY;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -313,7 +301,6 @@ bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, uint8_t units, bool
     default:
       break;
     }
-    currentStatus.changed |= TRX_CFLAG_SIGNAL_METER_DB_LEVEL;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -328,7 +315,6 @@ bool Transceiver::setAFGain(uint8_t value, bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.AFGain = value;
-    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -350,7 +336,6 @@ bool Transceiver::incrementAFGain(uint8_t units, bool fromISR)
     {
       currentStatus.AFGain = 100;
     }
-    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -372,7 +357,62 @@ bool Transceiver::decrementAFGain(uint8_t units, bool fromISR)
     {
       currentStatus.AFGain = 0;
     }
-    currentStatus.changed |= TRX_CFLAG_AF_GAIN;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setSquelch(uint8_t value, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.squelch = value;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::incrementSquelch(uint8_t units, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if ((currentStatus.squelch + units) <= 100)
+    {
+      currentStatus.squelch += units;
+    }
+    else
+    {
+      currentStatus.squelch = 100;
+    }
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::decrementSquelch(uint8_t units, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if ((currentStatus.squelch - units) >= 0)
+    {
+      currentStatus.squelch -= units;
+    }
+    else
+    {
+      currentStatus.squelch = 0;
+    }
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -387,7 +427,6 @@ bool Transceiver::setAudioMuted(bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.audioMuted = true;
-    currentStatus.changed |= TRX_CFLAG_AUDIO_MUTE;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
@@ -402,7 +441,6 @@ bool Transceiver::setAudioUnMuted(bool fromISR)
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     currentStatus.audioMuted = false;
-    currentStatus.changed |= TRX_CFLAG_AUDIO_MUTE;
     return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else

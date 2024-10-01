@@ -69,7 +69,9 @@ void LGFX::InitScreen(SCREEN_TYPE screenType)
     case SCREEN_TYPE_CONNECTED:
         if (this->currentScreen == nullptr)
         {
-            this->currentScreen = new LGFXScreenConnected(this, trx);
+            TransceiverStatus trxStatus;
+            this->trx->getCurrentStatus(&trxStatus);
+            this->currentScreen = new LGFXScreenConnected(this, &trxStatus);
         }
         this->currentScreenType = screenType;
         break;
