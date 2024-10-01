@@ -19,6 +19,7 @@
 #define TEXT_COLOR_SECONDARY 0x528A
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR TFT_BLACK
+#define TEXT_COLOR_MUTED TFT_RED
 
 LGFXVolumeSquelchWidget::LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
@@ -49,17 +50,22 @@ void LGFXVolumeSquelchWidget::refreshVolume(bool force, uint8_t value, bool mute
   if (value > 0)
   {
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1 + value, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1 + value, this->yOffset + this->padding + 1, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
   else
   {
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, 100, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_VOLUME_VALUE_X_OFFSET, this->yOffset + this->padding);
-  // TODO: muted color
+  if (muted)
+  {
+    this->parentDisplayPtr->setTextColor(TEXT_COLOR_MUTED, TEXT_BACKGROUND_COLOR);
+  }
+  else
+  {
+    this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+  }
   this->parentDisplayPtr->printf("%03d", value);
-  this->oldAFGainValue = value;
-  this->oldAudioMutedValue = muted;
 }
 
 void LGFXVolumeSquelchWidget::refreshSquelch(bool force, uint8_t value)
@@ -76,7 +82,7 @@ void LGFXVolumeSquelchWidget::refreshSquelch(bool force, uint8_t value)
   if (value > 0)
   {
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1 + value, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1 + value, this->yOffset + this->padding + 1, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
   else
   {
@@ -96,11 +102,14 @@ bool LGFXVolumeSquelchWidget::refresh(bool force, const TransceiverStatus *curre
   if (force || (this->oldAFGainValue != currentTransceiverStatusPtr->AFGain || this->oldAudioMutedValue != currentTransceiverStatusPtr->audioMuted))
   {
     this->refreshVolume(force, currentTransceiverStatusPtr->AFGain, currentTransceiverStatusPtr->audioMuted);
+    this->oldAFGainValue = currentTransceiverStatusPtr->AFGain;
+    this->oldAudioMutedValue = currentTransceiverStatusPtr->audioMuted;
     changed = true;
   }
   if (force || this->oldSquelchValue != currentTransceiverStatusPtr->squelch)
   {
     this->refreshSquelch(force, currentTransceiverStatusPtr->squelch);
+    this->oldSquelchValue = currentTransceiverStatusPtr->squelch;
     changed = true;
   }
   return (changed);
