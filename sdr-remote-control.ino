@@ -77,11 +77,8 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
     /*
     trx->VFO[trx->activeVFOIndex].LF += acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].HF += acceleratedDelta;
-    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
-    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
     */
   }
-  // trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
 void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
@@ -104,11 +101,8 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
     /*
     trx->VFO[trx->activeVFOIndex].LF -= acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].HF -= acceleratedDelta;
-    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_LOW;
-    trx->changed |= TRX_CFLAG_SECONDARY_VFO_FILTER_HIGH;
     */
   }
-  // trx->changed |= TRX_CFLAG_SEND_CAT;
 }
 
 void setup()
