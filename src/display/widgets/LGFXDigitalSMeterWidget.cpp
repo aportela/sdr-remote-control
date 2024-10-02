@@ -27,10 +27,41 @@
 
 #define BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
+/*
+  SMeter ranges
+  S0     -54 dB
+         -51 dB
+  S1     –48 dB
+         -45 dB
+  S2     –42 dB
+         -39 dB
+  S3 	   –36 dB
+         -33 dB
+  S4 	   –30 dB
+         -27 dB
+  S5 	   –24 dB
+         -21 dB
+  S6 	   –18 dB
+         -15 dB
+  S7 	   –12 dB
+          -9 dB
+  S8 	    –6 dB
+          -3 dB
+  S9 	     0 dB
+  S9+10   10 dB
+  ...
+  S9+30 	30 dB
+  ...
+  S9+60 	60 dB
+*/
+
 LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   if (displayPtr != nullptr)
   {
+    this->expSprite = new lgfx::LGFX_Sprite(displayPtr);
+    this->expSprite->setColorDepth(8);
+    this->expSprite->createSprite(60, 28);
     if (currentTransceiverStatusPtr != nullptr)
     {
       this->refresh(true, currentTransceiverStatusPtr);
@@ -40,9 +71,11 @@ LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t
 
 LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 {
+  delete this->expSprite;
+  this->expSprite = nullptr;
 }
 
-// TODO: PEAKS
+// TODO: PEAKS / OPTIMIZE
 void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
 {
   for (int i = 0; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
@@ -71,40 +104,76 @@ void LGFXDigitalSMeterWidget::createSMeter(void)
   this->drawBars(MIN_DB);
 }
 
-void LGFXDigitalSMeterWidget::refreshSMeterDBLabel(void)
+void LGFXDigitalSMeterWidget::refreshSMeterDBLabel(bool force, int8_t dB)
 {
   this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-  this->parentDisplayPtr->print("S0dB");
+  if (force)
+  {
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+    this->parentDisplayPtr->print("S");
+  }
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+  bool showDBExp = dB >= 10;
+  if (dB < -48)
+  {
+    this->parentDisplayPtr->print("0");
+  }
+  else if (dB < -42)
+  {
+    this->parentDisplayPtr->print("1");
+  }
+  else if (dB < -36)
+  {
+    this->parentDisplayPtr->print("2");
+  }
+  else if (dB < -30)
+  {
+    this->parentDisplayPtr->print("3");
+  }
+  else if (dB < -24)
+  {
+    this->parentDisplayPtr->print("4");
+  }
+  else if (dB < -18)
+  {
+    this->parentDisplayPtr->print("5");
+  }
+  else if (dB < -12)
+  {
+    this->parentDisplayPtr->print("6");
+  }
+  else if (dB < -6)
+  {
+    this->parentDisplayPtr->print("7");
+  }
+  else if (dB < 0)
+  {
+    this->parentDisplayPtr->print("8");
+  }
+  else
+  {
+    this->parentDisplayPtr->print("9");
+  }
+  if (!showDBExp)
+  {
+    // only refresh base dB label if previous value has exp label
+    if (force || this->previousDBValue >= 10)
+    {
+      this->parentDisplayPtr->print("dB ");
+    }
+  }
+  else
+  {
+    this->expSprite->fillScreen(TFT_BLACK);
+    this->expSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+    this->expSprite->setTextSize(_DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE);
+    this->expSprite->setCursor(0, 0);
+    this->expSprite->printf("+%ddB", dB);
+    this->expSprite->pushSprite(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+  }
 }
-/*
-  SMeter ranges
-  S0     -54 dB
-         -51 dB
-  S1     –48 dB
-         -45 dB
-  S2     –42 dB
-         -39 dB
-  S3 	   –36 dB
-         -33 dB
-  S4 	   –30 dB
-         -27 dB
-  S5 	   –24 dB
-         -21 dB
-  S6 	   –18 dB
-         -15 dB
-  S7 	   –12 dB
-          -9 dB
-  S8 	    –6 dB
-          -3 dB
-  S9 	     0 dB
-  S9+10   10 dB
-  ...
-  S9+30 	30 dB
-  ...
-  S9+60 	60 dB
-*/
+
 void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
 {
   uint8_t activeBars = 0;
@@ -132,8 +201,9 @@ bool LGFXDigitalSMeterWidget::refresh(bool force, const TransceiverStatus *curre
   }
   if (force || this->previousDBValue != currentTransceiverStatusPtr->signalMeterdBLevel)
   {
-    this->refreshSMeterDBLabel();
     this->refreshSMeter(currentTransceiverStatusPtr->signalMeterdBLevel);
+    this->refreshSMeterDBLabel(force, currentTransceiverStatusPtr->signalMeterdBLevel);
+    this->previousDBValue = currentTransceiverStatusPtr->signalMeterdBLevel;
     changed = true;
   }
   return (changed);

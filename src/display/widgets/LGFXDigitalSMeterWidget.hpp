@@ -8,10 +8,11 @@
 class LGFXDigitalSMeterWidget : public LGFXWidget
 {
 private:
+  lgfx::LGFX_Sprite *expSprite;
   int8_t previousDBValue = -57;
   void drawBars(int8_t dB);
   void createSMeter(void);
-  void refreshSMeterDBLabel(void);
+  void refreshSMeterDBLabel(bool force, int8_t dB);
   void refreshSMeter(int8_t dB);
 
 public:
