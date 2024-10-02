@@ -84,7 +84,7 @@ void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
     uint16_t barColor = BAR_DISABLED_BACKGROUND_COLOR;
     if (dB >= currentdB)
     {
-      barColor = i < 19 ? TFT_GREEN : TFT_RED;
+      barColor = i < 18 ? TFT_GREEN : TFT_RED;
     }
     uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET + (i * (_DIGITAL_SMETER_WIDGET_BAR_WIDTH + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN));
     bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
