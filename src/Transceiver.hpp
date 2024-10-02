@@ -72,26 +72,10 @@ struct TransceiverStatus
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
   int8_t signalMeterdBLevel = -54;
-  int8_t signalMeterTS2KSDRRadioUnits = -18;
   uint8_t AFGain = 0;
   uint8_t squelch = 0;
   bool audioMuted = false;
   TransceiverStatus() = default;
-};
-
-struct SourceDataQueueUptimeValue
-{
-  bool lockedByControls = false;
-  bool poweredOn = false;
-  char radioName[32] = "unknown";
-  uint8_t activeVFOIndex = 0;
-  TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
-  int8_t signalMeterdBLevel = -54;
-  int8_t signalMeterTS2KSDRRadioUnits = -18;
-  uint8_t AFGain = 0;
-  uint8_t squelch = 0;
-  bool audioMuted = false;
-  SourceDataQueueUptimeValue() = default;
 };
 
 class Transceiver
