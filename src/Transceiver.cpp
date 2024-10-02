@@ -308,11 +308,9 @@ bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool 
     switch (unitType)
     {
     case SIGNAL_METER_TS2K_SDR_RADIO_LEVEL:
-      currentStatus.signalMeterTS2KSDRRadioUnits = units;
-      currentStatus.signalMeterdBLevel = units * 3;
+      currentStatus.signalMeterdBLevel = (units * 3) - 54;
       break;
     case SIGNAL_METER_DB_UNITS:
-      currentStatus.signalMeterTS2KSDRRadioUnits = units / 3;
       currentStatus.signalMeterdBLevel = units;
       break;
     default:
