@@ -8,8 +8,8 @@
 #define MILLISECONDS_BETWEEN_LOOP 10 // WARNING: this (10ms) transfer/process THOUSANDS of commands per second, set a higher value if you notice saturation on the serial port (data refresh rates will be reduced)
 #define MILLISECONDS_WAITED_AFTER_FLUSH 2
 #define MILLISECONDS_WAITED_AFTER_SEND 5
-#define MILLISECONDS_WAITED_BEFORE_CONNECTION_TRIES 1000
-#define MILLISECONDS_TO_WAIT_BEFORE_TIMEOUT 5000
+#define MILLISECONDS_WAITED_BEFORE_CONNECTION_TRIES 1000 // try to check serial cat connection every 1 second
+#define MILLISECONDS_TO_WAIT_BEFORE_TIMEOUT 3000         // disconnect (timeout) if no data received for more than 3 seconds
 
 class SerialConnection : public ISerialConnection
 {
