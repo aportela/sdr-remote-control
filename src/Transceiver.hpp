@@ -53,7 +53,6 @@ struct TrxVFO
   TrxVFOMode mode = TRX_VFO_MODE_ERROR;
   uint32_t LF = 0;            // low filter
   uint32_t HF = 0;            // high filter
-  uint32_t BW = 0;            // bandwith
   uint64_t frequencyStep = 1; // hz
   TrxVFO() = default;
 };
