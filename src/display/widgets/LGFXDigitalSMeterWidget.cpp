@@ -114,7 +114,7 @@ void LGFXDigitalSMeterWidget::refreshSMeterDBLabel(bool force, int8_t dB)
     this->parentDisplayPtr->print("S");
   }
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-  bool showDBExp = dB >= 10;
+  bool showDBExp = dB > 0;
   if (dB < -48)
   {
     this->parentDisplayPtr->print("0");
@@ -158,7 +158,7 @@ void LGFXDigitalSMeterWidget::refreshSMeterDBLabel(bool force, int8_t dB)
   if (!showDBExp)
   {
     // only refresh base dB label if previous value has exp label
-    if (force || this->previousDBValue >= 10)
+    if (force || this->previousDBValue >= 0)
     {
       this->parentDisplayPtr->print("dB ");
     }
