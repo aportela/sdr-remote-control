@@ -118,21 +118,20 @@
 #define _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_MAX_LENGTH 120 // trapezium top horizontal line max length
 #define _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH 180  // trapezium bottom horizontal line length
 #define _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_Y_OFFSET 8     // trapezium top horizontal line y offset
-#define _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET 50 // trapezium bottom horizontal line y offset
+#define _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET 45 // trapezium bottom horizontal line y offset
 
 #define _FILTER_WIDGET_TRAPEZIUM_LR_LINES_HORIZONTAL_OFFSET (_FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH - _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_MAX_LENGTH) / 4 // trapecium x offsets between left/right lines on top/bottom horizontal lines
 
-#define _FILTER_WIDGET_TRAPEZIUM_CENTER_V_LINE_LENGTH 42 // trapecium "center" (low/hi cut) separator vertical line length
+#define _FILTER_WIDGET_TRAPEZIUM_CENTER_V_LINE_LENGTH 44 // trapecium "center" (low/hi cut) separator vertical line length
 
 #define _FILTER_WIDGET_FONT_SIZE 2
 
 #define _FILTER_WIDGET_LEFT_LABELS_X_OFFSET (DISPLAY_WIDTH / 2) - 40
 #define _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET (DISPLAY_WIDTH / 2) + 50
-#define _FILTER_WIDGET_LABELS_Y_OFFSET 4
 #define _FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT 17 // total pixel height for current font size
 
 #define FILTER_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
-#define FILTER_WIDGET_HEIGHT 64
+#define FILTER_WIDGET_HEIGHT 50
 #define FILTER_WIDGET_X_OFFSET _DISPLAY_PADDING
 #define FILTER_WIDGET_Y_OFFSET VOLUME_SQUELCH_WIDGET_Y_OFFSET + VOLUME_SQUELCH_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
 #define FILTER_WIDGET_PADDING 1
