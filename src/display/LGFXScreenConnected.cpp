@@ -20,11 +20,6 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-#define TEXT_COLOR_ACTIVE TFT_WHITE
-#define TEXT_COLOR_SECONDARY 0x528A
-#define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND TFT_BLACK
-
 #define _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
 #define LABEL_FPS_X_OFFSET DISPLAY_WIDTH - 54
@@ -67,7 +62,7 @@ LGFXScreenConnected::~LGFXScreenConnected()
 void LGFXScreenConnected::createDigitalSMeter()
 {
     this->parentDisplay->setTextSize(_DIGITAL_SMETER_WIDGET_FONT_SIZE);
-    this->parentDisplay->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND);
+    this->parentDisplay->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
 
     // this->parentDisplay->setCursor(_DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET, _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET);
     // this->parentDisplay->print("1  3  5  7  9 +15 +30    +60");

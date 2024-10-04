@@ -17,11 +17,6 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-#define TEXT_COLOR_ACTIVE TFT_WHITE
-#define TEXT_COLOR_SECONDARY 0x528A
-#define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND_COLOR TFT_BLACK
-
 LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
   if (displayPtr != nullptr)

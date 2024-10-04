@@ -16,11 +16,6 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-#define TEXT_COLOR_ACTIVE TFT_WHITE
-#define TEXT_COLOR_SECONDARY 0x528A
-#define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND_COLOR TFT_BLACK
-
 #define MIN_DB -54     // S0
 #define MAX_DB 60      // S9+60
 #define DB_BAR_STEPS 3 // 3 db between each bar
