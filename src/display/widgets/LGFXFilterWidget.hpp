@@ -2,10 +2,10 @@
 #define SDR_REMOTE_CONTROL_LGFX_FILTER_WIDGET_H
 
 #include <LovyanGFX.hpp>
-#include "LGFXWidget.hpp"
+#include "LGFXTransceiverStatusWidget.hpp"
 #include "../../Transceiver.hpp"
 
-class LGFXFilterWidget : public LGFXWidget
+class LGFXFilterWidget : public LGFXTransceiverStatusWidget
 {
 private:
   uint32_t oldLFValue = 0;
@@ -16,9 +16,9 @@ private:
   void refreshLabels(bool force, uint64_t lowCut, uint64_t highCut);
 
 public:
-  LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr);
+  LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr = nullptr);
   ~LGFXFilterWidget();
-  bool refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr);
+  bool refresh(bool force = false) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_FILTER_WIDGET_H

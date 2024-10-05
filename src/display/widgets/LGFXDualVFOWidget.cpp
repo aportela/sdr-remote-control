@@ -1,6 +1,7 @@
 #include <cstdbool>
 #include "LGFXDualVFOWidget.hpp"
 #include "../../DisplayConfiguration.hpp"
+#include <Arduino.h>
 
 #ifdef DISPLAY_LOVYANN_ILI9488_480x320
 
@@ -16,13 +17,20 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
   if (displayPtr != nullptr)
   {
+    Serial.println("LGFXDualVFOWidget::LGFXDualVFOWidget");
+    // MAL
+    Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
     if (currentTransceiverStatusPtr != nullptr)
     {
-      this->refresh(true, currentTransceiverStatusPtr);
+      Serial.println("DIFERENTE");
+      this->refresh(true);
+      Serial.println("LGFXDualVFOWidget::refresh");
+      //  MAL
+      Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
     }
   }
 }
@@ -190,50 +198,52 @@ void LGFXDualVFOWidget::refreshVFOFrequencyStep(uint8_t number, bool isActive, u
   }
 }
 
-bool LGFXDualVFOWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
+bool LGFXDualVFOWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (currentTransceiverStatusPtr->activeVFOIndex != this->previousActiveVFOIndexValue))
+  if (force || (this->currentTransceiverStatusPtr->activeVFOIndex != this->previousActiveVFOIndexValue))
   {
-    this->refreshVFOIndex(0, currentTransceiverStatusPtr->activeVFOIndex == 0);
-    this->refreshVFOIndex(1, currentTransceiverStatusPtr->activeVFOIndex == 1);
-    this->previousActiveVFOIndexValue = currentTransceiverStatusPtr->activeVFOIndex;
+    this->refreshVFOIndex(0, this->currentTransceiverStatusPtr->activeVFOIndex == 0);
+    this->refreshVFOIndex(1, this->currentTransceiverStatusPtr->activeVFOIndex == 1);
+    this->previousActiveVFOIndexValue = this->currentTransceiverStatusPtr->activeVFOIndex;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[0].frequency != this->previousActiveVFOFrequency))
+  if (force || (this->currentTransceiverStatusPtr->VFO[0].frequency != this->previousActiveVFOFrequency))
   {
-    this->refreshVFOFreq(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].frequency);
-    this->previousActiveVFOFrequency = currentTransceiverStatusPtr->VFO[0].frequency;
+    Serial.println("Refrescando frequencia 0");
+    Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
+    this->refreshVFOFreq(0, this->currentTransceiverStatusPtr->activeVFOIndex == 0, this->currentTransceiverStatusPtr->VFO[0].frequency);
+    this->previousActiveVFOFrequency = this->currentTransceiverStatusPtr->VFO[0].frequency;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[0].mode != this->previousActiveVFOMode))
+  if (force || (this->currentTransceiverStatusPtr->VFO[0].mode != this->previousActiveVFOMode))
   {
-    this->refreshVFOMode(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].mode);
-    this->previousActiveVFOMode = currentTransceiverStatusPtr->VFO[0].mode;
+    this->refreshVFOMode(0, this->currentTransceiverStatusPtr->activeVFOIndex == 0, this->currentTransceiverStatusPtr->VFO[0].mode);
+    this->previousActiveVFOMode = this->currentTransceiverStatusPtr->VFO[0].mode;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[0].frequencyStep != this->previousActiveVFOFrequencyStep))
+  if (force || (this->currentTransceiverStatusPtr->VFO[0].frequencyStep != this->previousActiveVFOFrequencyStep))
   {
-    this->refreshVFOFrequencyStep(0, currentTransceiverStatusPtr->activeVFOIndex == 0, currentTransceiverStatusPtr->VFO[0].frequencyStep);
-    this->previousActiveVFOFrequencyStep = currentTransceiverStatusPtr->VFO[0].frequencyStep;
+    this->refreshVFOFrequencyStep(0, this->currentTransceiverStatusPtr->activeVFOIndex == 0, this->currentTransceiverStatusPtr->VFO[0].frequencyStep);
+    this->previousActiveVFOFrequencyStep = this->currentTransceiverStatusPtr->VFO[0].frequencyStep;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[1].frequency != this->previousSecondaryVFOFrequency))
+  if (force || (this->currentTransceiverStatusPtr->VFO[1].frequency != this->previousSecondaryVFOFrequency))
   {
-    this->refreshVFOFreq(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].frequency);
-    this->previousSecondaryVFOFrequency = currentTransceiverStatusPtr->VFO[1].frequency;
+    this->refreshVFOFreq(1, this->currentTransceiverStatusPtr->activeVFOIndex == 1, this->currentTransceiverStatusPtr->VFO[1].frequency);
+    this->previousSecondaryVFOFrequency = this->currentTransceiverStatusPtr->VFO[1].frequency;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[1].mode != this->previousSecondaryVFOMode))
+  if (force || (this->currentTransceiverStatusPtr->VFO[1].mode != this->previousSecondaryVFOMode))
   {
-    this->refreshVFOMode(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].mode);
-    this->previousSecondaryVFOMode = currentTransceiverStatusPtr->VFO[1].mode;
+    this->refreshVFOMode(1, this->currentTransceiverStatusPtr->activeVFOIndex == 1, this->currentTransceiverStatusPtr->VFO[1].mode);
+    this->previousSecondaryVFOMode = this->currentTransceiverStatusPtr->VFO[1].mode;
     changed = true;
   }
-  if (force || (currentTransceiverStatusPtr->VFO[1].frequencyStep != this->previousSecondaryVFOFrequencyStep))
+  if (force || (this->currentTransceiverStatusPtr->VFO[1].frequencyStep != this->previousSecondaryVFOFrequencyStep))
   {
-    this->refreshVFOFrequencyStep(1, currentTransceiverStatusPtr->activeVFOIndex == 1, currentTransceiverStatusPtr->VFO[1].frequencyStep);
-    this->previousSecondaryVFOFrequencyStep = currentTransceiverStatusPtr->VFO[1].frequencyStep;
+    this->refreshVFOFrequencyStep(1, this->currentTransceiverStatusPtr->activeVFOIndex == 1, this->currentTransceiverStatusPtr->VFO[1].frequencyStep);
+    this->previousSecondaryVFOFrequencyStep = this->currentTransceiverStatusPtr->VFO[1].frequencyStep;
     changed = true;
   }
   return (changed);

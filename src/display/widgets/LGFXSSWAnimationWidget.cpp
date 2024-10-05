@@ -18,10 +18,10 @@
 
 LGFXSSWAnimationWidget::LGFXSSWAnimationWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
 {
-  // init random seed
-  randomSeed(analogRead(0) ^ (micros() * esp_random()));
   if (displayPtr != nullptr)
   {
+    // init random seed
+    randomSeed(analogRead(0) ^ (micros() * esp_random()));
     this->canvasSpectrumScope = new lgfx::LGFX_Sprite(displayPtr);
     this->canvasSpectrumScope->setColorDepth(16);
     this->canvasSpectrumScope->createSprite(this->width, SSWA_SPECTRUM_SCOPE_HEIGHT);
@@ -338,7 +338,7 @@ void LGFXSSWAnimationWidget::draw(uint16_t xOffset, uint16_t yOffset)
 }
 
 // refresh animation
-bool LGFXSSWAnimationWidget::refresh(void)
+bool LGFXSSWAnimationWidget::refresh(bool force)
 {
   this->refreshSignals();
   this->draw(this->xOffset, this->yOffset);

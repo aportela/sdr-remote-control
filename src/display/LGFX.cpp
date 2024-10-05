@@ -3,7 +3,7 @@
 #include "LGFXScreenConnecting.hpp"
 #include "LGFXScreenConnected.hpp"
 
-LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, Transceiver *trx) : trx(trx)
+LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus) : trxStatus(trxStatus)
 {
     auto cfg = this->_bus_instance.config();
     cfg.spi_host = VSPI_HOST;  // Utilizar el SPI del hardware VSPI
@@ -69,9 +69,7 @@ void LGFX::InitScreen(SCREEN_TYPE screenType)
     case SCREEN_TYPE_CONNECTED:
         if (this->currentScreen == nullptr)
         {
-            TransceiverStatus trxStatus;
-            this->trx->getCurrentStatus(&trxStatus);
-            this->currentScreen = new LGFXScreenConnected(this, &trxStatus);
+            this->currentScreen = new LGFXScreenConnected(this, this->trxStatus);
         }
         this->currentScreenType = screenType;
         break;
@@ -125,13 +123,13 @@ bool LGFX::ToggleScreen(void)
     return (success);
 }
 
-bool LGFX::Refresh(bool force, const TransceiverStatus *currentTrxStatus)
+bool LGFX::Refresh(bool force)
 {
     if (this->currentScreenType != SCREEN_TYPE_NONE)
     {
         if (this->currentScreen != nullptr)
         {
-            return (this->currentScreen->Refresh(force, currentTrxStatus));
+            return (this->currentScreen->Refresh(force));
         }
         else
         {

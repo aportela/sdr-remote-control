@@ -35,7 +35,8 @@ LGFX *screen = nullptr;
 
 #endif // DISPLAY_DRIVER_LOVYANN
 
-Transceiver *trx;
+Transceiver *trx = nullptr;
+TransceiverStatus *trxStatus = nullptr;
 
 // ROTARY ENCODER PINS
 
@@ -119,10 +120,12 @@ void setup()
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
+  trxStatus = new TransceiverStatus;
 #ifdef DISPLAY_DRIVER_LOVYANN
 
-  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trx);
+  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trxStatus);
   screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+
 #else
 
 #error NO DISPLAY DRIVER DEFINED
@@ -132,10 +135,9 @@ void setup()
 
 void loop()
 {
-  TransceiverStatus trxStatus;
-  if (trx->getCurrentStatus(&trxStatus))
+  if (trx->getCurrentStatus(trxStatus))
   {
-    if (!trxStatus.poweredOn)
+    if (!trxStatus->poweredOn)
     {
       if (serialConnection->tryConnection(trx))
       {
@@ -145,20 +147,20 @@ void loop()
     }
     else
     {
-      if (serialConnection->isDisconnectedByTimeout())
+      if (false && serialConnection->isDisconnectedByTimeout())
       {
         trx->setPowerOnStatus(false);
         screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
       }
       else
       {
-        serialConnection->loop(trx, &trxStatus);
+        serialConnection->loop(trx, trxStatus);
       }
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN
 
-  screen->Refresh(false, &trxStatus);
+  screen->Refresh(false);
 
 #ifdef DEBUG_FPS
 

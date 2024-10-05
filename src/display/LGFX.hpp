@@ -24,18 +24,18 @@ private:
 
     LGFXScreen *currentScreen = nullptr;
 
-    Transceiver *trx = nullptr;
+    const TransceiverStatus *trxStatus = nullptr;
 
     void DeleteCurrentScreen(void);
 
 public:
-    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, Transceiver *trx);
+    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus = nullptr);
     ~LGFX();
     void InitScreen(SCREEN_TYPE scr);
     SCREEN_TYPE GetCurrentScreenType(void);
     bool FlipToScreen(SCREEN_TYPE scr);
     bool ToggleScreen(void);
-    bool Refresh(bool force, const TransceiverStatus *currentTrxStatus = nullptr);
+    bool Refresh(bool force = false);
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_H

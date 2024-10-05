@@ -17,13 +17,13 @@
 
 #define TEXT_COLOR_MUTED TFT_RED
 
-LGFXVolumeSquelchWidget::LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXVolumeSquelchWidget::LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
   if (displayPtr != nullptr)
   {
     if (currentTransceiverStatusPtr != nullptr)
     {
-      this->refresh(true, currentTransceiverStatusPtr);
+      this->refresh(true);
     }
   }
 }
@@ -92,20 +92,20 @@ void LGFXVolumeSquelchWidget::setMuted(bool force, uint8_t value)
 {
 }
 
-bool LGFXVolumeSquelchWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
+bool LGFXVolumeSquelchWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (this->oldAFGainValue != currentTransceiverStatusPtr->AFGain || this->oldAudioMutedValue != currentTransceiverStatusPtr->audioMuted))
+  if (force || (this->oldAFGainValue != this->currentTransceiverStatusPtr->AFGain || this->oldAudioMutedValue != this->currentTransceiverStatusPtr->audioMuted))
   {
-    this->refreshVolume(force, currentTransceiverStatusPtr->AFGain, currentTransceiverStatusPtr->audioMuted);
-    this->oldAFGainValue = currentTransceiverStatusPtr->AFGain;
-    this->oldAudioMutedValue = currentTransceiverStatusPtr->audioMuted;
+    this->refreshVolume(force, this->currentTransceiverStatusPtr->AFGain, this->currentTransceiverStatusPtr->audioMuted);
+    this->oldAFGainValue = this->currentTransceiverStatusPtr->AFGain;
+    this->oldAudioMutedValue = this->currentTransceiverStatusPtr->audioMuted;
     changed = true;
   }
-  if (force || this->oldSquelchValue != currentTransceiverStatusPtr->squelch)
+  if (force || this->oldSquelchValue != this->currentTransceiverStatusPtr->squelch)
   {
-    this->refreshSquelch(force, currentTransceiverStatusPtr->squelch);
-    this->oldSquelchValue = currentTransceiverStatusPtr->squelch;
+    this->refreshSquelch(force, this->currentTransceiverStatusPtr->squelch);
+    this->oldSquelchValue = this->currentTransceiverStatusPtr->squelch;
     changed = true;
   }
   return (changed);

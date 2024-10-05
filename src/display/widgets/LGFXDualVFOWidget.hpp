@@ -2,10 +2,10 @@
 #define SDR_REMOTE_CONTROL_LGFX_DUAL_VFO_WIDGET_H
 
 #include <LovyanGFX.hpp>
-#include "LGFXWidget.hpp"
+#include "LGFXTransceiverStatusWidget.hpp"
 #include "../../Transceiver.hpp"
 
-class LGFXDualVFOWidget : public LGFXWidget
+class LGFXDualVFOWidget : public LGFXTransceiverStatusWidget
 {
 private:
   uint8_t previousActiveVFOIndexValue = 0;
@@ -24,9 +24,9 @@ private:
   void refreshVFOFrequencyStep(uint8_t number, bool isActive, uint64_t step);
 
 public:
-  LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr);
+  LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr = nullptr);
   ~LGFXDualVFOWidget();
-  bool refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr);
+  bool refresh(bool force = false) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_DUAL_VFO_WIDGET_H

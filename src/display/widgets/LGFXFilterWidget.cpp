@@ -17,7 +17,7 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
   if (displayPtr != nullptr)
   {
@@ -26,7 +26,7 @@ LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
     this->plotSprite->createSprite(180, 46);
     if (currentTransceiverStatusPtr != nullptr)
     {
-      this->refresh(true, currentTransceiverStatusPtr);
+      this->refresh(true);
     }
   }
 }
@@ -85,15 +85,15 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   this->parentDisplayPtr->printf("  HI CUT:%" PRIu64 "Hz   ", highCut);
 }
 
-bool LGFXFilterWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
+bool LGFXFilterWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (this->oldLFValue != currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF || this->oldHFValue != currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF))
+  if (force || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF))
   {
-    this->refreshPlot(force, 0, 0, 3800, 3800, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
-    this->refreshLabels(force, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
-    this->oldLFValue = currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF;
-    this->oldHFValue = currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF;
+    this->refreshPlot(force, 0, 0, 3800, 3800, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    this->refreshLabels(force, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    this->oldLFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF;
+    this->oldHFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF;
     changed = true;
   }
   return (changed);

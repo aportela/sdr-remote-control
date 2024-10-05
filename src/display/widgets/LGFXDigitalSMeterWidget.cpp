@@ -50,7 +50,7 @@
   S9+60 	60 dB
 */
 
-LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
   if (displayPtr != nullptr)
   {
@@ -59,7 +59,7 @@ LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t
     this->expSprite->createSprite(60, 28);
     if (currentTransceiverStatusPtr != nullptr)
     {
-      this->refresh(true, currentTransceiverStatusPtr);
+      this->refresh(true);
     }
   }
 }
@@ -187,18 +187,18 @@ void LGFXDigitalSMeterWidget::refreshSMeter(int8_t dB)
   this->drawBars(dB);
 }
 
-bool LGFXDigitalSMeterWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
+bool LGFXDigitalSMeterWidget::refresh(bool force)
 {
   bool changed = force;
   if (force)
   {
     this->createSMeter();
   }
-  if (force || this->previousDBValue != currentTransceiverStatusPtr->signalMeterdBLevel)
+  if (force || this->previousDBValue != this->currentTransceiverStatusPtr->signalMeterdBLevel)
   {
-    this->refreshSMeter(currentTransceiverStatusPtr->signalMeterdBLevel);
-    this->refreshSMeterDBLabel(force, currentTransceiverStatusPtr->signalMeterdBLevel);
-    this->previousDBValue = currentTransceiverStatusPtr->signalMeterdBLevel;
+    this->refreshSMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+    this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel);
+    this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
     changed = true;
   }
   return (changed);

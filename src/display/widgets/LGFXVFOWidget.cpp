@@ -17,7 +17,7 @@
 
 #endif // DISPLAY_LOVYANN_ILI9488_480x320
 
-LGFXVFOWidget::LGFXVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXVFOWidget::LGFXVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
   if (displayPtr != nullptr)
   {
@@ -25,7 +25,7 @@ LGFXVFOWidget::LGFXVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t hei
     {
       this->isActive = currentTransceiverStatusPtr->activeVFOIndex == index;
       this->index = index;
-      this->refresh(true, currentTransceiverStatusPtr);
+      this->refresh(true);
     }
   }
 }
@@ -205,31 +205,31 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
   }
 }
 
-bool LGFXVFOWidget::refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr)
+bool LGFXVFOWidget::refresh(bool force)
 {
   bool changed = force;
-  bool currentActiveStatus = currentTransceiverStatusPtr->activeVFOIndex == this->index;
+  bool currentActiveStatus = this->currentTransceiverStatusPtr->activeVFOIndex == this->index;
   if (force || currentActiveStatus != this->isActive)
   {
     this->printIndex();
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
+  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
   {
-    this->printFrequency(currentTransceiverStatusPtr->VFO[this->index].frequency);
-    this->previousFrequency = currentTransceiverStatusPtr->VFO[this->index].frequency;
+    this->printFrequency(this->currentTransceiverStatusPtr->VFO[this->index].frequency);
+    this->previousFrequency = this->currentTransceiverStatusPtr->VFO[this->index].frequency;
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
+  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
   {
-    this->printMode(currentTransceiverStatusPtr->VFO[this->index].mode);
-    this->previousMode = currentTransceiverStatusPtr->VFO[this->index].mode;
+    this->printMode(this->currentTransceiverStatusPtr->VFO[this->index].mode);
+    this->previousMode = this->currentTransceiverStatusPtr->VFO[this->index].mode;
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
+  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
   {
-    this->printFrequencyStep(currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
-    this->previousFrequencyStep = currentTransceiverStatusPtr->VFO[this->index].frequencyStep;
+    this->printFrequencyStep(this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
+    this->previousFrequencyStep = this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep;
     changed = true;
   }
   this->isActive = currentActiveStatus;

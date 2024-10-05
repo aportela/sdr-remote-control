@@ -2,10 +2,10 @@
 #define SDR_REMOTE_CONTROL_LGFX_VOLUME_SQUELCH_WIDGET_H
 
 #include <LovyanGFX.hpp>
-#include "LGFXWidget.hpp"
+#include "LGFXTransceiverStatusWidget.hpp"
 #include "../../Transceiver.hpp"
 
-class LGFXVolumeSquelchWidget : public LGFXWidget
+class LGFXVolumeSquelchWidget : public LGFXTransceiverStatusWidget
 {
 private:
   uint8_t oldAFGainValue = 0;
@@ -17,9 +17,9 @@ private:
   void setMuted(bool force, uint8_t value);
 
 public:
-  LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr);
+  LGFXVolumeSquelchWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr = nullptr);
   ~LGFXVolumeSquelchWidget();
-  bool refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr);
+  bool refresh(bool force = false) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_VOLUME_SQUELCH_WIDGET_H

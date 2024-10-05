@@ -2,10 +2,10 @@
 #define SDR_REMOTE_CONTROL_LGFX_DIGITAL_SMETER_WIDGET_H
 
 #include <LovyanGFX.hpp>
-#include "LGFXWidget.hpp"
+#include "LGFXTransceiverStatusWidget.hpp"
 #include "../../Transceiver.hpp"
 
-class LGFXDigitalSMeterWidget : public LGFXWidget
+class LGFXDigitalSMeterWidget : public LGFXTransceiverStatusWidget
 {
 private:
   lgfx::LGFX_Sprite *expSprite;
@@ -16,9 +16,9 @@ private:
   void refreshSMeter(int8_t dB);
 
 public:
-  LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr);
+  LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr = nullptr);
   ~LGFXDigitalSMeterWidget();
-  bool refresh(bool force, const TransceiverStatus *currentTransceiverStatusPtr);
+  bool refresh(bool force = false) override;
 };
 
 #endif // SDR_REMOTE_CONTROL_LGFX_DIGITAL_SMETER_WIDGET_H
