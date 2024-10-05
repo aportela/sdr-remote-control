@@ -58,7 +58,7 @@ void LGFXVFOWidget::printFrequency(uint64_t frequency)
     }
   }
   formattedFrequency[resultIndex] = '\0';
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DUAL_VFO_WIDGET_FREQUENCY_X_OFFSET, (this->yOffset + this->padding) + (number == 0 ? 0 : DUAL_VFO_WIDGET_SECONDARY_VFO_Y_OFFSET));
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DUAL_VFO_WIDGET_FREQUENCY_X_OFFSET, this->yOffset + this->padding);
   this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
   if (this->isActive)
   {
@@ -228,7 +228,7 @@ bool LGFXVFOWidget::refresh(bool force, const TransceiverStatus *currentTranscei
   }
   if (force || currentActiveStatus != this->isActive || currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
   {
-    this->refreshVFOFrequencyStep(currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
+    this->printFrequencyStep(currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
     this->previousFrequencyStep = currentTransceiverStatusPtr->VFO[this->index].frequencyStep;
     changed = true;
   }
