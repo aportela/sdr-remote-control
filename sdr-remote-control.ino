@@ -147,7 +147,7 @@ void loop()
     }
     else
     {
-      if (false && serialConnection->isDisconnectedByTimeout())
+      if (serialConnection->isDisconnectedByTimeout())
       {
         trx->setPowerOnStatus(false);
         screen->FlipToScreen(SCREEN_TYPE_NOT_CONNECTED);
