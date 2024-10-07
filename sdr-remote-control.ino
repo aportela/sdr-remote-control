@@ -34,7 +34,7 @@ LGFX *screen = nullptr;
 #error NO DISPLAY DRIVER DEFINED
 #endif // DISPLAY_DRIVER_LOVYANN
 
-volatile Transceiver *trx = nullptr;
+Transceiver *trx = nullptr;
 TransceiverStatus *trxStatus = nullptr;
 
 // ROTARY ENCODER PINS
