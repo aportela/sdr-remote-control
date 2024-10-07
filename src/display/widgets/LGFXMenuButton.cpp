@@ -1,19 +1,4 @@
 #include "LGFXMenuButton.hpp"
-#include "../../DisplayConfiguration.hpp"
-
-#ifdef DISPLAY_LOVYANN_ILI9488_480x320
-
-#include "../ILI9488/ScreenConnectedDefines.hpp"
-
-#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
-
-#include "../ST7789/ScreenConnectedDefines.hpp"
-
-#else
-
-#error NO DISPLAY DEFINED
-
-#endif // DISPLAY_LOVYANN_ILI9488_480x320
 
 #define BUTTON_NOT_ACTIVE_BACKGROUND_COLOR 0x0000
 #define BUTTON_ACTIVE_BACKGROUND_COLOR 0xFFFF

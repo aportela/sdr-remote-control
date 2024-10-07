@@ -4,6 +4,8 @@
 #include <LovyanGFX.hpp>
 #include "Widget.hpp"
 
+#include "../../DisplayConfiguration.hpp"
+
 class LGFXWidget : public Widget
 {
 protected:

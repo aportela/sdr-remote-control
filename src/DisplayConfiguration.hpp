@@ -28,6 +28,8 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR TFT_BLACK
 
+#include "display/ILI9488/ScreenConnectedDefines.hpp"
+
 // ILI9488 native resolution is 320x480 so we need (for LovyAnn driver) to invert width/height values & rotate
 #define DISPLAY_DRIVER_LOVYANN_WIDTH DISPLAY_HEIGHT
 #define DISPLAY_DRIVER_LOVYANN_HEIGHT DISPLAY_WIDTH
@@ -52,6 +54,8 @@
 #define DISPLAY_DRIVER_LOVYANN_ROTATION 3
 #define DISPLAY_DRIVER_LOVYANN_ROTATION_MIRROR_FLIP_VERTICAL 1
 #define DISPLAY_DRIVER_LOVYANN_INVERT_COLORS true
+
+#include "display/ST7789/ScreenConnectedDefines.hpp"
 
 #else
 
