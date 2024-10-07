@@ -34,7 +34,8 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
         this->parentDisplay->setTextDatum(TL_DATUM);
         if (currentTransceiverStatusPtr != nullptr)
         {
-            this->vfoWidget = new LGFXDualVFOWidget(display, DUAL_VFO_WIDGET_WIDTH, DUAL_VFO_WIDGET_HEIGHT, DUAL_VFO_WIDGET_X_OFFSET, DUAL_VFO_WIDGET_Y_OFFSET, DUAL_VFO_WIDGET_PADDING, currentTransceiverStatusPtr);
+            this->primaryVFOWidget = new LGFXVFOWidget(display, VFO_WIDGET_WIDTH, VFO_WIDGET_HEIGHT, VFO_WIDGET_X_OFFSET, VFO_PRIMARY_WIDGET_Y_OFFSET, VFO_WIDGET_PADDING, 0, currentTransceiverStatusPtr);
+            this->secondaryVFOWidget = new LGFXVFOWidget(display, VFO_WIDGET_WIDTH, VFO_WIDGET_HEIGHT, VFO_WIDGET_X_OFFSET, VFO_SECONDARY_WIDGET_Y_OFFSET, VFO_WIDGET_PADDING, 1, currentTransceiverStatusPtr);
             this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
             this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, currentTransceiverStatusPtr);
             this->filterWidget = new LGFXFilterWidget(display, FILTER_WIDGET_WIDTH, FILTER_WIDGET_HEIGHT, FILTER_WIDGET_X_OFFSET, FILTER_WIDGET_Y_OFFSET, FILTER_WIDGET_PADDING, currentTransceiverStatusPtr);
@@ -46,8 +47,10 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
 
 LGFXScreenConnected::~LGFXScreenConnected()
 {
-    delete this->vfoWidget;
-    this->vfoWidget = nullptr;
+    delete this->primaryVFOWidget;
+    this->primaryVFOWidget = nullptr;
+    delete this->secondaryVFOWidget;
+    this->secondaryVFOWidget = nullptr;
     delete this->digitalSMeterWidget;
     this->digitalSMeterWidget = nullptr;
     delete this->volumeSquelchWidget;
@@ -262,7 +265,11 @@ bool LGFXScreenConnected::Refresh(bool force)
     if (this->parentDisplay != nullptr)
     {
         bool changed = false;
-        if (this->vfoWidget->refresh(force))
+        if (this->secondaryVFOWidget->refresh(force))
+        {
+            changed = true;
+        }
+        if (this->secondaryVFOWidget->refresh(force))
         {
             changed = true;
         }

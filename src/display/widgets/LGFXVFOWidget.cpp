@@ -38,7 +38,7 @@ void LGFXVFOWidget::printIndex()
 {
   this->parentDisplayPtr->setTextColor(this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding, this->yOffset + this->padding);
-  this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
+  this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
   this->parentDisplayPtr->print(this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL);
 }
 
@@ -58,8 +58,8 @@ void LGFXVFOWidget::printFrequency(uint64_t frequency)
     }
   }
   formattedFrequency[resultIndex] = '\0';
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DUAL_VFO_WIDGET_FREQUENCY_X_OFFSET, this->yOffset + this->padding);
-  this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VFO_WIDGET_FREQUENCY_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
   if (this->isActive)
   {
     uint8_t firstNonZeroIndex = 0;
@@ -141,8 +141,8 @@ void LGFXVFOWidget::getModeLabel(TrxVFOMode mode, char *label, size_t labelSize)
 void LGFXVFOWidget::printMode(TrxVFOMode mode)
 {
   this->parentDisplayPtr->setTextColor(this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DUAL_VFO_WIDGET_MODE_X_OFFSET, this->yOffset + this->padding);
-  this->parentDisplayPtr->setTextSize(_DUAL_VFO_WIDGET_FONT_SIZE);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VFO_WIDGET_MODE_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
   char label[4] = {'\0'};
   this->getModeLabel(mode, label, sizeof(label));
   this->parentDisplayPtr->print(label);
@@ -150,47 +150,47 @@ void LGFXVFOWidget::printMode(TrxVFOMode mode)
 
 void LGFXVFOWidget::printFrequencyStep(uint64_t step)
 {
-  uint16_t x = this->xOffset + this->padding + _DUAL_VFO_WIDGET_FREQUENCY_STEP_X_OFFSET;
-  uint16_t y = (this->yOffset + this->padding) + _DUAL_VFO_WIDGET_PRIMARY_FREQUENCY_STEP_Y_OFFSET;
+  uint16_t x = this->xOffset + this->padding + _VFO_WIDGET_FREQUENCY_STEP_X_OFFSET;
+  uint16_t y = (this->yOffset + this->padding) + _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET;
   // clear previous frequency step
-  this->parentDisplayPtr->fillRect(x, y, 15 * (_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN), _DUAL_VFO_WIDGET_FREQUENCY_STEP_HEIGHT, TFT_BLACK);
+  this->parentDisplayPtr->fillRect(x, y, 15 * (_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN), _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, TFT_BLACK);
   bool hideStep = false;
   if (step > 0)
   {
     switch (step)
     {
     case 1: // 1 hz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 14);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 14);
       break;
     case 10: // 10 hz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 13);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 13);
       break;
     case 100: // 100 hz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 12);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 12);
       break;
     case 1000: // 1 Khz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 10);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 10);
       break;
     case 10000: // 10 Khz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 9);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 9);
       break;
     case 100000: // 100 Khz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 8);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 8);
       break;
     case 1000000: // 1 Mhz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 6);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 6);
       break;
     case 10000000: // 10 Mhz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 5);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 5);
       break;
     case 100000000: // 100 Mhz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 4);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 4);
       break;
     case 1000000000: // 1 Ghz
-      x += ((_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 2);
+      x += ((_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN) * 2);
       break;
     case 10000000000: // 10 Ghz
-      x += (_DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _DUAL_VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN);
+      x += (_VFO_WIDGET_FREQUENCY_STEP_WIDTH + _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN);
       break;
     case 100000000000: // 100 Ghz
       break;
@@ -200,7 +200,7 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
     }
     if (!hideStep)
     {
-      this->parentDisplayPtr->fillRect(x, y, _DUAL_VFO_WIDGET_FREQUENCY_STEP_WIDTH, _DUAL_VFO_WIDGET_FREQUENCY_STEP_HEIGHT, this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
+      this->parentDisplayPtr->fillRect(x, y, _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
     }
   }
 }

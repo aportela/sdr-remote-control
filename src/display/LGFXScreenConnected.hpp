@@ -4,7 +4,7 @@
 #include <LovyanGFX.hpp>
 #include "LGFXScreen.hpp"
 #include "../Transceiver.hpp"
-#include "widgets/LGFXDualVFOWidget.hpp"
+#include "widgets/LGFXVFOWidget.hpp"
 #include "widgets/LGFXDigitalSMeterWidget.hpp"
 #include "widgets/LGFXVolumeSquelchWidget.hpp"
 #include "widgets/LGFXFilterWidget.hpp"
@@ -18,7 +18,8 @@ private:
     uint8_t currentSignal = 0;
     uint8_t peakSignal = 0;
     long lastPeakChange;
-    LGFXDualVFOWidget *vfoWidget = nullptr;
+    LGFXVFOWidget *primaryVFOWidget = nullptr;
+    LGFXVFOWidget *secondaryVFOWidget = nullptr;
     LGFXDigitalSMeterWidget *digitalSMeterWidget = nullptr;
     LGFXVolumeSquelchWidget *volumeSquelchWidget = nullptr;
     LGFXFilterWidget *filterWidget = nullptr;
