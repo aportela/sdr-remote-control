@@ -265,7 +265,7 @@ bool LGFXScreenConnected::Refresh(bool force)
     if (this->parentDisplay != nullptr)
     {
         bool changed = false;
-        if (this->secondaryVFOWidget->refresh(force))
+        if (this->primaryVFOWidget->refresh(force))
         {
             changed = true;
         }
