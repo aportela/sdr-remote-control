@@ -208,30 +208,30 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
 bool LGFXVFOWidget::refresh(bool force)
 {
   bool changed = force;
-  bool currentActiveStatus = this->currentTransceiverStatusPtr->activeVFOIndex == this->index;
-  if (force || currentActiveStatus != this->isActive)
+  bool previousActiveFlag = this->isActive;
+  this->isActive = this->currentTransceiverStatusPtr->activeVFOIndex == this->index;
+  if (force || this->isActive != previousActiveFlag)
   {
     this->printIndex();
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
+  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
   {
     this->printFrequency(this->currentTransceiverStatusPtr->VFO[this->index].frequency);
     this->previousFrequency = this->currentTransceiverStatusPtr->VFO[this->index].frequency;
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
+  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
   {
     this->printMode(this->currentTransceiverStatusPtr->VFO[this->index].mode);
     this->previousMode = this->currentTransceiverStatusPtr->VFO[this->index].mode;
     changed = true;
   }
-  if (force || currentActiveStatus != this->isActive || this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
+  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
   {
     this->printFrequencyStep(this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
     this->previousFrequencyStep = this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep;
     changed = true;
   }
-  this->isActive = currentActiveStatus;
   return (changed);
 }
