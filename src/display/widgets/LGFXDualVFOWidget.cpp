@@ -21,16 +21,9 @@ LGFXDualVFOWidget::LGFXDualVFOWidget(LovyanGFX *displayPtr, uint16_t width, uint
 {
   if (displayPtr != nullptr)
   {
-    Serial.println("LGFXDualVFOWidget::LGFXDualVFOWidget");
-    // MAL
-    Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
     if (currentTransceiverStatusPtr != nullptr)
     {
-      Serial.println("DIFERENTE");
       this->refresh(true);
-      Serial.println("LGFXDualVFOWidget::refresh");
-      //  MAL
-      Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
     }
   }
 }
@@ -210,8 +203,6 @@ bool LGFXDualVFOWidget::refresh(bool force)
   }
   if (force || (this->currentTransceiverStatusPtr->VFO[0].frequency != this->previousActiveVFOFrequency))
   {
-    Serial.println("Refrescando frequencia 0");
-    Serial.println(this->currentTransceiverStatusPtr->VFO[0].frequency);
     this->refreshVFOFreq(0, this->currentTransceiverStatusPtr->activeVFOIndex == 0, this->currentTransceiverStatusPtr->VFO[0].frequency);
     this->previousActiveVFOFrequency = this->currentTransceiverStatusPtr->VFO[0].frequency;
     changed = true;
