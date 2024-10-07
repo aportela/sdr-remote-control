@@ -208,26 +208,30 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
 bool LGFXVFOWidget::refresh(bool force)
 {
   bool changed = force;
-  bool previousActiveFlag = this->isActive;
-  this->isActive = this->currentTransceiverStatusPtr->activeVFOIndex == this->index;
-  if (force || this->isActive != previousActiveFlag)
+  bool activeStatusChanged = false;
+  if (this->isActive != this->currentTransceiverStatusPtr->activeVFOIndex == this->index)
+  {
+    this->isActive = !this->isActive;
+    activeStatusChanged = true;
+  }
+  if (force || activeStatusChanged)
   {
     this->printIndex();
     changed = true;
   }
-  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
+  if (force || activeStatusChanged || this->currentTransceiverStatusPtr->VFO[this->index].frequency != this->previousFrequency)
   {
     this->printFrequency(this->currentTransceiverStatusPtr->VFO[this->index].frequency);
     this->previousFrequency = this->currentTransceiverStatusPtr->VFO[this->index].frequency;
     changed = true;
   }
-  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
+  if (force || activeStatusChanged || this->currentTransceiverStatusPtr->VFO[this->index].mode != this->previousMode)
   {
     this->printMode(this->currentTransceiverStatusPtr->VFO[this->index].mode);
     this->previousMode = this->currentTransceiverStatusPtr->VFO[this->index].mode;
     changed = true;
   }
-  if (force || this->isActive != previousActiveFlag || this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
+  if (force || activeStatusChanged || this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep != this->previousFrequencyStep)
   {
     this->printFrequencyStep(this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep);
     this->previousFrequencyStep = this->currentTransceiverStatusPtr->VFO[this->index].frequencyStep;
