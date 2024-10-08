@@ -11,7 +11,7 @@
 #include "src/controls/RotaryControl.hpp"
 #include "src/Transceiver.hpp"
 
-#define DEBUG_DUMMY_CONNECTION
+// #define DEBUG_DUMMY_CONNECTION
 
 #ifdef DEBUG_FPS
 #include "src/utils/FPS.hpp"
