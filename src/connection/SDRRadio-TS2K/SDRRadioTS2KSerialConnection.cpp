@@ -38,7 +38,7 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
 
 void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
 {
-    if (trx != nullptr && currentTrxStatus != nullptr && !currentTrxStatus->lockedByControls)
+    if (trx != nullptr && currentTrxStatus != nullptr)
     {
         /*
         this->send("FA;");   // get frequency
@@ -61,32 +61,55 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
             if (receivedData.startsWith("FA") && receivedData != "FA")
             {
                 this->lastRXValidCommand = millis();
-                uint64_t f = receivedData.substring(2).toInt();
-                trx->setActiveVFOFrequency(f);
+                // ignore received frequency if we change manually from rotary encoder in the last 500ms
+                if (millis() - currentTrxStatus->lastFrequencyChangedByLocalControl > 500)
+                {
+                    uint64_t f = receivedData.substring(2).toInt();
+                    if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency != f)
+                    {
+                        trx->setActiveVFOFrequency(f);
+                    }
+                }
                 trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("MD") && receivedData != "MD")
             {
                 this->lastRXValidCommand = millis();
-                trx->setVFOMode(currentTrxStatus->activeVFOIndex, (TrxVFOMode)receivedData.substring(2).toInt());
+                TrxVFOMode mode = (TrxVFOMode)receivedData.substring(2).toInt();
+                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].mode != mode)
+                {
+                    trx->setVFOMode(currentTrxStatus->activeVFOIndex, mode);
+                }
                 trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("SL") && receivedData != "SL")
             {
                 this->lastRXValidCommand = millis();
-                trx->setVFOFilterLowCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
+                uint64_t lowFilter = receivedData.substring(2).toInt();
+                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].LF != lowFilter)
+                {
+                    trx->setVFOFilterLowCut(currentTrxStatus->activeVFOIndex, lowFilter);
+                }
                 trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("SH") && receivedData != "SH")
             {
                 this->lastRXValidCommand = millis();
-                trx->setVFOFilterHighCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
+                uint64_t highFilter = receivedData.substring(2).toInt();
+                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].HF != highFilter)
+                {
+                    trx->setVFOFilterHighCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
+                }
                 trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("AG") && receivedData != "AG")
             {
                 this->lastRXValidCommand = millis();
-                trx->setAFGain(receivedData.substring(2).toInt());
+                uint8_t AFGain = receivedData.substring(2).toInt();
+                if (currentTrxStatus->AFGain != AFGain)
+                {
+                    trx->setAFGain(AFGain);
+                }
                 trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("MU") && receivedData != "MU")
@@ -106,7 +129,8 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
             else if (receivedData.startsWith("SM") && receivedData != "SM")
             {
                 this->lastRXValidCommand = millis();
-                trx->setSignalMeter(SIGNAL_METER_TS2K_SDR_RADIO_LEVEL, receivedData.substring(2).toInt());
+                uint8_t smLevel = receivedData.substring(2).toInt();
+                trx->setSignalMeter(SIGNAL_METER_TS2K_SDR_RADIO_LEVEL, smLevel);
                 trx->incSerialCommandCount();
             }
         }
