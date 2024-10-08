@@ -160,13 +160,17 @@ bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
   }
 }
 
-bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR)
+bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool changedByRemote)
 {
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency + hz <= UINT64_MAX)
     {
+      if (!changedByRemote)
+      {
+        currentStatus.lastFrequencyChangedByLocalControl = millis();
+      }
       currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
@@ -181,13 +185,17 @@ bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR)
   }
 }
 
-bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR)
+bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool changedByRemote)
 {
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
     if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency > 0 && hz <= currentStatus.VFO[currentStatus.activeVFOIndex].frequency)
     {
+      if (!changedByRemote)
+      {
+        currentStatus.lastFrequencyChangedByLocalControl = millis();
+      }
       currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
@@ -279,20 +287,6 @@ bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, boo
     {
       return (false);
     }
-  }
-  else
-  {
-    return (false);
-  }
-}
-
-bool Transceiver::setLockedByControls(bool locked, bool fromISR)
-{
-  TransceiverStatus currentStatus;
-  if (this->getCurrentStatus(&currentStatus, fromISR))
-  {
-    currentStatus.lockedByControls = locked;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {

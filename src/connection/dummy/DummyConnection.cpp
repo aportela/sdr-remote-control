@@ -15,7 +15,7 @@ bool DummyConnection::tryConnection(Transceiver *trx)
 
 void DummyConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
 {
-    if (trx != nullptr && currentTrxStatus != nullptr && !currentTrxStatus->lockedByControls)
+    if (trx != nullptr && currentTrxStatus != nullptr)
     {
         if (millis() % 100 == 0)
         {
