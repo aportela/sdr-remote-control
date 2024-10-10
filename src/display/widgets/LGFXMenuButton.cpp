@@ -44,9 +44,9 @@ bool LGFXMenuButton::refresh(bool force)
         {
             this->parentDisplayPtr->setTextColor(BUTTON_ACTIVE_LABEL_COLOR, BUTTON_ACTIVE_BACKGROUND_COLOR);
         }
-        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 44, this->yOffset + this->padding + 5);
+        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _MENU_BUTTON_WIDGET_TOP_LABEL_X_OFFSET, this->yOffset + this->padding + _MENU_BUTTON_WIDGET_TOP_LABEL_Y_OFFSET);
         this->parentDisplayPtr->print(this->topLabel);
-        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 8, this->yOffset + this->padding + 26);
+        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _MENU_BUTTON_WIDGET_MAIN_LABEL_X_OFFSET, this->yOffset + this->padding + _MENU_BUTTON_WIDGET_MAIN_LABEL_Y_OFFSET);
         this->parentDisplayPtr->print(this->bottomLabel);
         this->changed = false;
     }
