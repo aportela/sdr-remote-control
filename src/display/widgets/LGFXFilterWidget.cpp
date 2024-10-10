@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <cinttypes>
 #include "LGFXFilterWidget.hpp"
+#include "../../Bandwith.hpp"
 
 LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
@@ -75,7 +76,47 @@ bool LGFXFilterWidget::refresh(bool force)
   bool changed = force;
   if (force || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF))
   {
-    this->refreshPlot(force, 0, 0, 3800, 3800, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    uint64_t maxLF = 0;
+    uint64_t maxHF = 0;
+    TrxVFOMode mode = TRX_VFO_MD_RESERVED;
+    switch (this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].mode)
+    {
+    case TRX_VFO_MD_DSB:
+    case TRX_VFO_MD_LSB:
+    case TRX_VFO_MD_USB:
+      maxLF = 4000;
+      maxHF = 4000;
+      break;
+    case TRX_VFO_MD_CW_U:
+    case TRX_VFO_MD_CW_L:
+      maxLF = 4000;
+      maxHF = 4000;
+      break;
+    case TRX_VFO_MD_FM:
+      maxLF = 16000;
+      maxHF = 16000;
+      break;
+    case TRX_VFO_MD_SAM:
+      maxLF = 24000;
+      maxHF = 24000;
+      break;
+    case TRX_VFO_MD_WFM:
+      maxLF = 48000;
+      maxHF = 48000;
+      break;
+    case TRX_VFO_MD_BFM:
+      maxLF = 350000;
+      maxHF = 350000;
+    default:
+      // this is for set a "medium" trapezium on unknown modes
+      maxLF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF * 2;
+      maxHF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF * 2;
+      break;
+    }
+    if (maxLF > 0 && maxHF > 0)
+    {
+      this->refreshPlot(force, 0, 0, maxLF, maxHF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+    }
     this->refreshLabels(force, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
     this->oldLFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF;
     this->oldHFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF;
