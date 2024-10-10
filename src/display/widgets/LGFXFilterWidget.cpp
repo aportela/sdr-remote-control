@@ -61,7 +61,8 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
   this->parentDisplayPtr->print("PRESET");
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
-  this->parentDisplayPtr->print(" 1/8");
+  // this->parentDisplayPtr->print(" 1/8");
+  this->parentDisplayPtr->print("CUSTOM");
   // TODO: human units
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding);
   this->parentDisplayPtr->printf("BANDWITH:%" PRIu64 "Hz   ", lowCut + highCut);
