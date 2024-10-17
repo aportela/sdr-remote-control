@@ -1,56 +1,40 @@
 #include "Keypad8.hpp"
+#include <Arduino.h>
 
-static KeyPad8KeyCallback KP8Callbacks[8] = {nullptr};
+#define DEBOUNCE_MS_INTERVAL 5
 
-static void IRAM_ATTR KP8KeyInterruptHandler(KeyPad8FKey KeyPad8FKey)
+Bounce *Keypad8::KP8Buttons[KP8_BUTTON_COUNT];
+
+void Keypad8::init(const uint8_t (&buttonPins)[KP8_BUTTON_COUNT])
 {
-    if (KP8Callbacks[KeyPad8FKey])
+    for (int i = 0; i < KP8_BUTTON_COUNT; i++)
     {
-        KP8Callbacks[KeyPad8FKey]();
+        Keypad8::KP8Buttons[i] = new Bounce();
+        Keypad8::KP8Buttons[i]->attach(buttonPins[i], INPUT_PULLUP);
+        Keypad8::KP8Buttons[i]->interval(DEBOUNCE_MS_INTERVAL);
     }
 }
 
-// Funciones estáticas para manejar las interrupciones de cada tecla
-static void IRAM_ATTR KP8OnkeyF1() { KP8KeyInterruptHandler(KP8_F1); }
-static void IRAM_ATTR KP8OnkeyF2() { KP8KeyInterruptHandler(KP8_F2); }
-static void IRAM_ATTR KP8OnkeyF3() { KP8KeyInterruptHandler(KP8_F3); }
-static void IRAM_ATTR KP8OnkeyF4() { KP8KeyInterruptHandler(KP8_F4); }
-static void IRAM_ATTR KP8OnkeyF5() { KP8KeyInterruptHandler(KP8_F5); }
-static void IRAM_ATTR KP8OnkeyF6() { KP8KeyInterruptHandler(KP8_F6); }
-static void IRAM_ATTR KP8OnkeyF7() { KP8KeyInterruptHandler(KP8_F7); }
-static void IRAM_ATTR KP8OnkeyF8() { KP8KeyInterruptHandler(KP8_F8); }
-
-void Keypad8::initKey(KeyPad8FKey FKey, uint8_t pin, KeyPad8KeyCallback callback)
+void Keypad8::cleanup(void)
 {
-    pinMode(pin, INPUT_PULLUP);
-    KP8Callbacks[FKey] = callback;
-
-    // Asociar la interrupción al pin correspondiente
-    switch (FKey)
+    for (int i = 0; i < KP8_BUTTON_COUNT; i++)
     {
-    case KP8_F1:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF1, RISING);
-        break;
-    case KP8_F2:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF2, RISING);
-        break;
-    case KP8_F3:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF3, RISING);
-        break;
-    case KP8_F4:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF4, RISING);
-        break;
-    case KP8_F5:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF5, RISING);
-        break;
-    case KP8_F6:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF6, RISING);
-        break;
-    case KP8_F7:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF7, RISING);
-        break;
-    case KP8_F8:
-        attachInterrupt(digitalPinToInterrupt(pin), KP8OnkeyF8, RISING);
-        break;
+        delete Keypad8::KP8Buttons[i];
+        Keypad8::KP8Buttons[i] = nullptr; // Limpia el puntero
     }
+}
+
+uint8_t Keypad8::loop(void)
+{
+    uint8_t pressedButtonsMask = 0;
+    for (int i = 0; i < KP8_BUTTON_COUNT; i++)
+    {
+        Keypad8::KP8Buttons[i]->update();
+
+        if (Keypad8::KP8Buttons[i]->fell())
+        {
+            pressedButtonsMask |= (1 << i);
+        }
+    }
+    return pressedButtonsMask;
 }
