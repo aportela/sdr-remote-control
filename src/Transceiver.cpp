@@ -134,7 +134,7 @@ bool Transceiver::toggleActiveVFO(bool fromISR)
 
 bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR)
 {
-  if (frequency >= 0 && frequency <= UINT64_MAX)
+  if (frequency >= 0 && frequency <= MAX_FREQUENCY)
   {
     TransceiverStatus currentStatus;
     if (this->getCurrentStatus(&currentStatus, fromISR))
@@ -163,7 +163,7 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fro
 
 bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
 {
-  if (frequency >= 0 && frequency <= UINT64_MAX)
+  if (frequency >= 0 && (frequency >= MIN_FREQUENCY || frequency <= MAX_FREQUENCY))
   {
     TransceiverStatus currentStatus;
     if (this->getCurrentStatus(&currentStatus, fromISR))
@@ -187,13 +187,14 @@ bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool ch
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency + hz <= UINT64_MAX)
+    uint64_t hzIncrement = hz * currentStatus.VFO[currentStatus.activeVFOIndex].frequencyStep;
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency + hzIncrement <= MAX_FREQUENCY)
     {
       if (!changedByRemote)
       {
         currentStatus.lastFrequencyChangedByLocalControl = millis();
       }
-      currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hz;
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hzIncrement;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -212,13 +213,14 @@ bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool ch
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency > 0 && hz <= currentStatus.VFO[currentStatus.activeVFOIndex].frequency)
+    uint64_t hzDecrement = hz * currentStatus.VFO[currentStatus.activeVFOIndex].frequencyStep;
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency > 0 && hzDecrement <= currentStatus.VFO[currentStatus.activeVFOIndex].frequency)
     {
       if (!changedByRemote)
       {
         currentStatus.lastFrequencyChangedByLocalControl = millis();
       }
-      currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hz;
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hzDecrement;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
