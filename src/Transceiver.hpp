@@ -95,15 +95,18 @@ public:
 
   bool setPowerOnStatus(bool powerOnStatus, bool fromISR = false);
   bool setRadioName(const char *radioName, bool fromISR = false);
+  bool toggleActiveVFO(bool fromISR = false);
   bool setActiveVFO(uint8_t VFOIndex, bool fromISR = false);
   bool setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR = false);
   bool setActiveVFOFrequency(uint64_t frequency, bool fromISR = false);
   bool incrementActiveVFOFrequency(uint64_t hz, bool fromISR = false, bool changedByRemote = false);
   bool decrementActiveVFOFrequency(uint64_t hz, bool fromISR = false, bool changedByRemote = false);
   bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR = false);
+  bool toggleActiveVFOMode(bool fromISR = false);
   bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR = false);
   bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR = false);
   bool setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR = false);
+  bool toggleActiveVFOCustomStep(bool fromISR = false);
 
   bool setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool fromISR = false);
 

@@ -110,6 +110,28 @@ bool Transceiver::setActiveVFO(uint8_t VFOIndex, bool fromISR)
   }
 }
 
+bool Transceiver::toggleActiveVFO(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    switch (currentStatus.activeVFOIndex)
+    {
+    case 0:
+      currentStatus.activeVFOIndex = 1;
+      break;
+    case 1:
+      currentStatus.activeVFOIndex = 0;
+      break;
+    }
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fromISR)
 {
   if (frequency >= 0 && frequency <= UINT64_MAX)
@@ -231,6 +253,50 @@ bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR)
   }
 }
 
+bool Transceiver::toggleActiveVFOMode(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    switch (currentStatus.VFO[currentStatus.activeVFOIndex].mode)
+    {
+    case TRX_VFO_MD_CW_L:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_CW_U;
+      break;
+    case TRX_VFO_MD_CW_U:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_LSB;
+      break;
+    case TRX_VFO_MD_LSB:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_USB;
+      break;
+    case TRX_VFO_MD_USB:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_DSB;
+      break;
+    case TRX_VFO_MD_DSB:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_SAM;
+      break;
+    case TRX_VFO_MD_SAM:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_FM;
+      break;
+    case TRX_VFO_MD_FM:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_WFM;
+      break;
+    case TRX_VFO_MD_WFM:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_BFM;
+      break;
+    case TRX_VFO_MD_BFM:
+    default:
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = TRX_VFO_MD_CW_L;
+      break;
+    }
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR)
 {
   TransceiverStatus currentStatus;
@@ -287,6 +353,27 @@ bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, boo
     {
       return (false);
     }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::toggleActiveVFOCustomStep(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].frequencyStep < 100000000000)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequencyStep *= 10;
+    }
+    else
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequencyStep = 1;
+    }
+    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
