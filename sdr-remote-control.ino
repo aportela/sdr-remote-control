@@ -11,6 +11,7 @@
 #include "src/controls/RotaryControl.hpp"
 #include "src/controls/Keypad8.hpp"
 #include "src/Transceiver.hpp"
+#include "src/Menu.hpp"
 
 #define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
 
@@ -37,6 +38,8 @@ LGFX *screen = nullptr;
 
 Transceiver *trx = nullptr;
 TransceiverStatus *trxStatus = nullptr;
+
+Menu *menu = nullptr;
 
 // ROTARY ENCODER PINS
 
@@ -183,9 +186,10 @@ void setup()
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
+  menu = new Menu();
 
 #ifdef DISPLAY_DRIVER_LOVYANN
-  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trxStatus);
+  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trxStatus, menu);
   screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
 #else
 #error NO DISPLAY DRIVER DEFINED

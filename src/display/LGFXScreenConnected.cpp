@@ -25,7 +25,7 @@
 
 using namespace aportela::microcontroller::utils;
 
-LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXScreen(display)
+LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr, const Menu *menuPtr) : LGFXScreen(display)
 {
     if (display != nullptr)
     {
@@ -37,7 +37,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
             this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
             this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, currentTransceiverStatusPtr);
             this->filterWidget = new LGFXFilterWidget(display, FILTER_WIDGET_WIDTH, FILTER_WIDGET_HEIGHT, FILTER_WIDGET_X_OFFSET, FILTER_WIDGET_Y_OFFSET, FILTER_WIDGET_PADDING, currentTransceiverStatusPtr);
-            this->menuWidget = new LGFXMenu(display, MENU_WIDGET_WIDTH, MENU_WIDGET_HEIGHT, MENU_WIDGET_X_OFFSET, MENU_WIDGET_Y_OFFSET, MENU_WIDGET_PADDING);
+            this->menuWidget = new LGFXMenu(display, MENU_WIDGET_WIDTH, MENU_WIDGET_HEIGHT, MENU_WIDGET_X_OFFSET, MENU_WIDGET_Y_OFFSET, MENU_WIDGET_PADDING, menuPtr);
             this->parentDisplay->setTextSize(1);
             this->parentDisplay->setCursor(CONNECTED_SCREEN_BOTTOM_INFO_X_OFFSET, CONNECTED_SCREEN_BOTTOM_INFO_Y_OFFSET);
             this->parentDisplay->printf("SDR-REMOTE-CONTROL v%s (%s) - CAT speed: %d baud - FPS: ", SDR_REMOTE_CONTROL_CURRENT_VERSION, SDR_REMOTE_CONTROL_CURRENT_VERSION_DATE, SERIAL_DEFAULT_BAUD_RATE);

@@ -4,6 +4,7 @@
 #include <LovyanGFX.hpp>
 #include "LGFXScreen.hpp"
 #include "../Transceiver.hpp"
+#include "../Menu.hpp"
 #include "widgets/LGFXVFOWidget.hpp"
 #include "widgets/LGFXDigitalSMeterWidget.hpp"
 #include "widgets/LGFXVolumeSquelchWidget.hpp"
@@ -29,7 +30,7 @@ private:
     void refreshDigitalSMeter(uint8_t newSignal);
 
 public:
-    LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr);
+    LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr = nullptr, const Menu *menuPtr = nullptr);
     ~LGFXScreenConnected();
     bool Refresh(bool force) override;
 };

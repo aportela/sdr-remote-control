@@ -47,7 +47,7 @@ const ButtonCallback buttonCallbacks[TOTAL_MENU_BUTTONS] = {
     defaultCallBack,
 };
 
-LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding)
+LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const Menu *menuPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), menuPtr(menuPtr)
 {
     if (displayPtr != nullptr)
     {
@@ -69,6 +69,7 @@ LGFXMenu::~LGFXMenu()
         this->buttons[i] = nullptr;
     }
     this->parentDisplayPtr = nullptr;
+    this->menuPtr = nullptr;
 }
 
 void LGFXMenu::initMenu(void)
