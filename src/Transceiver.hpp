@@ -8,6 +8,9 @@
 
 #define TRANSCEIVER_VFO_COUNT 2
 
+#define MIN_FREQUENCY 150000 // 150 Khz (FUNCUBE DONGLE PRO +)
+#define MAX_FREQUENCY 999999999999
+
 // bitmask definitions for checking changed values
 #define TRX_CFLAG_TRANSMIT_RECEIVE_POWER_STATUS (1 << 0) // 1
 #define TRX_CFLAG_TRANSMIT_RECEIVE_STATUS (1 << 1)       // 2
