@@ -9,9 +9,10 @@
 #include "src/DisplayConfiguration.hpp"
 #include "src/CommonDefines.hpp"
 #include "src/controls/RotaryControl.hpp"
+#include "src/controls/Keypad8.hpp"
 #include "src/Transceiver.hpp"
 
-// #define DEBUG_DUMMY_CONNECTION
+#define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
 
 #ifdef DEBUG_FPS
 #include "src/utils/FPS.hpp"
@@ -41,6 +42,17 @@ TransceiverStatus *trxStatus = nullptr;
 
 #define ENC1_A 19
 #define ENC1_B 21
+
+// KEYPAD8 PINS
+
+#define KP8_F1_PIN 13
+#define KP8_F2_PIN 12
+#define KP8_F3_PIN 14
+#define KP8_F4_PIN 27
+#define KP8_F5_PIN 26
+#define KP8_F6_PIN 25
+#define KP8_F7_PIN 33
+#define KP8_F8_PIN 32
 
 // bitmask definitions for encoder changes
 #define ENCODER_CHANGE_TUNE (1 << 0)        // 1
@@ -109,6 +121,55 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   }
 }
 
+void onKP8Loop(uint8_t pressedMask = 0)
+{
+  // F1
+  if (pressedMask & (1 << 0))
+  {
+    Serial.println("F1");
+    encoderChangeBitmask = ENCODER_CHANGE_TUNE;
+  }
+  // F2
+  if (pressedMask & (1 << 1))
+  {
+    Serial.println("F2");
+    encoderChangeBitmask = ENCODER_CHANGE_VOLUME;
+  }
+  // F3
+  if (pressedMask & (1 << 2))
+  {
+    Serial.println("F3");
+  }
+  // F4
+  if (pressedMask & (1 << 3))
+  {
+    Serial.println("F4");
+  }
+  // F5
+  if (pressedMask & (1 << 4))
+  {
+    Serial.println("F5");
+    trx->toggleActiveVFO(false);
+  }
+  // F6
+  if (pressedMask & (1 << 5))
+  {
+    Serial.println("F6");
+    trx->toggleActiveVFOCustomStep(false);
+  }
+  // F7
+  if (pressedMask & (1 << 6))
+  {
+    Serial.println("F7");
+    trx->toggleActiveVFOMode(false);
+  }
+  // F8
+  if (pressedMask & (1 << 7))
+  {
+    Serial.println("F8");
+  }
+}
+
 void setup()
 {
 #ifdef DEBUG_DUMMY_CONNECTION
@@ -118,6 +179,7 @@ void setup()
 #endif
 
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
+  Keypad8::init({KP8_F1_PIN, KP8_F2_PIN, KP8_F3_PIN, KP8_F4_PIN, KP8_F5_PIN, KP8_F6_PIN, KP8_F7_PIN, KP8_F8_PIN});
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
@@ -132,6 +194,7 @@ void setup()
 
 void loop()
 {
+  onKP8Loop(Keypad8::loop());
   if (trx->getCurrentStatus(trxStatus))
   {
     if (!trxStatus->poweredOn)
