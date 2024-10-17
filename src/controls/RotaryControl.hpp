@@ -1,7 +1,6 @@
 #ifndef SDR_REMOTE_CONTROL_ROTARY_CONTROL_H
 #define SDR_REMOTE_CONTROL_ROTARY_CONTROL_H
 
-#include <Arduino.h>
 #include <stdint.h>
 
 enum RotaryControlChange
@@ -14,7 +13,7 @@ typedef void (*RotaryControlCallback)(uint8_t, uint64_t);
 
 class RotaryControl
 {
-public:
+private:
     static uint8_t pinA;
     static uint8_t pinB;
     static RotaryControlCallback RCCallbacks[2];
@@ -24,6 +23,8 @@ public:
     static void RCInterruptHandler(RotaryControlChange rcChange, uint8_t acceleratedDelta, uint64_t lastEncoderMillis);
     static void counterClockWiseCallback(uint8_t pinA, uint8_t pinB);
     static void clockWiseCallback(uint8_t pinA, uint8_t pinB);
+
+public:
     static void init(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback);
 };
 

@@ -1,4 +1,5 @@
 #include "RotaryControl.hpp"
+#include <Arduino.h>
 
 uint8_t RotaryControl::pinA = 0;
 uint8_t RotaryControl::pinB = 0;
