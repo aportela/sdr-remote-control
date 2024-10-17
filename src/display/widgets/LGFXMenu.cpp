@@ -13,11 +13,11 @@ const char *buttonLabels[TOTAL_MENU_BUTTONS] = {
     "VFO MODE",
     ">>>>>>>>",
 
+    "VFO A=>B",
+    "VFO B=>A",
     "+++ BAND",
     "--- BAND",
     "SETTINGS",
-    "        ",
-    "        ",
     "        ",
     "        ",
     "<<<<<<<<",
