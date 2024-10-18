@@ -128,4 +128,4 @@ public:
   uint64_t getSerialCommandCount(void);
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_TRANSCEIVER_H
