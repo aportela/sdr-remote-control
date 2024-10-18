@@ -4,8 +4,10 @@
 #include "../CommonDefines.hpp"
 
 #ifdef DEBUG_FPS
+
 #include "../utils/FPS.hpp"
-#endif
+
+#endif // DEBUG_FPS
 
 #ifdef DISPLAY_LOVYANN_ILI9488_480x320
 
@@ -291,6 +293,7 @@ bool LGFXScreenConnected::Refresh(bool force)
             changed = true;
         }
 #ifdef DEBUG_FPS
+
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)
         {
@@ -300,7 +303,8 @@ bool LGFXScreenConnected::Refresh(bool force)
             this->parentDisplay->drawString(str, CONNECTED_SCREEN_BOTTOM_INFO_LABEL_FPS_X_OFFSET, CONNECTED_SCREEN_BOTTOM_INFO_Y_OFFSET);
             changed = true;
         }
-#endif
+
+#endif // DEBUG_FPS
         return (changed);
     }
     else

@@ -18,4 +18,4 @@ public:
     static uint8_t loop(void);
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_KEYPAD8_CONTROL_H

@@ -10,8 +10,10 @@ LGFXScreen::LGFXScreen(LovyanGFX *display) : parentDisplay(display)
         this->parentDisplay->fillScreen(TFT_BLACK);
         this->parentDisplay->setTextWrap(false);
 #ifdef DEBUG_SCREEN_BOUNDS
+
         this->parentDisplay->drawRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, TFT_WHITE);
-#endif
+
+#endif // DEBUG_SCREEN_BOUNDS
     }
 }
 

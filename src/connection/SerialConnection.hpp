@@ -34,4 +34,4 @@ protected:
     void send(String str);
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_SERIAL_CONNECTION_H

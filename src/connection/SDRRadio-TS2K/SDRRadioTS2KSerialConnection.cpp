@@ -40,19 +40,22 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
 {
     if (trx != nullptr && currentTrxStatus != nullptr)
     {
-        /*
-        this->send("FA;");   // get frequency
-        this->send("MD;");   // get mode
-        this->send("SL;");   // get low filter
-        this->send("SH;");   // get high filter
-        this->send("AG0;");  // get af gain (volume)
-        this->send("MU;");   // get audio mute status
-        this->send("SM0;");  // get signal meter level
-        */
-        // this works BETTER than sending separated commands (with own delay)
-        if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
+        bool sendRequired = false;
+        char buffer[64] = {'\0'};
+        // ignore receive frequency sent cmd if we change manually from rotary encoder in the last 500ms
+        if (millis() - currentTrxStatus->lastFrequencyChangedByLocalControl > 250)
         {
-            this->send("FA;MD;SL;SH;AG0;MU;SM0;");
+            snprintf(buffer, sizeof(buffer), "FA%011" PRIu64 ";MD;SL;SH;AG0;MU;SM0;", currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency);
+            sendRequired = true;
+        }
+        else if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
+        {
+            snprintf(buffer, sizeof(buffer), "%s", "FA;MD;SL;SH;AG0;MU;SM0;");
+            sendRequired = true;
+        }
+        if (sendRequired)
+        {
+            this->send(buffer);
         }
         while (this->serial->available() > 0)
         {

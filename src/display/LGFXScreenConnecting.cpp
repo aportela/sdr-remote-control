@@ -56,6 +56,7 @@ bool LGFXScreenConnecting::Refresh(bool force)
         bool changed = true;
         this->animatedScreenPtr->refresh(true);
 #ifdef DEBUG_FPS
+
         uint16_t currentFPS = FPS::GetFPS();
         if (force || this->previousFPS != currentFPS)
         {
@@ -64,7 +65,8 @@ bool LGFXScreenConnecting::Refresh(bool force)
             this->parentDisplay->drawString(str, LABEL_FPS_X_OFFSET, LABEL_FPS_Y_OFFSET);
             changed = true;
         }
-#endif
+
+#endif // DEBUG_FPS
         return (changed);
     }
     else

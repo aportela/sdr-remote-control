@@ -16,24 +16,34 @@
 #define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
 
 #ifdef DEBUG_FPS
+
 #include "src/utils/FPS.hpp"
-#endif
+
+#endif // DEBUG_FPS
 
 using namespace aportela::microcontroller::utils;
 
 #ifdef DEBUG_DUMMY_CONNECTION
+
 #include "src/connection/dummy/DummyConnection.hpp"
+
 #else
+
 #include "src/connection/SDRRadio-TS2K/SDRRadioTS2KSerialConnection.hpp"
-#endif
+
+#endif // DEBUG_DUMMY_CONNECTION
 
 #include "src/display/ScreenType.hpp"
 
 #ifdef DISPLAY_DRIVER_LOVYANN
+
 #include "src/display/LGFX.hpp"
 LGFX *screen = nullptr;
+
 #else
+
 #error NO DISPLAY DRIVER DEFINED
+
 #endif // DISPLAY_DRIVER_LOVYANN
 
 Transceiver *trx = nullptr;
@@ -71,10 +81,14 @@ volatile uint8_t encoderChangeBitmask = 0;
 volatile uint64_t lastEncoderMillis = 0;
 
 #ifdef DEBUG_DUMMY_CONNECTION
+
 DummyConnection *connection;
+
 #else
+
 SDRRadioTS2KSerialConnection *connection;
-#endif
+
+#endif // DEBUG_DUMMY_CONNECTION
 
 void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
@@ -82,10 +96,14 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
+
     trx->incrementActiveVFOFrequency(acceleratedDelta, true);
+
 #else
+
     trx->incrementActiveVFOFrequency(1, true);
-#endif
+
+#endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
@@ -106,10 +124,14 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
+
     trx->decrementActiveVFOFrequency(acceleratedDelta, true);
+
 #else
+
     trx->decrementActiveVFOFrequency(1, true);
-#endif
+
+#endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
@@ -176,10 +198,14 @@ void onKP8Loop(uint8_t pressedMask = 0)
 void setup()
 {
 #ifdef DEBUG_DUMMY_CONNECTION
+
   connection = new DummyConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
+
 #else
+
   connection = new SDRRadioTS2KSerialConnection(&Serial, SERIAL_DEFAULT_BAUD_RATE, SERIAL_TIMEOUT);
-#endif
+
+#endif // DEBUG_DUMMY_CONNECTION
 
   RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
   Keypad8::init({KP8_F1_PIN, KP8_F2_PIN, KP8_F3_PIN, KP8_F4_PIN, KP8_F5_PIN, KP8_F6_PIN, KP8_F7_PIN, KP8_F8_PIN});
@@ -189,10 +215,14 @@ void setup()
   menu = new Menu();
 
 #ifdef DISPLAY_DRIVER_LOVYANN
+
   screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trxStatus, menu);
   screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
+
 #else
+
 #error NO DISPLAY DRIVER DEFINED
+
 #endif // DISPLAY_DRIVER_LOVYANN
 }
 
@@ -212,8 +242,11 @@ void loop()
     else
     {
 #ifdef DEBUG_DUMMY_CONNECTION
+
       connection->loop(trx, trxStatus);
+
 #else
+
       if (connection->isDisconnectedByTimeout())
       {
         trx->setPowerOnStatus(false);
@@ -223,7 +256,8 @@ void loop()
       {
         connection->loop(trx, trxStatus);
       }
-#endif
+
+#endif // DEBUG_DUMMY_CONNECTION
     }
   }
 #ifdef DISPLAY_DRIVER_LOVYANN

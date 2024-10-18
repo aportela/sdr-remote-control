@@ -15,4 +15,4 @@ public:
     bool tryConnection(Transceiver *trx) override;
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_SDRRADIO_TS2K_SERIAL_CONNECTION_H

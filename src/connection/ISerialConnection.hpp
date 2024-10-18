@@ -13,4 +13,4 @@ public:
     virtual void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus) = 0;
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_SERIAL_CONNECTION_INTERFACE

@@ -28,4 +28,4 @@ public:
     static void init(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback);
 };
 
-#endif
+#endif // SDR_REMOTE_CONTROL_ROTARY_CONTROL_H
