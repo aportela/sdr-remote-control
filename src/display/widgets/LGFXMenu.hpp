@@ -12,7 +12,7 @@
 class LGFXMenu : public LGFXWidget
 {
 private:
-    LGFXMenuButton *buttons[TOTAL_MENU_BUTTONS];
+    LGFXMenuButton *buttons[TOTAL_MENU_ITEMS];
     uint8_t currentPage = 0;
     uint8_t totalPages = 0;
     const Menu *menuPtr = nullptr;

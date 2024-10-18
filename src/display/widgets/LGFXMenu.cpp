@@ -3,7 +3,7 @@
 #define DEFAULT_COLOR 0xFFFF
 #define DEFAULT_BG 0x0000
 
-const char *buttonLabels[TOTAL_MENU_BUTTONS] = {
+const char *buttonLabels[TOTAL_MENU_ITEMS] = {
     "  TUNE  ",
     " VOLUME ",
     " FILTER ",
@@ -27,7 +27,7 @@ void defaultCallBack(void)
 {
 }
 
-const ButtonCallback buttonCallbacks[TOTAL_MENU_BUTTONS] = {
+const ButtonCallback buttonCallbacks[TOTAL_MENU_ITEMS] = {
     defaultCallBack,
     defaultCallBack,
     defaultCallBack,
@@ -63,7 +63,7 @@ LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint1
 
 LGFXMenu::~LGFXMenu()
 {
-    for (uint8_t i = 0; i < TOTAL_MENU_BUTTONS; i++)
+    for (uint8_t i = 0; i < TOTAL_MENU_ITEMS; i++)
     {
         delete (this->buttons[i]);
         this->buttons[i] = nullptr;
@@ -74,10 +74,10 @@ LGFXMenu::~LGFXMenu()
 
 void LGFXMenu::initMenu(void)
 {
-    for (uint8_t i = 0, f = 1, row = 0, col = 0; i < TOTAL_MENU_BUTTONS; i++, f++)
+    for (uint8_t i = 0, f = 1, row = 0, col = 0; i < TOTAL_MENU_ITEMS; i++, f++)
     {
         char topLabel[8];
-        if (f > BUTTONS_PER_PAGE)
+        if (f > MENU_ITEMS_PER_PAGE)
         {
             f = 1;
         }
@@ -98,12 +98,12 @@ void LGFXMenu::initMenu(void)
             buttonCallbacks[i]                                                                                          // callback
         );
         col++;
-        if (col == COLS_PER_PAGE)
+        if (col == MENU_ITEMS_COLS_PER_PAGE)
         {
             col = 0;
             row++;
         }
-        if (row == ROWS_PER_PAGE)
+        if (row == MENU_ITEMS_ROWS_PER_PAGE)
         {
             row = 0;
         }
@@ -113,8 +113,8 @@ void LGFXMenu::initMenu(void)
 bool LGFXMenu::refresh(bool force)
 {
     bool changed = force;
-    uint8_t startIndex = this->currentPage * BUTTONS_PER_PAGE;
-    uint8_t endIndex = startIndex + BUTTONS_PER_PAGE;
+    uint8_t startIndex = this->currentPage * MENU_ITEMS_PER_PAGE;
+    uint8_t endIndex = startIndex + MENU_ITEMS_PER_PAGE;
     for (uint8_t i = startIndex; i < endIndex; i++)
     {
         if (force)
@@ -129,7 +129,7 @@ bool LGFXMenu::refresh(bool force)
 
 void LGFXMenu::setButtonEnabled(uint8_t btnIndex)
 {
-    if (btnIndex < BUTTONS_PER_PAGE)
+    if (btnIndex < MENU_ITEMS_PER_PAGE)
     {
         this->buttons[btnIndex]->setActive(true);
     }
@@ -137,7 +137,7 @@ void LGFXMenu::setButtonEnabled(uint8_t btnIndex)
 
 void LGFXMenu::setButtonDisabled(uint8_t btnIndex)
 {
-    if (btnIndex < BUTTONS_PER_PAGE)
+    if (btnIndex < MENU_ITEMS_PER_PAGE)
     {
         this->buttons[btnIndex]->setActive(false);
     }
