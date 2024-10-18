@@ -195,6 +195,26 @@ void onKP8Loop(uint8_t pressedMask = 0)
   }
 }
 
+const char *menuLabels[TOTAL_MENU_ITEMS] = {
+    "  TUNE  ",
+    " VOLUME ",
+    " FILTER ",
+    "SETTINGS",
+    "VFO  A/B",
+    "VFO STEP",
+    "VFO MODE",
+    ">>>>>>>>",
+
+    "VFO A=>B",
+    "VFO B=>A",
+    "+++ BAND",
+    "--- BAND",
+    "SETTINGS",
+    "        ",
+    "        ",
+    "<<<<<<<<",
+};
+
 void setup()
 {
 #ifdef DEBUG_DUMMY_CONNECTION
@@ -212,7 +232,7 @@ void setup()
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
-  menu = new Menu();
+  menu = new Menu(menuLabels);
 
 #ifdef DISPLAY_DRIVER_LOVYANN
 
