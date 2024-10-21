@@ -47,5 +47,13 @@ bool MenuItem::isActive(void)
 
 bool MenuItem::isBlinking(void)
 {
-    return (this->blink && millis() - this->blinkStartTimer < MENU_ITEM_BLINK_TIMER);
+    if (this->blink && millis() - this->blinkStartTimer < MENU_ITEM_BLINK_TIMER)
+    {
+        return (true);
+    }
+    else
+    {
+        this->blink = false;
+        return (false)
+    }
 }
