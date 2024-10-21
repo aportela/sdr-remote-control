@@ -299,6 +299,79 @@ bool Transceiver::toggleActiveVFOMode(bool fromISR)
   }
 }
 
+bool Transceiver::copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (sourceIndex < TRANSCEIVER_VFO_COUNT && destIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[destIndex].frequency = currentStatus.VFO[sourceIndex].frequency;
+      currentStatus.VFO[destIndex].mode = currentStatus.VFO[sourceIndex].mode;
+      currentStatus.VFO[destIndex].filter.changeMode = currentStatus.VFO[sourceIndex].filter.changeMode;
+      currentStatus.VFO[destIndex].filter.LF = currentStatus.VFO[sourceIndex].filter.LF;
+      currentStatus.VFO[destIndex].filter.HF = currentStatus.VFO[sourceIndex].filter.HF;
+      currentStatus.VFO[destIndex].frequencyStep = currentStatus.VFO[sourceIndex].frequencyStep;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setVFOFilterChangeMode(uint8_t VFOIndex, TrxVFOFilterChangeMode mode, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
+    {
+      currentStatus.VFO[VFOIndex].filter.changeMode = mode;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::toggleActiveVFOFilterChangeMode(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    switch (currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode)
+    {
+    case TRX_VFO_F_CM_BOTH:
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_LOW;
+      break;
+    case TRX_VFO_F_CM_LOW:
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_HIGH;
+      break;
+    case TRX_VFO_F_CM_HIGH:
+    default:
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_BOTH;
+      break;
+    }
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR)
 {
   TransceiverStatus currentStatus;
@@ -306,7 +379,7 @@ bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].LF = LF;
+      currentStatus.VFO[VFOIndex].filter.LF = LF;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -327,7 +400,7 @@ bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromIS
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].HF = HF;
+      currentStatus.VFO[VFOIndex].filter.HF = HF;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -545,6 +618,18 @@ bool Transceiver::setAudioUnMuted(bool fromISR)
   {
     return (false);
   }
+}
+
+bool Transceiver::increaseActiveVFOBand(bool fromISR)
+{
+  // TODO
+  return (false);
+}
+
+bool Transceiver::decreaseActiveVFOBand(bool fromISR)
+{
+  // TODO
+  return (false);
 }
 
 void Transceiver::incSerialCommandCount(void)
