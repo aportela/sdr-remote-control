@@ -11,6 +11,7 @@
 #include "src/controls/RotaryControl.hpp"
 #include "src/controls/Keypad8.hpp"
 #include "src/Transceiver.hpp"
+#include "src/MenuConfiguration.hpp"
 #include "src/Menu.hpp"
 
 #define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
@@ -112,8 +113,8 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
     /*
-    trx->VFO[trx->activeVFOIndex].LF += acceleratedDelta;
-    trx->VFO[trx->activeVFOIndex].HF += acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].filter.LF += acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].filter.HF += acceleratedDelta;
     */
   }
 }
@@ -140,79 +141,178 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
     /*
-    trx->VFO[trx->activeVFOIndex].LF -= acceleratedDelta;
-    trx->VFO[trx->activeVFOIndex].HF -= acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].filter.LF -= acceleratedDelta;
+    trx->VFO[trx->activeVFOIndex].filter.HF -= acceleratedDelta;
     */
   }
 }
 
 void onKP8Loop(uint8_t pressedMask = 0)
 {
+  uint8_t currentPage = menu->getCurrentPage();
   // F1
   if (pressedMask & (1 << 0))
   {
-    Serial.println("F1");
-    encoderChangeBitmask = ENCODER_CHANGE_TUNE;
+    switch (currentPage)
+    {
+    case 1: // TUNE
+      encoderChangeBitmask = ENCODER_CHANGE_TUNE;
+      menu->setActive(0, true, true);
+      break;
+    case 2: // VFO A => B
+      menu->click(8);
+      trx->copyVFO(0, 1, false);
+      break;
+    }
   }
   // F2
   if (pressedMask & (1 << 1))
   {
-    Serial.println("F2");
-    encoderChangeBitmask = ENCODER_CHANGE_VOLUME;
+    switch (currentPage)
+    {
+    case 1: // VOLUME
+      encoderChangeBitmask = ENCODER_CHANGE_VOLUME;
+      menu->setActive(1, true, true);
+      break;
+    case 2: // VFO B => A
+      menu->click(9);
+      trx->copyVFO(1, 0, false);
+      break;
+    }
   }
   // F3
   if (pressedMask & (1 << 2))
   {
-    Serial.println("F3");
+    switch (currentPage)
+    {
+    case 1: // FILTER
+      switch (encoderChangeBitmask)
+      {
+      case ENCODER_CHANGE_TUNE:
+      case ENCODER_CHANGE_VOLUME:
+      default:
+        encoderChangeBitmask = ENCODER_CHANGE_FILTER_BOTH;
+        break;
+      case ENCODER_CHANGE_FILTER_BOTH:
+        encoderChangeBitmask = ENCODER_CHANGE_FILTER_LOW;
+        break;
+      case ENCODER_CHANGE_FILTER_LOW:
+        encoderChangeBitmask = ENCODER_CHANGE_FILTER_HIGH;
+        break;
+      case ENCODER_CHANGE_FILTER_HIGH:
+        encoderChangeBitmask = ENCODER_CHANGE_FILTER_BOTH;
+        break;
+      }
+      menu->setActive(2, true, true);
+      break;
+    case 2: // +++ BAND
+      menu->click(10);
+      trx->increaseActiveVFOBand(false);
+      break;
+    }
   }
   // F4
   if (pressedMask & (1 << 3))
   {
-    Serial.println("F4");
+    switch (currentPage)
+    {
+    case 1: // SETTINGS
+      menu->click(3);
+      // TODO: show settings screen
+      break;
+    case 2: // --- BAND
+      menu->click(11);
+      trx->decreaseActiveVFOBand(false);
+      break;
+    }
   }
   // F5
   if (pressedMask & (1 << 4))
   {
-    Serial.println("F5");
-    trx->toggleActiveVFO(false);
+    switch (currentPage)
+    {
+    case 1: // VFO A/B
+      menu->click(4);
+      trx->toggleActiveVFO(false);
+      break;
+    }
   }
   // F6
   if (pressedMask & (1 << 5))
   {
-    Serial.println("F6");
-    trx->toggleActiveVFOCustomStep(false);
+    switch (currentPage)
+    {
+    case 1: // VFO STEP
+      menu->click(5);
+      trx->toggleActiveVFOCustomStep(false);
+      break;
+    }
   }
   // F7
   if (pressedMask & (1 << 6))
   {
-    Serial.println("F7");
-    trx->toggleActiveVFOMode(false);
+    switch (currentPage)
+    {
+    case 1: // VFO MODE
+      menu->click(5);
+      trx->toggleActiveVFOMode(false);
+      break;
+    }
   }
   // F8
   if (pressedMask & (1 << 7))
   {
-    Serial.println("F8");
+    switch (currentPage)
+    {
+    case 1: // NEXT PAGE
+      menu->click(7);
+      menu->nextPage();
+      break;
+
+    case 2: // PREVIOUS PAGE
+      menu->click(15);
+      menu->previousPage();
+      break;
+    }
   }
 }
 
 const char *menuLabels[TOTAL_MENU_ITEMS] = {
-    "  TUNE  ",
-    " VOLUME ",
-    " FILTER ",
-    "SETTINGS",
-    "VFO  A/B",
-    "VFO STEP",
-    "VFO MODE",
-    ">>>>>>>>",
+    "  TUNE  ", // F1 / PAGE 1 (BUTTON INDEX 0)
+    " VOLUME ", // F2 / PAGE 1 (BUTTON INDEX 1)
+    " FILTER ", // F3 / PAGE 1 (BUTTON INDEX 2)
+    "SETTINGS", // F4 / PAGE 1 (BUTTON INDEX 3)
+    "VFO  A/B", // F5 / PAGE 1 (BUTTON INDEX 4)
+    "VFO STEP", // F6 / PAGE 1 (BUTTON INDEX 5)
+    "VFO MODE", // F7 / PAGE 1 (BUTTON INDEX 6)
+    ">>>>>>>>", // F8 / PAGE 1 (BUTTON INDEX 7)
+    "VFO A=>B", // F1 / PAGE 2 (BUTTON INDEX 8)
+    "VFO B=>A", // F2 / PAGE 2 (BUTTON INDEX 9)
+    "+++ BAND", // F3 / PAGE 2 (BUTTON INDEX 10)
+    "--- BAND", // F4 / PAGE 2 (BUTTON INDEX 11)
+    "        ", // F5 / PAGE 2 (BUTTON INDEX 12)
+    "        ", // F6 / PAGE 2 (BUTTON INDEX 13)
+    "        ", // F7 / PAGE 2 (BUTTON INDEX 14)
+    "<<<<<<<<", // F8 / PAGE 2 (BUTTON INDEX 15)
+};
 
-    "VFO A=>B",
-    "VFO B=>A",
-    "+++ BAND",
-    "--- BAND",
-    "SETTINGS",
-    "        ",
-    "        ",
-    "<<<<<<<<",
+const availableMenuActions menuActions[TOTAL_MENU_ITEMS] = {
+    MENU_ACTION_CONTROL_TUNE,           // F1 / PAGE 1 (BUTTON INDEX 0)
+    MENU_ACTION_CONTROL_VOLUME,         // F2 / PAGE 1 (BUTTON INDEX 1)
+    MENU_ACTION_CONTROL_FILTER,         // F3 / PAGE 1 (BUTTON INDEX 2)
+    MENU_ACTION_SETTINGS,               // F4 / PAGE 1 (BUTTON INDEX 3)
+    MENU_ACTION_TOGGLE_ACTIVE_VFO,      // F5 / PAGE 1 (BUTTON INDEX 4)
+    MENU_ACTION_TOGGLE_ACTIVE_VFO_STEP, // F6 / PAGE 1 (BUTTON INDEX 5)
+    MENU_ACTION_TOGGLE_ACTIVE_VFO_MODE, // F7 / PAGE 1 (BUTTON INDEX 6)
+    MENU_ACTION_NEXT_PAGE,              // F8 / PAGE 1 (BUTTON INDEX 7)
+    MENU_ACTION_COPY_VFO_A_B,           // F1 / PAGE 2 (BUTTON INDEX 8)
+    MENU_ACTION_COPY_VFO_B_A,           // F2 / PAGE 2 (BUTTON INDEX 9)
+    MENU_ACTION_INCREASE_BAND,          // F3 / PAGE 2 (BUTTON INDEX 10)
+    MENU_ACTION_DECREASE_BAND,          // F4 / PAGE 2 (BUTTON INDEX 11)
+    MENU_ACTION_NONE,                   // F5 / PAGE 2 (BUTTON INDEX 12)
+    MENU_ACTION_NONE,                   // F6 / PAGE 2 (BUTTON INDEX 13)
+    MENU_ACTION_NONE,                   // F7 / PAGE 2 (BUTTON INDEX 14)
+    MENU_ACTION_PREVIOUS_PAGE,          // F8 / PAGE 2 (BUTTON INDEX 15)
 };
 
 void setup()
@@ -232,7 +332,8 @@ void setup()
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
-  menu = new Menu(menuLabels);
+  menu = new Menu(menuLabels, menuActions);
+  menu->setActive(0, true, true);
 
 #ifdef DISPLAY_DRIVER_LOVYANN
 
