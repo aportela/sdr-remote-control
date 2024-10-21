@@ -54,6 +54,6 @@ bool MenuItem::isBlinking(void)
     else
     {
         this->blink = false;
-        return (false)
+        return (false);
     }
 }
