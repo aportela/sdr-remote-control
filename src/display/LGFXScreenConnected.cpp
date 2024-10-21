@@ -27,7 +27,7 @@
 
 using namespace aportela::microcontroller::utils;
 
-LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr, const Menu *menuPtr) : LGFXScreen(display)
+LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr, Menu *menuPtr) : LGFXScreen(display)
 {
     if (display != nullptr)
     {

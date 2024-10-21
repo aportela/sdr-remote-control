@@ -3,7 +3,7 @@
 #include "LGFXScreenConnecting.hpp"
 #include "LGFXScreenConnected.hpp"
 
-LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus, const Menu *menuPtr) : trxStatus(trxStatus), menuPtr(menuPtr)
+LGFX::LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus, Menu *menuPtr) : trxStatus(trxStatus), menuPtr(menuPtr)
 {
     auto cfg = this->_bus_instance.config();
     cfg.spi_host = VSPI_HOST;  // Utilizar el SPI del hardware VSPI

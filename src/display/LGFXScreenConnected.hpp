@@ -30,7 +30,7 @@ private:
     void refreshDigitalSMeter(uint8_t newSignal);
 
 public:
-    LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr = nullptr, const Menu *menuPtr = nullptr);
+    LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr, Menu *menuPtr = nullptr);
     ~LGFXScreenConnected();
     bool Refresh(bool force) override;
 };

@@ -26,12 +26,12 @@ private:
     LGFXScreen *currentScreen = nullptr;
 
     const TransceiverStatus *trxStatus = nullptr;
-    const Menu *menuPtr = nullptr;
+    Menu *menuPtr = nullptr;
 
     void DeleteCurrentScreen(void);
 
 public:
-    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus = nullptr, const Menu *menuPtr = nullptr);
+    LGFX(uint8_t pinSDA, uint8_t pinSCL, uint8_t pinCS, uint8_t pinDC, uint8_t pinRST, uint16_t width, uint16_t height, uint8_t rotation, bool invertColors, const TransceiverStatus *trxStatus = nullptr, Menu *menuPtr = nullptr);
     ~LGFX();
     void InitScreen(SCREEN_TYPE scr);
     SCREEN_TYPE GetCurrentScreenType(void);
