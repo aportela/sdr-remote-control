@@ -24,6 +24,7 @@ public:
     ~LGFXMenuButton();
     bool refresh(bool force = false) override;
     void onChange(void);
+    bool isActive(void);
     void setActive(bool flag);
     void click(void);
 };

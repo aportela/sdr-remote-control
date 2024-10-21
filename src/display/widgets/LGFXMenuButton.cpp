@@ -58,6 +58,11 @@ void LGFXMenuButton::onChange(void)
     this->changed = true;
 }
 
+bool LGFXMenuButton::isActive(void)
+{
+    return (this->active);
+}
+
 void LGFXMenuButton::setActive(bool flag)
 {
     this->active = flag;
