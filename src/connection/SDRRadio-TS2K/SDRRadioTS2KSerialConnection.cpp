@@ -89,7 +89,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
             {
                 this->lastRXValidCommand = millis();
                 uint64_t lowFilter = receivedData.substring(2).toInt();
-                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].LF != lowFilter)
+                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].filter.LF != lowFilter)
                 {
                     trx->setVFOFilterLowCut(currentTrxStatus->activeVFOIndex, lowFilter);
                 }
@@ -99,7 +99,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
             {
                 this->lastRXValidCommand = millis();
                 uint64_t highFilter = receivedData.substring(2).toInt();
-                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].HF != highFilter)
+                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].filter.HF != highFilter)
                 {
                     trx->setVFOFilterHighCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
                 }
