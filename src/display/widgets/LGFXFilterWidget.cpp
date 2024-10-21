@@ -75,7 +75,7 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
 bool LGFXFilterWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF))
+  if (force || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF))
   {
     uint64_t maxLF = 0;
     uint64_t maxHF = 0;
@@ -110,17 +110,17 @@ bool LGFXFilterWidget::refresh(bool force)
       maxHF = 350000;
     default:
       // this is for set a "medium" trapezium on unknown modes
-      maxLF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF * 2;
-      maxHF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF * 2;
+      maxLF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF * 2;
+      maxHF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF * 2;
       break;
     }
     if (maxLF > 0 && maxHF > 0)
     {
-      this->refreshPlot(force, 0, 0, maxLF, maxHF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
+      this->refreshPlot(force, 0, 0, maxLF, maxHF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF);
     }
-    this->refreshLabels(force, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF);
-    this->oldLFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].LF;
-    this->oldHFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].HF;
+    this->refreshLabels(force, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF);
+    this->oldLFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF;
+    this->oldHFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF;
     changed = true;
   }
   return (changed);
