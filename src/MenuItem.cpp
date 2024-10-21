@@ -3,10 +3,11 @@
 
 #define MENU_ITEM_BLINK_TIMER 100 // 100ms
 
-MenuItem::MenuItem(const char *label)
+MenuItem::MenuItem(const char *label, availableMenuActions action)
 {
     strncpy(this->label, label, MENU_ITEM_LABEL_LENGTH);
     this->label[MENU_ITEM_LABEL_LENGTH] = '\0';
+    this->action = action;
 }
 
 MenuItem::~MenuItem()
@@ -20,6 +21,11 @@ void MenuItem::getLabel(char *buf, size_t count)
         strncpy(buf, this->label, count - 1);
         buf[count - 1] = '\0';
     }
+}
+
+availableMenuActions MenuItem::getAction()
+{
+    return (this->action);
 }
 
 void MenuItem::setActive(bool flag)

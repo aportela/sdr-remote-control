@@ -12,11 +12,11 @@ class Menu
 {
 private:
     uint8_t currentPage = 1;
-    uint8_t totalPages = 0;
+    uint8_t totalPages = TOTAL_MENU_PAGES;
     MenuItem *items[TOTAL_MENU_ITEMS] = {};
 
 public:
-    Menu(const char **labels);
+    Menu(const char **labels, const availableMenuActions menuActions[TOTAL_MENU_ITEMS]);
     ~Menu();
     void getLabel(uint8_t index, char *buf, size_t count);
     void setActive(uint8_t index, bool flag, bool unsetOthers = true);

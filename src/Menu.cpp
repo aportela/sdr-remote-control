@@ -1,12 +1,11 @@
 #include "Menu.hpp"
 
-Menu::Menu(const char **labels)
+Menu::Menu(const char **labels, const availableMenuActions menuActions[TOTAL_MENU_ITEMS])
 {
     for (uint8_t i = 0; i < TOTAL_MENU_ITEMS; i++)
     {
-        this->items[i] = new MenuItem(labels[i]);
+        this->items[i] = new MenuItem(labels[i], menuActions[i]);
     }
-    this->totalPages = TOTAL_MENU_ITEMS / (MENU_ITEMS_COLS_PER_PAGE * MENU_ITEMS_ROWS_PER_PAGE);
 }
 
 Menu::~Menu()
@@ -85,7 +84,7 @@ uint8_t Menu::getTotalPages(void)
 
 bool Menu::nextPage(void)
 {
-    if (this->currentPage < this->totalPages)
+    if (this->currentPage <= this->totalPages)
     {
         this->currentPage++;
         return (true);
