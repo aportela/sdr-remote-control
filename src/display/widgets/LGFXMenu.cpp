@@ -3,26 +3,6 @@
 #define DEFAULT_COLOR 0xFFFF
 #define DEFAULT_BG 0x0000
 
-const char *buttonLabels[TOTAL_MENU_ITEMS] = {
-    "  TUNE  ",
-    " VOLUME ",
-    " FILTER ",
-    "SETTINGS",
-    "VFO  A/B",
-    "VFO STEP",
-    "VFO MODE",
-    ">>>>>>>>",
-
-    "VFO A=>B",
-    "VFO B=>A",
-    "+++ BAND",
-    "--- BAND",
-    "SETTINGS",
-    "        ",
-    "        ",
-    "<<<<<<<<",
-};
-
 void defaultCallBack(void)
 {
 }
@@ -47,11 +27,11 @@ const ButtonCallback buttonCallbacks[TOTAL_MENU_ITEMS] = {
     defaultCallBack,
 };
 
-LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const Menu *menuPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), menuPtr(menuPtr)
+LGFXMenu::LGFXMenu(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, Menu *menuPtr) : LGFXWidget(displayPtr, width, height, xOffset, yOffset, padding), menuPtr(menuPtr)
 {
     if (displayPtr != nullptr)
     {
-        this->totalPages = TOTAL_MENU_PAGES;
+        this->currentPage = this->menuPtr->getCurrentPage();
         this->initMenu();
         this->refresh(true);
 
@@ -82,8 +62,8 @@ void LGFXMenu::initMenu(void)
             f = 1;
         }
         sprintf(topLabel, "F%d", f);
-        char mainLabel[24];
-        sprintf(mainLabel, buttonLabels[i]);
+        char mainLabel[24] = {'\0'};
+        this->menuPtr->getLabel(i, mainLabel, sizeof(mainLabel));
         this->buttons[i] = new LGFXMenuButton(
             this->parentDisplayPtr,
             MENU_BUTTON_WIDGET_WIDTH,                                                                                   // width
@@ -94,7 +74,7 @@ void LGFXMenu::initMenu(void)
             i,                                                                                                          // index
             topLabel,                                                                                                   // top label
             mainLabel,                                                                                                  // bottom label
-            i == 0,                                                                                                     // active
+            this->menuPtr->isActive(i),                                                                                 // active
             buttonCallbacks[i]                                                                                          // callback
         );
         col++;
@@ -113,15 +93,23 @@ void LGFXMenu::initMenu(void)
 bool LGFXMenu::refresh(bool force)
 {
     bool changed = force;
-    uint8_t startIndex = this->currentPage * MENU_ITEMS_PER_PAGE;
+    if (this->currentPage != this->menuPtr->getCurrentPage())
+    {
+        this->currentPage = this->menuPtr->getCurrentPage();
+        changed = true;
+    }
+    uint8_t startIndex = (this->currentPage - 1) * MENU_ITEMS_PER_PAGE;
     uint8_t endIndex = startIndex + MENU_ITEMS_PER_PAGE;
     for (uint8_t i = startIndex; i < endIndex; i++)
     {
-        if (force)
+        if (this->menuPtr->isActive(i) != this->buttons[i]->isActive())
+        {
+            // this->buttons[i]->setActive(this->buttons[i]->isActive());
+        }
+        if (force || changed)
         {
             this->buttons[i]->onChange();
         }
-        // TODO: save/restore active flag on page changes ???
         this->buttons[i]->refresh(force);
     }
     return (changed);
@@ -140,23 +128,5 @@ void LGFXMenu::setButtonDisabled(uint8_t btnIndex)
     if (btnIndex < MENU_ITEMS_PER_PAGE)
     {
         this->buttons[btnIndex]->setActive(false);
-    }
-}
-
-void LGFXMenu::previousPage(void)
-{
-    if (this->currentPage > 0)
-    {
-        this->currentPage--;
-        this->refresh(true);
-    }
-}
-
-void LGFXMenu::nextPage(void)
-{
-    if (this->currentPage < this->totalPages)
-    {
-        this->currentPage++;
-        this->refresh(true);
     }
 }
