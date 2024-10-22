@@ -10,6 +10,7 @@ class LGFXFilterWidget : public LGFXTransceiverStatusWidget
 private:
   uint32_t oldLFValue = 0;
   uint32_t oldHFValue = 0;
+  uint8_t previousCurrentVFOIndex = 0;
   lgfx::LGFX_Sprite *plotSprite;
 
   void refreshPlot(bool force, uint64_t minLowCut, uint64_t minHighCut, uint64_t maxLowCut, uint64_t maxHighCut, uint64_t currentLowCut, uint64_t currentHighCut);

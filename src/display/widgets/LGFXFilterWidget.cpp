@@ -33,6 +33,7 @@ void LGFXFilterWidget::refreshPlot(bool force, uint64_t minLowCut, uint64_t minH
 
   // top horizontal line
   this->plotSprite->drawFastHLine(topHLineXOffset, topHLineYOffset, topHLineLength, TEXT_COLOR_ACTIVE);
+
   // bottom horizontal line
   this->plotSprite->drawFastHLine(0, _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET, _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH, TEXT_COLOR_ACTIVE);
 
@@ -75,7 +76,12 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
 bool LGFXFilterWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF))
+  if (this->previousCurrentVFOIndex != currentTransceiverStatusPtr->activeVFOIndex)
+  {
+    this->previousCurrentVFOIndex = currentTransceiverStatusPtr->activeVFOIndex;
+    changed = true;
+  }
+  if (force || changed || (this->oldLFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF || this->oldHFValue != this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF))
   {
     uint64_t maxLF = 0;
     uint64_t maxHF = 0;
@@ -117,6 +123,11 @@ bool LGFXFilterWidget::refresh(bool force)
     if (maxLF > 0 && maxHF > 0)
     {
       this->refreshPlot(force, 0, 0, maxLF, maxHF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF);
+    }
+    else if (force || changed)
+    {
+      // draw default (max) trapezium on start
+      this->refreshPlot(force, 0, 0, 100, 100, 100, 100);
     }
     this->refreshLabels(force, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF);
     this->oldLFValue = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF;
