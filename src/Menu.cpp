@@ -1,4 +1,5 @@
 #include "Menu.hpp"
+#include <Arduino.h>
 
 Menu::Menu(const char **labels, const availableMenuActions menuActions[TOTAL_MENU_ITEMS])
 {
@@ -26,14 +27,17 @@ void Menu::setActive(uint8_t index, bool flag, bool unsetOthers)
 {
     if (index >= 0 && index < TOTAL_MENU_ITEMS)
     {
-        this->items[index]->setActive(flag);
-        if (unsetOthers)
+        if (this->items[index]->isActive() != flag)
         {
-            for (uint8_t i = 0; i < TOTAL_MENU_ITEMS; i++)
+            this->items[index]->setActive(flag);
+            if (unsetOthers)
             {
-                if (i != index)
+                for (uint8_t i = 0; i < TOTAL_MENU_ITEMS; i++)
                 {
-                    this->items[index]->setActive(false);
+                    if (i != index && this->items[i]->isActive() != false)
+                    {
+                        this->items[i]->setActive(false);
+                    }
                 }
             }
         }
@@ -52,7 +56,7 @@ bool Menu::isActive(uint8_t index)
 {
     if (index >= 0 && index < TOTAL_MENU_ITEMS)
     {
-        return (this->items[index]->isActive());
+        return (this->items[index]->isActive() || this->items[index]->isBlinking());
     }
     else
     {
