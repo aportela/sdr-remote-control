@@ -333,7 +333,7 @@ void setup()
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
   menu = new Menu(menuLabels, menuActions);
-  menu->setActive(0, true, true);
+  menu->setActive(0, true, false);
 
 #ifdef DISPLAY_DRIVER_LOVYANN
 
