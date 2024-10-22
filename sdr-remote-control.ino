@@ -332,6 +332,24 @@ void setup()
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
+#ifdef DEBUG_DUMMY_CONNECTION
+  trxStatus->AFGain = 50;
+  trxStatus->activeVFOIndex = 0;
+  trxStatus->VFO[0].frequency = 7084152;
+  trxStatus->VFO[0].frequencyStep = 10;
+  trxStatus->VFO[0].mode = TRX_VFO_MD_LSB;
+  trxStatus->VFO[0].filter.changeMode = TRX_VFO_F_CM_BOTH;
+  trxStatus->VFO[0].filter.LF = 0;
+  trxStatus->VFO[0].filter.HF = 2000;
+  trxStatus->VFO[1].frequency = 145625000;
+  trxStatus->VFO[1].frequencyStep = 10000;
+  trxStatus->VFO[1].mode = TRX_VFO_MD_FM;
+  trxStatus->VFO[1].filter.changeMode = TRX_VFO_F_CM_BOTH;
+  trxStatus->VFO[1].filter.LF = 6000;
+  trxStatus->VFO[1].filter.HF = 6000;
+
+  trx->setCurrentStatus(trxStatus, false);
+#endif
   menu = new Menu(menuLabels, menuActions);
   menu->setActive(0, true, false);
 
