@@ -36,7 +36,7 @@ bool LGFXMenuButton::refresh(bool force)
             this->parentDisplayPtr->fillRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, BUTTON_ACTIVE_BACKGROUND_COLOR);
         }
         this->parentDisplayPtr->setTextSize(2);
-        if (!active)
+        if (!this->active)
         {
             this->parentDisplayPtr->setTextColor(BUTTON_NOT_ACTIVE_LABEL_COLOR, BUTTON_NOT_ACTIVE_BACKGROUND_COLOR);
         }
