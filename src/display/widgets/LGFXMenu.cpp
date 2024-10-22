@@ -102,9 +102,10 @@ bool LGFXMenu::refresh(bool force)
     uint8_t endIndex = startIndex + MENU_ITEMS_PER_PAGE;
     for (uint8_t i = startIndex; i < endIndex; i++)
     {
+
         if (this->menuPtr->isActive(i) != this->buttons[i]->isActive())
         {
-            // this->buttons[i]->setActive(this->buttons[i]->isActive());
+            this->buttons[i]->setActive(this->menuPtr->isActive(i));
         }
         if (force || changed)
         {
@@ -113,20 +114,4 @@ bool LGFXMenu::refresh(bool force)
         this->buttons[i]->refresh(force);
     }
     return (changed);
-}
-
-void LGFXMenu::setButtonEnabled(uint8_t btnIndex)
-{
-    if (btnIndex < MENU_ITEMS_PER_PAGE)
-    {
-        this->buttons[btnIndex]->setActive(true);
-    }
-}
-
-void LGFXMenu::setButtonDisabled(uint8_t btnIndex)
-{
-    if (btnIndex < MENU_ITEMS_PER_PAGE)
-    {
-        this->buttons[btnIndex]->setActive(false);
-    }
 }
