@@ -19,17 +19,6 @@ void DummyConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrx
     {
         if (millis() % 100 == 0)
         {
-            if (this->oldFrequency == 0)
-            {
-                trx->setVFOMode(0, TRX_VFO_MD_FM);
-            }
-            /*
-            this->oldFrequency++;
-            if (this->oldFrequency < 1000000000)
-            {
-                trx->setActiveVFOFrequency(this->oldFrequency);
-            }
-            */
             if (this->oldSMeter < 20)
             {
                 this->oldSMeter += random(0, 10);
