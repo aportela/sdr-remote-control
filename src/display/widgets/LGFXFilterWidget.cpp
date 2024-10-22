@@ -66,11 +66,33 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   this->parentDisplayPtr->print("CUSTOM");
   // TODO: human units
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding);
-  this->parentDisplayPtr->printf("BANDWITH:%" PRIu64 "Hz   ", lowCut + highCut);
+  uint64_t totalBandwith = lowCut + highCut;
+  if (totalBandwith > 1000)
+  {
+    this->parentDisplayPtr->printf("BW: %.3fKHz   ", totalBandwith / (double)1000);
+  }
+  else
+  {
+    this->parentDisplayPtr->printf("BW: %" PRIu64 "Hz   ", totalBandwith);
+  }
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
-  this->parentDisplayPtr->printf(" LOW CUT:%" PRIu64 "Hz   ", lowCut);
+  if (lowCut > 1000)
+  {
+    this->parentDisplayPtr->printf("LC: %.3fKHz   ", lowCut / (double)1000);
+  }
+  else
+  {
+    this->parentDisplayPtr->printf("LC: %" PRIu64 "Hz   ", lowCut);
+  }
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
-  this->parentDisplayPtr->printf("  HI CUT:%" PRIu64 "Hz   ", highCut);
+  if (highCut > 1000)
+  {
+    this->parentDisplayPtr->printf("HC: %.3fKHz   ", highCut / (double)1000);
+  }
+  else
+  {
+    this->parentDisplayPtr->printf("HC: %" PRIu64 "Hz   ", highCut);
+  }
 }
 
 bool LGFXFilterWidget::refresh(bool force)
