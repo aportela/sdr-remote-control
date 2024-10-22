@@ -254,7 +254,7 @@ void onKP8Loop(uint8_t pressedMask = 0)
     switch (currentPage)
     {
     case 1: // VFO MODE
-      menu->click(5);
+      menu->click(6);
       trx->toggleActiveVFOMode(false);
       break;
     }
