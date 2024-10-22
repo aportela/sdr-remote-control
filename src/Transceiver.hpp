@@ -69,8 +69,8 @@ struct TrxVFO
 {
   uint64_t frequency = 0;
   TrxVFOMode mode = TRX_VFO_MODE_ERROR;
-  TrxVFOFilter filter;
   uint64_t frequencyStep = 1; // hz
+  TrxVFOFilter filter;
   TrxVFO() = default;
 };
 

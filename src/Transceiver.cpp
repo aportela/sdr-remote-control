@@ -308,10 +308,10 @@ bool Transceiver::copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR)
     {
       currentStatus.VFO[destIndex].frequency = currentStatus.VFO[sourceIndex].frequency;
       currentStatus.VFO[destIndex].mode = currentStatus.VFO[sourceIndex].mode;
+      currentStatus.VFO[destIndex].frequencyStep = currentStatus.VFO[sourceIndex].frequencyStep;
       currentStatus.VFO[destIndex].filter.changeMode = currentStatus.VFO[sourceIndex].filter.changeMode;
       currentStatus.VFO[destIndex].filter.LF = currentStatus.VFO[sourceIndex].filter.LF;
       currentStatus.VFO[destIndex].filter.HF = currentStatus.VFO[sourceIndex].filter.HF;
-      currentStatus.VFO[destIndex].frequencyStep = currentStatus.VFO[sourceIndex].frequencyStep;
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
