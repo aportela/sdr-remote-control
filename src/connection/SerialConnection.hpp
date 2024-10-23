@@ -18,7 +18,7 @@ public:
     SerialConnection(HardwareSerial *serialPort, long speed, long timeout);
     ~SerialConnection() {}
 
-    virtual void loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) = 0;
+    virtual void loop(Transceiver *trx) = 0;
     virtual void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) = 0;
     virtual bool tryConnection(Transceiver *trx) = 0;
     bool isDisconnectedByTimeout(void);

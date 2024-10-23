@@ -13,7 +13,7 @@ public:
     DummyConnection(HardwareSerial *serialPort, long speed, long timeout);
     ~DummyConnection() {}
 
-    void loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) override;
+    void loop(Transceiver *trx) override;
 
     void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) override;
     bool tryConnection(Transceiver *trx) override;

@@ -421,7 +421,7 @@ void loop()
     {
 #ifdef DEBUG_DUMMY_CONNECTION
 
-      connection->loop(trx, trxStatus);
+      connection->loop(trx);
 
 #else
 
@@ -432,7 +432,7 @@ void loop()
       }
       else
       {
-        connection->loop(trx, trxStatus);
+        connection->loop(trx);
       }
 
 #endif // DEBUG_DUMMY_CONNECTION

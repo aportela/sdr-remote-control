@@ -41,25 +41,15 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
     return (connected);
 }
 
-void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
+void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
 {
-    if (trx != nullptr && currentTrxStatus != nullptr)
+    if (trx != nullptr)
     {
         bool sendRequired = false;
         char buffer[64] = {'\0'};
-        // ignore receive frequency sent cmd if we change manually from rotary encoder in the last 500ms
-        if (millis() - currentTrxStatus->lastFrequencyChangedByLocalControl > 250)
-        {
-            snprintf(buffer, sizeof(buffer), "FA%011" PRIu64 ";MD;SL;SH;AG0;MU;SM0;", currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency);
-            sendRequired = true;
-        }
-        else if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
+        if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
         {
             snprintf(buffer, sizeof(buffer), "%s", "FA;MD;SL;SH;AG0;MU;SM0;");
-            sendRequired = true;
-        }
-        if (sendRequired)
-        {
             this->send(buffer);
         }
         while (this->serial->available() > 0)

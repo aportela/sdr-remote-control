@@ -13,9 +13,9 @@ bool DummyConnection::tryConnection(Transceiver *trx)
     return (millis() > 0);
 }
 
-void DummyConnection::loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
+void DummyConnection::loop(Transceiver *trx)
 {
-    if (trx != nullptr && currentTrxStatus != nullptr)
+    if (trx != nullptr)
     {
         if (millis() % 100 == 0)
         {

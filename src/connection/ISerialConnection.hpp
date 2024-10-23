@@ -9,7 +9,7 @@ class ISerialConnection
 {
 public:
     virtual ~ISerialConnection() {}
-    virtual void loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus) = 0;
+    virtual void loop(Transceiver *trx) = 0;
     virtual void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus) = 0;
 };
 
