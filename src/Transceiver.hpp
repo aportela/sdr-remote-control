@@ -5,6 +5,7 @@
 #include <cstdbool>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
+#include "TransceiverSyncCommand.hpp"
 
 #define TRANSCEIVER_VFO_COUNT 2
 
@@ -91,6 +92,7 @@ class Transceiver
 {
 private:
   QueueHandle_t statusQueue;
+  QueueHandle_t syncQueue;
 
 public:
   Transceiver();
@@ -135,6 +137,8 @@ public:
 
   bool increaseActiveVFOBand(bool fromISR = false);
   bool decreaseActiveVFOBand(bool fromISR = false);
+
+  bool enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd = nullptr, bool fromISR = false);
 };
 
 #endif // SDR_REMOTE_CONTROL_TRANSCEIVER_H
