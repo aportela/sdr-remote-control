@@ -5,9 +5,12 @@
 
 class SDRRadioTS2KSerialConnection : public SerialConnection
 {
+private:
+    TransceiverStatus *trxStatusPtr = nullptr;
+
 public:
     SDRRadioTS2KSerialConnection(HardwareSerial *serialPort, long speed, long timeout);
-    ~SDRRadioTS2KSerialConnection() {}
+    ~SDRRadioTS2KSerialConnection();
 
     void loop(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) override;
 

@@ -3,6 +3,13 @@
 SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *serialPort, long speed, long timeout)
     : SerialConnection(serialPort, speed, timeout)
 {
+    this->trxStatusPtr = new TransceiverStatus;
+}
+
+SDRRadioTS2KSerialConnection::~SDRRadioTS2KSerialConnection()
+{
+    delete this->trxStatusPtr;
+    this->trxStatusPtr = nullptr;
 }
 
 bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
@@ -21,13 +28,11 @@ bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
         {
             trx->setRadioName(receivedData.substring(2).c_str());
             this->lastRXValidCommand = millis();
-            trx->incSerialCommandCount();
             break;
         }
         else if (receivedData == "PS1")
         {
             this->lastRXValidCommand = millis();
-            trx->incSerialCommandCount();
             this->flush();
             connected = true;
             break;
@@ -73,7 +78,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                         trx->setActiveVFOFrequency(f);
                     }
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("MD") && receivedData != "MD")
             {
@@ -83,7 +87,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                 {
                     trx->setVFOMode(currentTrxStatus->activeVFOIndex, mode);
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("SL") && receivedData != "SL")
             {
@@ -93,7 +96,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                 {
                     trx->setVFOFilterLowCut(currentTrxStatus->activeVFOIndex, lowFilter);
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("SH") && receivedData != "SH")
             {
@@ -103,7 +105,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                 {
                     trx->setVFOFilterHighCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("AG") && receivedData != "AG")
             {
@@ -113,7 +114,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                 {
                     trx->setAFGain(AFGain);
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("MU") && receivedData != "MU")
             {
@@ -127,14 +127,12 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
                 {
                     trx->setAudioMuted();
                 }
-                trx->incSerialCommandCount();
             }
             else if (receivedData.startsWith("SM") && receivedData != "SM")
             {
                 this->lastRXValidCommand = millis();
                 uint8_t smLevel = receivedData.substring(2).toInt();
                 trx->setSignalMeter(SIGNAL_METER_TS2K_SDR_RADIO_LEVEL, smLevel);
-                trx->incSerialCommandCount();
             }
         }
     }
