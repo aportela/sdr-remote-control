@@ -69,61 +69,37 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx, const TransceiverStatu
             if (receivedData.startsWith("FA") && receivedData != "FA")
             {
                 this->lastRXValidCommand = millis();
-                // ignore received frequency if we change manually from rotary encoder in the last 500ms
-                if (millis() - currentTrxStatus->lastFrequencyChangedByLocalControl > 500)
-                {
-                    uint64_t f = receivedData.substring(2).toInt();
-                    if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency != f)
-                    {
-                        trx->setActiveVFOFrequency(f);
-                    }
-                }
+                trx->setActiveVFOFrequency(receivedData.substring(2).toInt());
             }
             else if (receivedData.startsWith("MD") && receivedData != "MD")
             {
                 this->lastRXValidCommand = millis();
-                TrxVFOMode mode = (TrxVFOMode)receivedData.substring(2).toInt();
-                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].mode != mode)
-                {
-                    trx->setVFOMode(currentTrxStatus->activeVFOIndex, mode);
-                }
+                trx->setCurrentVFOMode((TrxVFOMode)receivedData.substring(2).toInt());
             }
             else if (receivedData.startsWith("SL") && receivedData != "SL")
             {
                 this->lastRXValidCommand = millis();
-                uint64_t lowFilter = receivedData.substring(2).toInt();
-                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].filter.LF != lowFilter)
-                {
-                    trx->setVFOFilterLowCut(currentTrxStatus->activeVFOIndex, lowFilter);
-                }
+                trx->setCurrentVFOFilterLowCut(receivedData.substring(2).toInt());
             }
             else if (receivedData.startsWith("SH") && receivedData != "SH")
             {
                 this->lastRXValidCommand = millis();
-                uint64_t highFilter = receivedData.substring(2).toInt();
-                if (currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].filter.HF != highFilter)
-                {
-                    trx->setVFOFilterHighCut(currentTrxStatus->activeVFOIndex, receivedData.substring(2).toInt());
-                }
+                trx->setCurrentVFOFilterHighCut(receivedData.substring(2).toInt());
             }
             else if (receivedData.startsWith("AG") && receivedData != "AG")
             {
                 this->lastRXValidCommand = millis();
-                uint8_t AFGain = receivedData.substring(2).toInt();
-                if (currentTrxStatus->AFGain != AFGain)
-                {
-                    trx->setAFGain(AFGain);
-                }
+                trx->setAFGain(receivedData.substring(2).toInt());
             }
             else if (receivedData.startsWith("MU") && receivedData != "MU")
             {
                 this->lastRXValidCommand = millis();
                 uint8_t newMutedStatus = receivedData.substring(2).toInt();
-                if (currentTrxStatus->audioMuted && newMutedStatus == 0)
+                if (newMutedStatus == 0)
                 {
                     trx->setAudioUnMuted();
                 }
-                else if (!currentTrxStatus->audioMuted && newMutedStatus == 1)
+                else if (newMutedStatus == 1)
                 {
                     trx->setAudioMuted();
                 }

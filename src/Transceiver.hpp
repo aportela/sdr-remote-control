@@ -109,10 +109,13 @@ public:
   bool incrementActiveVFOFrequency(uint64_t hz, bool fromISR = false, bool changedByRemote = false);
   bool decrementActiveVFOFrequency(uint64_t hz, bool fromISR = false, bool changedByRemote = false);
   bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR = false);
+  bool setCurrentVFOMode(TrxVFOMode mode, bool fromISR = false);
   bool toggleActiveVFOMode(bool fromISR = false);
   bool copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR = false);
   bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR = false);
+  bool setCurrentVFOFilterLowCut(uint32_t LF, bool fromISR = false);
   bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR = false);
+  bool setCurrentVFOFilterHighCut(uint32_t HF, bool fromISR = false);
   bool setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR = false);
   bool toggleActiveVFOCustomStep(bool fromISR = false);
 

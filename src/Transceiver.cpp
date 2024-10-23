@@ -282,6 +282,27 @@ bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR)
   }
 }
 
+bool Transceiver::setCurrentVFOMode(TrxVFOMode mode, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].mode != mode)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = mode;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::toggleActiveVFOMode(bool fromISR)
 {
   TransceiverStatus currentStatus;
@@ -379,6 +400,27 @@ bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR
   }
 }
 
+bool Transceiver::setCurrentVFOFilterLowCut(uint32_t LF, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].filter.LF != LF)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.LF = LF;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR)
 {
   TransceiverStatus currentStatus;
@@ -395,6 +437,27 @@ bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromIS
       {
         return (false);
       }
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
+bool Transceiver::setCurrentVFOFilterHighCut(uint32_t HF, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].filter.HF != HF)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.HF = HF;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
