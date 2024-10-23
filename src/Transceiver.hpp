@@ -50,17 +50,8 @@ enum TrxVFOMode
   TRX_VFO_MODE_ERROR = 10
 };
 
-enum TrxVFOFilterChangeMode
-{
-  TRX_VFO_F_CM_NONE = 0,
-  TRX_VFO_F_CM_BOTH = 1,
-  TRX_VFO_F_CM_LOW = 2,
-  TRX_VFO_F_CM_HIGH = 3,
-};
-
 struct TrxVFOFilter
 {
-  TrxVFOFilterChangeMode changeMode = TRX_VFO_F_CM_NONE;
   uint32_t LF = 0; // low filter
   uint32_t HF = 0; // high filter
 };
@@ -100,7 +91,6 @@ class Transceiver
 {
 private:
   QueueHandle_t statusQueue;
-  uint64_t serialCommandCount = 0;
 
 public:
   Transceiver();
@@ -121,8 +111,6 @@ public:
   bool setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR = false);
   bool toggleActiveVFOMode(bool fromISR = false);
   bool copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR = false);
-  bool setVFOFilterChangeMode(uint8_t VFOIndex, TrxVFOFilterChangeMode mode, bool fromISR = false);
-  bool toggleActiveVFOFilterChangeMode(bool fromISR = false);
   bool setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR = false);
   bool setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromISR = false);
   bool setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR = false);
@@ -143,9 +131,6 @@ public:
 
   bool increaseActiveVFOBand(bool fromISR = false);
   bool decreaseActiveVFOBand(bool fromISR = false);
-
-  void incSerialCommandCount(void);
-  uint64_t getSerialCommandCount(void);
 };
 
 #endif // SDR_REMOTE_CONTROL_TRANSCEIVER_H
