@@ -85,7 +85,7 @@ volatile uint64_t lastEncoderMillis = 0;
 
 DummyConnection *connection;
 
-#else
+#else // DEBUG_DUMMY_CONNECTION
 
 SDRRadioTS2KSerialConnection *connection;
 
@@ -96,26 +96,46 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   lastEncoderMillis = millis();
   if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
   {
+
+    // TODO: send command to serial connection
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
+
+#ifdef DEBUG_DUMMY_CONNECTION
 
     trx->incrementActiveVFOFrequency(acceleratedDelta, true);
 
-#else
+#endif // DEBUG_DUMMY_CONNECTION
+
+#else // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
+
+#ifdef DEBUG_DUMMY_CONNECTION
 
     trx->incrementActiveVFOFrequency(1, true);
+
+#endif // DEBUG_DUMMY_CONNECTION
 
 #endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
     trx->incrementAFGain(1, true);
+
+#endif // DEBUG_DUMMY_CONNECTION
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
     /*
     trx->VFO[trx->activeVFOIndex].filter.LF += acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].filter.HF += acceleratedDelta;
     */
+
+#endif // DEBUG_DUMMY_CONNECTION
   }
 }
 
@@ -126,24 +146,42 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
   {
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
 
+#ifdef DEBUG_DUMMY_CONNECTION
+
     trx->decrementActiveVFOFrequency(acceleratedDelta, true);
 
-#else
+#endif // DEBUG_DUMMY_CONNECTION
+
+#else // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
+
+#ifdef DEBUG_DUMMY_CONNECTION
 
     trx->decrementActiveVFOFrequency(1, true);
+
+#endif // DEBUG_DUMMY_CONNECTION
 
 #endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
   {
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
     trx->decrementAFGain(1, true);
+
+#endif // DEBUG_DUMMY_CONNECTION
   }
   else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
   {
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
     /*
     trx->VFO[trx->activeVFOIndex].filter.LF -= acceleratedDelta;
     trx->VFO[trx->activeVFOIndex].filter.HF -= acceleratedDelta;
     */
+
+#endif // DEBUG_DUMMY_CONNECTION
   }
 }
 
@@ -340,13 +378,11 @@ void setup()
   trxStatus->VFO[0].frequency = 7084152;
   trxStatus->VFO[0].frequencyStep = 10;
   trxStatus->VFO[0].mode = TRX_VFO_MD_LSB;
-  trxStatus->VFO[0].filter.changeMode = TRX_VFO_F_CM_BOTH;
   trxStatus->VFO[0].filter.LF = 0;
   trxStatus->VFO[0].filter.HF = 2000;
   trxStatus->VFO[1].frequency = 145625000;
   trxStatus->VFO[1].frequencyStep = 10000;
   trxStatus->VFO[1].mode = TRX_VFO_MD_FM;
-  trxStatus->VFO[1].filter.changeMode = TRX_VFO_F_CM_BOTH;
   trxStatus->VFO[1].filter.LF = 6000;
   trxStatus->VFO[1].filter.HF = 6000;
   trx->setCurrentStatus(trxStatus, false);
