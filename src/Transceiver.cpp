@@ -470,6 +470,28 @@ bool Transceiver::setCurrentVFOFilterHighCut(uint32_t HF, bool fromISR)
   }
 }
 
+bool Transceiver::setCurrentVFOFilter(uint32_t LF, uint32_t HF, bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].filter.LF != LF || currentStatus.VFO[currentStatus.activeVFOIndex].filter.HF != HF)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.LF = LF;
+      currentStatus.VFO[currentStatus.activeVFOIndex].filter.HF = HF;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, bool fromISR)
 {
   TransceiverStatus currentStatus;
