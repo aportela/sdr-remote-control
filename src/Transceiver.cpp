@@ -4,9 +4,11 @@
 #include <Arduino.h>
 
 #define QUEUE_PEEK_MS_TO_TICKS_TIMEOUT 5
+#define MAX_SYNC_QUEUE_ELEMENTS 128
 
 Transceiver::Transceiver(void)
 {
+  this->syncQueue = xQueueCreate(MAX_SYNC_QUEUE_ELEMENTS, sizeof(TransceiverSyncCommand));
   this->statusQueue = xQueueCreate(1, sizeof(TransceiverStatus));
   TransceiverStatus trxStatus;
   this->setCurrentStatus(&trxStatus, false);
@@ -761,4 +763,29 @@ bool Transceiver::decreaseActiveVFOBand(bool fromISR)
 {
   // TODO
   return (false);
+}
+
+bool Transceiver::enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fromISR)
+{
+  if (this->syncQueue != nullptr && trxSyncCmd != nullptr)
+  {
+    if (!fromISR)
+    {
+      return (xQueueSend(this->syncQueue, trxSyncCmd, portMAX_DELAY) != pdPASS);
+    }
+    else
+    {
+      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+      bool result = xQueueSendFromISR(this->syncQueue, trxSyncCmd, &xHigherPriorityTaskWoken) != pdPASS;
+      if (xHigherPriorityTaskWoken == pdTRUE)
+      {
+        portYIELD_FROM_ISR();
+      }
+      return (result);
+    }
+  }
+  else
+  {
+    return (false);
+  }
 }
