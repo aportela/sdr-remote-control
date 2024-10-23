@@ -6,7 +6,13 @@
 class SDRRadioTS2KSerialConnection : public SerialConnection
 {
 private:
-    TransceiverStatus *trxStatusPtr = nullptr;
+    uint64_t lastFrequency = 0;
+    TrxVFOMode lastMode = TRX_VFO_MODE_ERROR;
+    uint32_t lastLFFilter = 0;
+    uint32_t lastHFFilter = 0;
+    uint8_t lastAFGain = 0;
+    bool lastMutedStatus = false;
+    int8_t lastSMeterUnits = 0;
 
 public:
     SDRRadioTS2KSerialConnection(HardwareSerial *serialPort, long speed, long timeout);
@@ -14,8 +20,10 @@ public:
 
     void loop(Transceiver *trx) override;
 
-    void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus = nullptr) override;
     bool tryConnection(Transceiver *trx) override;
+
+    void incrementRemoteFrequency(uint64_t hz);
+    void decrementRemoteFrequency(uint64_t hz);
 };
 
 #endif // SDR_REMOTE_CONTROL_SDRRADIO_TS2K_SERIAL_CONNECTION_H

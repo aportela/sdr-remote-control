@@ -3,13 +3,10 @@
 SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *serialPort, long speed, long timeout)
     : SerialConnection(serialPort, speed, timeout)
 {
-    this->trxStatusPtr = new TransceiverStatus;
 }
 
 SDRRadioTS2KSerialConnection::~SDRRadioTS2KSerialConnection()
 {
-    delete this->trxStatusPtr;
-    this->trxStatusPtr = nullptr;
 }
 
 bool SDRRadioTS2KSerialConnection::tryConnection(Transceiver *trx)
@@ -49,7 +46,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
         char buffer[64] = {'\0'};
         if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
         {
-            snprintf(buffer, sizeof(buffer), "%s", "FA;MD;SL;SH;AG0;MU;SM0;");
+            snprintf(buffer, sizeof(buffer), "%s", "FA;MD;SH;SL;AG0;MU;SM0;");
             this->send(buffer);
         }
         while (this->serial->available() > 0)
@@ -59,77 +56,140 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
             if (receivedData.startsWith("FA") && receivedData != "FA")
             {
                 this->lastRXValidCommand = millis();
-                trx->setActiveVFOFrequency(receivedData.substring(2).toInt());
+                uint64_t currentFrequency = receivedData.substring(2).toInt();
+                if (currentFrequency != this->lastFrequency)
+                {
+                    trx->setActiveVFOFrequency(currentFrequency);
+                    this->lastFrequency = currentFrequency;
+                }
             }
             else if (receivedData.startsWith("MD") && receivedData != "MD")
             {
                 this->lastRXValidCommand = millis();
-                trx->setCurrentVFOMode((TrxVFOMode)receivedData.substring(2).toInt());
-            }
-            else if (receivedData.startsWith("SL") && receivedData != "SL")
-            {
-                this->lastRXValidCommand = millis();
-                trx->setCurrentVFOFilterLowCut(receivedData.substring(2).toInt());
+                TrxVFOMode currentMode = (TrxVFOMode)receivedData.substring(2).toInt();
+                if (currentMode != this->lastMode)
+                {
+                    trx->setCurrentVFOMode(currentMode);
+                    this->lastMode = currentMode;
+                }
             }
             else if (receivedData.startsWith("SH") && receivedData != "SH")
             {
                 this->lastRXValidCommand = millis();
-                trx->setCurrentVFOFilterHighCut(receivedData.substring(2).toInt());
+                uint32_t currentFilterCut = receivedData.substring(2).toInt();
+
+                if (this->lastMode == TRX_VFO_MD_FM || this->lastMode == TRX_VFO_MD_SAM || this->lastMode == TRX_VFO_MD_WFM || this->lastMode == TRX_VFO_MD_BFM)
+                {
+                    // some modes have simmetrical LF/HF values and ignore TS2K command value LF (equal to 0) and SH represent both "cuts" (LF / HF)
+                    // so SL0; and SH2000; seems to be equivalent to LOWCUT = 2000 & HI CUT = 2000
+                    if (this->lastLFFilter != currentFilterCut || this->lastHFFilter != currentFilterCut)
+                    {
+                        this->lastLFFilter = currentFilterCut;
+                        this->lastHFFilter = currentFilterCut;
+                        trx->setCurrentVFOFilter(this->lastLFFilter, this->lastHFFilter);
+                    }
+                }
+                else
+                {
+                    if (currentFilterCut != this->lastHFFilter)
+                    {
+                        trx->setCurrentVFOFilterHighCut(currentFilterCut);
+                        this->lastHFFilter = currentFilterCut;
+                    }
+                }
+            }
+            else if (receivedData.startsWith("SL") && receivedData != "SL")
+            {
+                this->lastRXValidCommand = millis();
+                uint32_t currentFilterCut = receivedData.substring(2).toInt();
+                if (currentFilterCut == 0 && (this->lastMode == TRX_VFO_MD_FM || this->lastMode == TRX_VFO_MD_SAM || this->lastMode == TRX_VFO_MD_WFM || this->lastMode == TRX_VFO_MD_BFM))
+                {
+                    // some modes have simmetrical LF/HF values and use TS2K command value LF = 0 to represent HF value on both "cuts" (LF / HF)
+                    // so SL0; and SH2000; is equivalent to LOWCUT = 2000 & HI CUT = 2000
+                    if (this->lastLFFilter != this->lastHFFilter)
+                    {
+                        this->lastLFFilter = this->lastHFFilter;
+                        trx->setCurrentVFOFilter(this->lastLFFilter, this->lastHFFilter);
+                    }
+                }
+                else
+                {
+                    if (currentFilterCut != this->lastLFFilter)
+                    {
+                        trx->setCurrentVFOFilterLowCut(currentFilterCut);
+                        this->lastLFFilter = currentFilterCut;
+                    }
+                }
             }
             else if (receivedData.startsWith("AG") && receivedData != "AG")
             {
                 this->lastRXValidCommand = millis();
-                trx->setAFGain(receivedData.substring(2).toInt());
+                uint8_t currentAFGain = receivedData.substring(2).toInt();
+                if (currentAFGain != this->lastAFGain)
+                {
+                    trx->setAFGain(currentAFGain);
+                    this->lastAFGain = currentAFGain;
+                }
             }
             else if (receivedData.startsWith("MU") && receivedData != "MU")
             {
                 this->lastRXValidCommand = millis();
-                uint8_t newMutedStatus = receivedData.substring(2).toInt();
-                if (newMutedStatus == 0)
+                bool currentMutedStatus = receivedData.substring(2).toInt() == 1;
+                if (currentMutedStatus != this->lastMutedStatus)
                 {
-                    trx->setAudioUnMuted();
-                }
-                else if (newMutedStatus == 1)
-                {
-                    trx->setAudioMuted();
+                    if (!currentMutedStatus)
+                    {
+                        trx->setAudioMuted();
+                    }
+                    else
+                    {
+                        trx->setAudioUnMuted();
+                    }
+                    this->lastMutedStatus = currentMutedStatus;
                 }
             }
             else if (receivedData.startsWith("SM") && receivedData != "SM")
             {
                 this->lastRXValidCommand = millis();
-                uint8_t smLevel = receivedData.substring(2).toInt();
-                trx->setSignalMeter(SIGNAL_METER_TS2K_SDR_RADIO_LEVEL, smLevel);
+                uint8_t currentSMeterUnits = receivedData.substring(2).toInt();
+                if (currentSMeterUnits != this->lastSMeterUnits)
+                {
+                    trx->setSignalMeter(SIGNAL_METER_TS2K_SDR_RADIO_LEVEL, currentSMeterUnits);
+                    this->lastSMeterUnits = currentSMeterUnits;
+                }
+            }
+            else
+            {
+                this->rxFlush();
             }
         }
     }
-    else
-    {
-        this->rxFlush();
-    }
 }
 
-void SDRRadioTS2KSerialConnection::syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
+void SDRRadioTS2KSerialConnection::incrementRemoteFrequency(uint64_t hz)
 {
-    if (currentTrxStatus != nullptr)
+    char serialCommandStr[15] = {'\0'};
+    this->lastFrequency += hz;
+    snprintf(serialCommandStr, sizeof(serialCommandStr), "FA%011llu;", this->lastFrequency);
+    this->send(serialCommandStr);
+    this->lastCATActivity = millis();
+}
+
+void SDRRadioTS2KSerialConnection::decrementRemoteFrequency(uint64_t hz)
+{
+    if (this->lastFrequency > 0)
     {
-        if (currentTrxStatus->poweredOn)
+        char serialCommandStr[15] = {'\0'};
+        if (this->lastFrequency - hz >= 0)
         {
-            // connected => main
-            /*
-            this->send("FA;");   // get frequency
-            this->send("MD;");   // get mode
-            this->send("SL;");   // get low filter
-            this->send("SH;");   // get high filter
-            this->send("AG0;");  // get af gain (volume)
-            this->send("MU;");   // get audio mute status
-            this->send("SM0;");  // get signal meter level
-            */
-            // this works BETTER than sending separated commands (with own delay)
-            char customCMD[256];
-            sprintf(customCMD, "FA%011llu;MD;SL;SH;AG0;MU;SM0;", currentTrxStatus->VFO[currentTrxStatus->activeVFOIndex].frequency);
-            // this->send(customCMD);
-            this->rxFlush();
-            this->lastCATActivity = millis();
+            this->lastFrequency -= hz;
         }
+        else
+        {
+            this->lastFrequency = 0;
+        }
+        snprintf(serialCommandStr, sizeof(serialCommandStr), "FA%011llu;", this->lastFrequency);
+        this->send(serialCommandStr);
+        this->lastCATActivity = millis();
     }
 }
