@@ -96,8 +96,15 @@ bool Transceiver::setActiveVFO(uint8_t VFOIndex, bool fromISR)
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.activeVFOIndex = VFOIndex;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.activeVFOIndex != VFOIndex)
+      {
+        currentStatus.activeVFOIndex = VFOIndex;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -141,9 +148,15 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fro
     {
       if (VFOIndex < TRANSCEIVER_VFO_COUNT)
       {
-
-        currentStatus.VFO[VFOIndex].frequency = frequency;
-        return (this->setCurrentStatus(&currentStatus, fromISR));
+        if (currentStatus.VFO[VFOIndex].frequency != frequency)
+        {
+          currentStatus.VFO[VFOIndex].frequency = frequency;
+          return (this->setCurrentStatus(&currentStatus, fromISR));
+        }
+        else
+        {
+          return (false);
+        }
       }
       else
       {
@@ -168,8 +181,15 @@ bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
     TransceiverStatus currentStatus;
     if (this->getCurrentStatus(&currentStatus, fromISR))
     {
-      currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency != frequency)
+      {
+        currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -241,8 +261,15 @@ bool Transceiver::setVFOMode(uint8_t VFOIndex, TrxVFOMode mode, bool fromISR)
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].mode = mode;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.VFO[VFOIndex].mode != mode)
+      {
+        currentStatus.VFO[VFOIndex].mode = mode;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -309,7 +336,6 @@ bool Transceiver::copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR)
       currentStatus.VFO[destIndex].frequency = currentStatus.VFO[sourceIndex].frequency;
       currentStatus.VFO[destIndex].mode = currentStatus.VFO[sourceIndex].mode;
       currentStatus.VFO[destIndex].frequencyStep = currentStatus.VFO[sourceIndex].frequencyStep;
-      currentStatus.VFO[destIndex].filter.changeMode = currentStatus.VFO[sourceIndex].filter.changeMode;
       currentStatus.VFO[destIndex].filter.LF = currentStatus.VFO[sourceIndex].filter.LF;
       currentStatus.VFO[destIndex].filter.HF = currentStatus.VFO[sourceIndex].filter.HF;
       return (this->setCurrentStatus(&currentStatus, fromISR));
@@ -325,53 +351,6 @@ bool Transceiver::copyVFO(uint8_t sourceIndex, uint8_t destIndex, bool fromISR)
   }
 }
 
-bool Transceiver::setVFOFilterChangeMode(uint8_t VFOIndex, TrxVFOFilterChangeMode mode, bool fromISR)
-{
-  TransceiverStatus currentStatus;
-  if (this->getCurrentStatus(&currentStatus, fromISR))
-  {
-    if (VFOIndex < TRANSCEIVER_VFO_COUNT)
-    {
-      currentStatus.VFO[VFOIndex].filter.changeMode = mode;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
-    }
-    else
-    {
-      return (false);
-    }
-  }
-  else
-  {
-    return (false);
-  }
-}
-
-bool Transceiver::toggleActiveVFOFilterChangeMode(bool fromISR)
-{
-  TransceiverStatus currentStatus;
-  if (this->getCurrentStatus(&currentStatus, fromISR))
-  {
-    switch (currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode)
-    {
-    case TRX_VFO_F_CM_BOTH:
-      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_LOW;
-      break;
-    case TRX_VFO_F_CM_LOW:
-      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_HIGH;
-      break;
-    case TRX_VFO_F_CM_HIGH:
-    default:
-      currentStatus.VFO[currentStatus.activeVFOIndex].filter.changeMode = TRX_VFO_F_CM_BOTH;
-      break;
-    }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
-  }
-  else
-  {
-    return (false);
-  }
-}
-
 bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR)
 {
   TransceiverStatus currentStatus;
@@ -379,8 +358,15 @@ bool Transceiver::setVFOFilterLowCut(uint8_t VFOIndex, uint32_t LF, bool fromISR
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].filter.LF = LF;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.VFO[VFOIndex].filter.LF != LF)
+      {
+        currentStatus.VFO[VFOIndex].filter.LF = LF;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -400,8 +386,15 @@ bool Transceiver::setVFOFilterHighCut(uint8_t VFOIndex, uint32_t HF, bool fromIS
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].filter.HF = HF;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.VFO[VFOIndex].filter.HF != HF)
+      {
+        currentStatus.VFO[VFOIndex].filter.HF = HF;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -421,8 +414,15 @@ bool Transceiver::setVFOCustomStep(uint8_t VFOIndex, uint64_t frequencyStep, boo
   {
     if (VFOIndex < TRANSCEIVER_VFO_COUNT)
     {
-      currentStatus.VFO[VFOIndex].frequencyStep = frequencyStep;
-      return (this->setCurrentStatus(&currentStatus, fromISR));
+      if (currentStatus.VFO[VFOIndex].frequencyStep != frequencyStep)
+      {
+        currentStatus.VFO[VFOIndex].frequencyStep = frequencyStep;
+        return (this->setCurrentStatus(&currentStatus, fromISR));
+      }
+      else
+      {
+        return (false);
+      }
     }
     else
     {
@@ -461,18 +461,30 @@ bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool 
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
+    bool changed = false;
+    int8_t newLevel = 0;
     switch (unitType)
     {
     case SIGNAL_METER_TS2K_SDR_RADIO_LEVEL:
-      currentStatus.signalMeterdBLevel = (units * 3) - 54;
+      newLevel = (units * 3) - 54;
+      changed = currentStatus.signalMeterdBLevel != newLevel;
       break;
     case SIGNAL_METER_DB_UNITS:
-      currentStatus.signalMeterdBLevel = units;
+      newLevel = units;
+      changed = currentStatus.signalMeterdBLevel != newLevel;
       break;
     default:
       break;
     }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (changed)
+    {
+      currentStatus.signalMeterdBLevel = newLevel;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -485,8 +497,15 @@ bool Transceiver::setAFGain(uint8_t value, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.AFGain = value;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (currentStatus.AFGain != value)
+    {
+      currentStatus.AFGain = value;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -499,15 +518,22 @@ bool Transceiver::incrementAFGain(uint8_t units, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if ((currentStatus.AFGain + units) <= 100)
+    if (currentStatus.AFGain < 100)
     {
-      currentStatus.AFGain += units;
+      if ((currentStatus.AFGain + units) <= 100)
+      {
+        currentStatus.AFGain += units;
+      }
+      else
+      {
+        currentStatus.AFGain = 100;
+      }
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
-      currentStatus.AFGain = 100;
+      return (false);
     }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -520,15 +546,22 @@ bool Transceiver::decrementAFGain(uint8_t units, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if ((currentStatus.AFGain - units) >= 0)
+    if (currentStatus.AFGain > 0)
     {
-      currentStatus.AFGain -= units;
+      if ((currentStatus.AFGain - units) >= 0)
+      {
+        currentStatus.AFGain -= units;
+      }
+      else
+      {
+        currentStatus.AFGain = 0;
+      }
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
-      currentStatus.AFGain = 0;
+      return (false);
     }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -541,8 +574,15 @@ bool Transceiver::setSquelch(uint8_t value, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.squelch = value;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (currentStatus.squelch != value)
+    {
+      currentStatus.squelch = value;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -555,15 +595,22 @@ bool Transceiver::incrementSquelch(uint8_t units, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if ((currentStatus.squelch + units) <= 100)
+    if (currentStatus.squelch < 100)
     {
-      currentStatus.squelch += units;
+      if ((currentStatus.squelch + units) <= 100)
+      {
+        currentStatus.squelch += units;
+      }
+      else
+      {
+        currentStatus.squelch = 100;
+      }
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
-      currentStatus.squelch = 100;
+      return (false);
     }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -576,15 +623,22 @@ bool Transceiver::decrementSquelch(uint8_t units, bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    if ((currentStatus.squelch - units) >= 0)
+    if (currentStatus.squelch > 0)
     {
-      currentStatus.squelch -= units;
+      if ((currentStatus.squelch - units) >= 0)
+      {
+        currentStatus.squelch -= units;
+      }
+      else
+      {
+        currentStatus.squelch = 0;
+      }
+      return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
     {
-      currentStatus.squelch = 0;
+      return (false);
     }
-    return (this->setCurrentStatus(&currentStatus, fromISR));
   }
   else
   {
@@ -597,8 +651,15 @@ bool Transceiver::setAudioMuted(bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.audioMuted = true;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (!currentStatus.audioMuted)
+    {
+      currentStatus.audioMuted = true;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -611,8 +672,15 @@ bool Transceiver::setAudioUnMuted(bool fromISR)
   TransceiverStatus currentStatus;
   if (this->getCurrentStatus(&currentStatus, fromISR))
   {
-    currentStatus.audioMuted = false;
-    return (this->setCurrentStatus(&currentStatus, fromISR));
+    if (currentStatus.audioMuted)
+    {
+      currentStatus.audioMuted = false;
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
   }
   else
   {
@@ -630,14 +698,4 @@ bool Transceiver::decreaseActiveVFOBand(bool fromISR)
 {
   // TODO
   return (false);
-}
-
-void Transceiver::incSerialCommandCount(void)
-{
-  this->serialCommandCount++;
-}
-
-uint64_t Transceiver::getSerialCommandCount(void)
-{
-  return (this->serialCommandCount);
 }
