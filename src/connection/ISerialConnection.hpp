@@ -10,7 +10,6 @@ class ISerialConnection
 public:
     virtual ~ISerialConnection() {}
     virtual void loop(Transceiver *trx) = 0;
-    virtual void syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus) = 0;
 };
 
 #endif // SDR_REMOTE_CONTROL_SERIAL_CONNECTION_INTERFACE

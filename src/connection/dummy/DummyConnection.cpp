@@ -31,13 +31,3 @@ void DummyConnection::loop(Transceiver *trx)
         }
     }
 }
-
-void DummyConnection::syncLocalToRemote(Transceiver *trx, const TransceiverStatus *currentTrxStatus)
-{
-    if (currentTrxStatus != nullptr)
-    {
-        if (currentTrxStatus->poweredOn)
-        {
-        }
-    }
-}
