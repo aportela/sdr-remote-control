@@ -139,6 +139,8 @@ public:
   bool decreaseActiveVFOBand(bool fromISR = false);
 
   bool enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd = nullptr, bool fromISR = false);
+
+  bool dequeueSyncCommand(TransceiverSyncCommand *trxSyncCmd = nullptr, bool fromISR = false);
 };
 
 #endif // SDR_REMOTE_CONTROL_TRANSCEIVER_H

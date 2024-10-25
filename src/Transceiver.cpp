@@ -811,3 +811,28 @@ bool Transceiver::enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fr
     return (false);
   }
 }
+
+bool Transceiver::dequeueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fromISR)
+{
+  if (this->syncQueue != nullptr && trxSyncCmd != nullptr)
+  {
+    if (!fromISR)
+    {
+      return (xQueueReceive(this->syncQueue, trxSyncCmd, 1) != pdPASS);
+    }
+    else
+    {
+      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+      bool result = xQueueReceiveFromISR(this->syncQueue, trxSyncCmd, &xHigherPriorityTaskWoken) != pdPASS;
+      if (xHigherPriorityTaskWoken == pdTRUE)
+      {
+        portYIELD_FROM_ISR();
+      }
+      return (result);
+    }
+  }
+  else
+  {
+    return (false);
+  }
+}
