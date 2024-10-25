@@ -42,12 +42,55 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
 {
     if (trx != nullptr)
     {
-        bool sendRequired = false;
-        char buffer[64] = {'\0'};
-        if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
+        bool hasSyncCmds = false;    // this is for sending pending queue manual sync commands
+        uint8_t maxLoopSyncCmds = 8; // only get first 8 elements from queue for avoiding very long sync blocks
+        bool manualFreqSet = false;  // this is for checking if set frequency manual sync command exists on queued cmds
+        TransceiverSyncCommand *syncCmdPtr = new TransceiverSyncCommand();
+        char str[1024] = {'\0'};
+        uint64_t lastSyncCmdFreq = this->lastFrequency; // get last "known" frequency (required for increase/decrease)
+        while (trx->dequeueSyncCommand(syncCmdPtr, false) && maxLoopSyncCmds-- > 0)
         {
-            snprintf(buffer, sizeof(buffer), "%s", "FA;MD;SH;SL;AG0;MU;SM0;");
-            this->send(buffer);
+            char cmd[32] = {'\0'};
+            switch (syncCmdPtr->getCommandType())
+            {
+            case TSCT_SET_FREQUENCY:
+                hasSyncCmds = true;
+                manualFreqSet = true;
+                lastSyncCmdFreq = syncCmdPtr->getUIntValue();
+                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                strcat(str, cmd);
+                break;
+            case TSCT_INCREASE_FREQUENCY:
+                hasSyncCmds = true;
+                manualFreqSet = true;
+                lastSyncCmdFreq += syncCmdPtr->getUIntValue();
+                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                strcat(str, cmd);
+                break;
+            case TSCT_DECREASE_FREQUENCY:
+                hasSyncCmds = true;
+                manualFreqSet = true;
+                lastSyncCmdFreq -= syncCmdPtr->getUIntValue();
+                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                strcat(str, cmd);
+                break;
+            }
+        }
+        if (hasSyncCmds)
+        {
+            if (manualFreqSet)
+            {
+                strcat(str, "MD;SH;SL;AG0;MU;SM0;");
+            }
+            else
+            {
+                strcat(str, "FA;MD;SH;SL;AG0;MU;SM0;");
+            }
+            this->send(str);
+        }
+        else if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)
+        {
+            this->send("FA;MD;SH;SL;AG0;MU;SM0;");
         }
         while (this->serial->available() > 0)
         {
