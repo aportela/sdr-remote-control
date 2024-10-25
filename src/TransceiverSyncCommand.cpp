@@ -1,5 +1,9 @@
 #include "TransceiverSyncCommand.hpp"
 
+TransceiverSyncCommand::TransceiverSyncCommand()
+{
+}
+
 TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd, bool value)
 {
     this->cmdType = cmd;
