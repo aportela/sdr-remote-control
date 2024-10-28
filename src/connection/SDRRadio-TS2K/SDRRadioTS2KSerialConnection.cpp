@@ -45,34 +45,36 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
         bool hasSyncCmds = false;    // this is for sending pending queue manual sync commands
         uint8_t maxLoopSyncCmds = 8; // only get first 8 elements from queue for avoiding very long sync blocks
         bool manualFreqSet = false;  // this is for checking if set frequency manual sync command exists on queued cmds
-        TransceiverSyncCommand *syncCmdPtr = new TransceiverSyncCommand();
+        TransceiverSyncCommand syncCmdPtr;
+        TransceiverStatus trxStatus;
+        trx->getCurrentStatus(&trxStatus, false);
         char str[1024] = {'\0'};
         uint64_t lastSyncCmdFreq = this->lastFrequency; // get last "known" frequency (required for increase/decrease)
-        while (trx->dequeueSyncCommand(syncCmdPtr, false) && maxLoopSyncCmds-- > 0)
+        while (trx->dequeueSyncCommand(&syncCmdPtr, false) && maxLoopSyncCmds-- > 0)
         {
             char cmd[32] = {'\0'};
-            switch (syncCmdPtr->getCommandType())
+            switch (syncCmdPtr.getCommandType())
             {
             case TSCT_SET_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq = syncCmdPtr->getUIntValue();
+                lastSyncCmdFreq = syncCmdPtr.getUIntValue();
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strcat(str, cmd);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_INCREASE_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq += syncCmdPtr->getUIntValue();
+                lastSyncCmdFreq += syncCmdPtr.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strcat(str, cmd);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_DECREASE_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq -= syncCmdPtr->getUIntValue();
+                lastSyncCmdFreq -= syncCmdPtr.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strcat(str, cmd);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             }
         }
@@ -80,11 +82,11 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
         {
             if (manualFreqSet)
             {
-                strcat(str, "MD;SH;SL;AG0;MU;SM0;");
+                strncat(str, "MD;SH;SL;AG0;MU;SM0;", sizeof(str) - strlen(str) - 1);
             }
             else
             {
-                strcat(str, "FA;MD;SH;SL;AG0;MU;SM0;");
+                strncat(str, "FA;MD;SH;SL;AG0;MU;SM0;", sizeof(str) - strlen(str) - 1);
             }
             this->send(str);
         }
@@ -206,33 +208,5 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                 this->rxFlush();
             }
         }
-    }
-}
-
-void SDRRadioTS2KSerialConnection::incrementRemoteFrequency(uint64_t hz)
-{
-    char serialCommandStr[15] = {'\0'};
-    this->lastFrequency += hz;
-    snprintf(serialCommandStr, sizeof(serialCommandStr), "FA%011llu;", this->lastFrequency);
-    this->send(serialCommandStr);
-    this->lastCATActivity = millis();
-}
-
-void SDRRadioTS2KSerialConnection::decrementRemoteFrequency(uint64_t hz)
-{
-    if (this->lastFrequency > 0)
-    {
-        char serialCommandStr[15] = {'\0'};
-        if (this->lastFrequency - hz >= 0)
-        {
-            this->lastFrequency -= hz;
-        }
-        else
-        {
-            this->lastFrequency = 0;
-        }
-        snprintf(serialCommandStr, sizeof(serialCommandStr), "FA%011llu;", this->lastFrequency);
-        this->send(serialCommandStr);
-        this->lastCATActivity = millis();
     }
 }
