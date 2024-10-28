@@ -52,52 +52,77 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
         char str[1024] = {'\0'};
         uint64_t lastSyncCmdFreq = this->lastFrequency; // get last "known" frequency (required for increase/decrease)
         uint8_t lastSyncCmdAFGain = this->lastAFGain;   // get last "known" af gain (required for increase/decrease)
+        uint64_t tmpCmdUint64Value = 0;
         while (trx->dequeueSyncCommand(&syncCmd, false) && maxLoopSyncCmds-- > 0)
         {
             char cmd[32] = {'\0'};
             switch (syncCmd.getCommandType())
             {
             case TSCT_SET_FREQUENCY:
-                hasSyncCmds = true;
-                manualFreqSet = true;
-                lastSyncCmdFreq = syncCmd.getUIntValue();
-                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue();
+                if (tmpCmdUint64Value >= MIN_FREQUENCY && tmpCmdUint64Value <= MAX_FREQUENCY)
+                {
+                    hasSyncCmds = true;
+                    manualFreqSet = true;
+                    lastSyncCmdFreq = tmpCmdUint64Value;
+                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             case TSCT_INCREASE_FREQUENCY:
-                hasSyncCmds = true;
-                manualFreqSet = true;
-                lastSyncCmdFreq += syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
-                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
+                if (lastSyncCmdFreq + tmpCmdUint64Value <= MAX_FREQUENCY)
+                {
+                    hasSyncCmds = true;
+                    manualFreqSet = true;
+                    lastSyncCmdFreq += tmpCmdUint64Value;
+                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             case TSCT_DECREASE_FREQUENCY:
-                hasSyncCmds = true;
-                manualFreqSet = true;
-                lastSyncCmdFreq -= syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
-                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
+                if (lastSyncCmdFreq - tmpCmdUint64Value >= MIN_FREQUENCY)
+                {
+                    hasSyncCmds = true;
+                    manualFreqSet = true;
+                    lastSyncCmdFreq -= tmpCmdUint64Value;
+                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             case TSCT_SET_AF_GAIN:
-                hasSyncCmds = true;
-                manualAFGainSet = true;
-                lastSyncCmdAFGain = syncCmd.getUIntValue();
-                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue();
+                if (tmpCmdUint64Value >= MIN_AF_GAIN && tmpCmdUint64Value <= MAX_AF_GAIN)
+                {
+                    hasSyncCmds = true;
+                    manualAFGainSet = true;
+                    lastSyncCmdAFGain = tmpCmdUint64Value;
+                    sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             case TSCT_INCREASE_AF_GAIN:
-                hasSyncCmds = true;
-                manualAFGainSet = true;
-                lastSyncCmdAFGain += syncCmd.getUIntValue();
-                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue();
+                if (lastSyncCmdAFGain + tmpCmdUint64Value <= MAX_AF_GAIN)
+                {
+                    hasSyncCmds = true;
+                    manualAFGainSet = true;
+                    lastSyncCmdAFGain += tmpCmdUint64Value;
+                    sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             case TSCT_DECREASE_AF_GAIN:
-                hasSyncCmds = true;
-                manualAFGainSet = true;
-                lastSyncCmdAFGain -= syncCmd.getUIntValue();
-                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
-                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                tmpCmdUint64Value = syncCmd.getUIntValue();
+                if (lastSyncCmdAFGain - tmpCmdUint64Value >= MIN_AF_GAIN)
+                {
+                    hasSyncCmds = true;
+                    manualAFGainSet = true;
+                    lastSyncCmdAFGain -= tmpCmdUint64Value;
+                    sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
                 break;
             }
         }
