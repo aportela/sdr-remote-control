@@ -1,4 +1,5 @@
 #include "SDRRadioTS2KSerialConnection.hpp"
+#include <inttypes.h>
 
 SDRRadioTS2KSerialConnection::SDRRadioTS2KSerialConnection(HardwareSerial *serialPort, long speed, long timeout)
     : SerialConnection(serialPort, speed, timeout)
@@ -70,7 +71,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                 manualFreqSet = true;
                 manualModeSet = true;
                 lastSyncCmdFreq = trxStatus.VFO[trxStatus.activeVFOIndex].frequency;
-                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
                 strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 sprintf(cmd, "MD%u;", trxStatus.VFO[trxStatus.activeVFOIndex].mode);
                 strncat(str, cmd, sizeof(str) - strlen(str) - 1);
@@ -82,7 +83,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     hasSyncCmds = true;
                     manualFreqSet = true;
                     lastSyncCmdFreq = tmpCmdUint64Value;
-                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
                     strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 }
                 break;
@@ -93,7 +94,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     hasSyncCmds = true;
                     manualFreqSet = true;
                     lastSyncCmdFreq += tmpCmdUint64Value;
-                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
                     strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 }
                 break;
@@ -104,7 +105,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     hasSyncCmds = true;
                     manualFreqSet = true;
                     lastSyncCmdFreq -= tmpCmdUint64Value;
-                    sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                    sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
                     strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 }
                 break;
