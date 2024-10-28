@@ -21,9 +21,6 @@ public:
     void loop(Transceiver *trx) override;
 
     bool tryConnection(Transceiver *trx) override;
-
-    void incrementRemoteFrequency(uint64_t hz);
-    void decrementRemoteFrequency(uint64_t hz);
 };
 
 #endif // SDR_REMOTE_CONTROL_SDRRADIO_TS2K_SERIAL_CONNECTION_H
