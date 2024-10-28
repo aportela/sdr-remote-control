@@ -144,6 +144,14 @@ bool LGFXFilterWidget::refresh(bool force)
     }
     if (maxLF > 0 && maxHF > 0)
     {
+      if (maxLF < this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF)
+      {
+        maxLF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF;
+      }
+      if (maxHF < this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF)
+      {
+        maxHF = this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF;
+      }
       this->refreshPlot(force, 0, 0, maxLF, maxHF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.LF, this->currentTransceiverStatusPtr->VFO[currentTransceiverStatusPtr->activeVFOIndex].filter.HF);
     }
     else if (force || changed)
