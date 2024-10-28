@@ -42,52 +42,76 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
 {
     if (trx != nullptr)
     {
-        bool hasSyncCmds = false;    // this is for sending pending queue manual sync commands
-        uint8_t maxLoopSyncCmds = 8; // only get first 8 elements from queue for avoiding very long sync blocks
-        bool manualFreqSet = false;  // this is for checking if set frequency manual sync command exists on queued cmds
-        TransceiverSyncCommand syncCmdPtr;
+        bool hasSyncCmds = false;     // this is for sending pending queue manual sync commands
+        uint8_t maxLoopSyncCmds = 8;  // only get first 8 elements from queue for avoiding very long sync blocks
+        bool manualFreqSet = false;   // this is for checking if set frequency manual sync command exists on queued cmds
+        bool manualAFGainSet = false; // this is for checking if set af gain manual sync command exists on queued cmds
+        TransceiverSyncCommand syncCmd;
         TransceiverStatus trxStatus;
         trx->getCurrentStatus(&trxStatus, false);
         char str[1024] = {'\0'};
         uint64_t lastSyncCmdFreq = this->lastFrequency; // get last "known" frequency (required for increase/decrease)
-        while (trx->dequeueSyncCommand(&syncCmdPtr, false) && maxLoopSyncCmds-- > 0)
+        uint8_t lastSyncCmdAFGain = this->lastAFGain;   // get last "known" af gain (required for increase/decrease)
+        while (trx->dequeueSyncCommand(&syncCmd, false) && maxLoopSyncCmds-- > 0)
         {
             char cmd[32] = {'\0'};
-            switch (syncCmdPtr.getCommandType())
+            switch (syncCmd.getCommandType())
             {
             case TSCT_SET_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq = syncCmdPtr.getUIntValue();
+                lastSyncCmdFreq = syncCmd.getUIntValue();
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
                 strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_INCREASE_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq += syncCmdPtr.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
+                lastSyncCmdFreq += syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
                 strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_DECREASE_FREQUENCY:
                 hasSyncCmds = true;
                 manualFreqSet = true;
-                lastSyncCmdFreq -= syncCmdPtr.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
+                lastSyncCmdFreq -= syncCmd.getUIntValue() * trxStatus.VFO[trxStatus.activeVFOIndex].frequencyStep;
                 sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                break;
+            case TSCT_SET_AF_GAIN:
+                hasSyncCmds = true;
+                manualAFGainSet = true;
+                lastSyncCmdAFGain = syncCmd.getUIntValue();
+                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                break;
+            case TSCT_INCREASE_AF_GAIN:
+                hasSyncCmds = true;
+                manualAFGainSet = true;
+                lastSyncCmdAFGain += syncCmd.getUIntValue();
+                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                break;
+            case TSCT_DECREASE_AF_GAIN:
+                hasSyncCmds = true;
+                manualAFGainSet = true;
+                lastSyncCmdAFGain -= syncCmd.getUIntValue();
+                sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
                 strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             }
         }
         if (hasSyncCmds)
         {
-            if (manualFreqSet)
+            if (!manualFreqSet)
             {
-                strncat(str, "MD;SH;SL;AG0;MU;SM0;", sizeof(str) - strlen(str) - 1);
+                strncat(str, "FA;", sizeof(str) - strlen(str) - 1);
             }
-            else
+            if (!manualAFGainSet)
             {
-                strncat(str, "FA;MD;SH;SL;AG0;MU;SM0;", sizeof(str) - strlen(str) - 1);
+                strncat(str, "AG;", sizeof(str) - strlen(str) - 1);
             }
+            strncat(str, "MD;SH;SL;MU;SM0;", sizeof(str) - strlen(str) - 1);
             this->send(str);
         }
         else if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)

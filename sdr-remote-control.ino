@@ -14,7 +14,7 @@
 #include "src/MenuConfiguration.hpp"
 #include "src/Menu.hpp"
 
-#define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
+// #define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
 
 #ifdef DEBUG_FPS
 
@@ -102,7 +102,11 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->incrementActiveVFOFrequency(acceleratedDelta, true);
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, acceleratedDelta), true);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, acceleratedDelta), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
@@ -111,6 +115,10 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
     trx->incrementActiveVFOFrequency(1, true);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, 1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
@@ -122,6 +130,11 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
     trx->incrementAFGain(1, true);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+    uint8_t v = 1;
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_AF_GAIN, v), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
   }
@@ -150,6 +163,10 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
     trx->decrementActiveVFOFrequency(acceleratedDelta, true);
 
+#else // DEBUG_DUMMY_CONNECTION
+
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, acceleratedDelta), true);
+
 #endif // DEBUG_DUMMY_CONNECTION
 
 #else // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
@@ -157,6 +174,10 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
     trx->decrementActiveVFOFrequency(1, true);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, 1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
@@ -168,6 +189,11 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
     trx->decrementAFGain(1, true);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+    uint8_t v = 1;
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_AF_GAIN, v), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
   }
