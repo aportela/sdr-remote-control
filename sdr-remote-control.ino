@@ -305,8 +305,12 @@ void onKP8Loop(uint8_t pressedMask = 0)
     {
     case 1: // VFO A/B
       menu->click(4);
-      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_ACTIVE_VFO_INDEX_CHANGED), true);
       trx->toggleActiveVFO(false);
+#ifndef DEBUG_DUMMY_CONNECTION
+
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_ACTIVE_VFO_INDEX_CHANGED), true);
+
+#endif
       break;
     }
   }
@@ -329,6 +333,11 @@ void onKP8Loop(uint8_t pressedMask = 0)
     case 1: // VFO MODE
       menu->click(6);
       trx->toggleActiveVFOMode(false);
+#ifndef DEBUG_DUMMY_CONNECTION
+
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_TOGGLE_VFO_MODE));
+
+#endif
       break;
     }
   }

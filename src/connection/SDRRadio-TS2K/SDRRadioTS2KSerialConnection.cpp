@@ -46,6 +46,7 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
         uint8_t maxLoopSyncCmds = 8;  // only get first 8 elements from queue for avoiding very long sync blocks
         bool manualFreqSet = false;   // this is for checking if set frequency manual sync command exists on queued cmds
         bool manualAFGainSet = false; // this is for checking if set af gain manual sync command exists on queued cmds
+        bool manualModeSet = false;   // this is for checking if set mode manual sync command exists on queued cmds
         TransceiverSyncCommand syncCmd;
         TransceiverStatus trxStatus;
         trx->getCurrentStatus(&trxStatus, false);
@@ -64,6 +65,15 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                 this->lastMode = TRX_VFO_MODE_ERROR;
                 this->lastLFFilter = 0;
                 this->lastHFFilter = 0;
+                // TODO: send current active VFO values
+                hasSyncCmds = true;
+                manualFreqSet = true;
+                manualModeSet = true;
+                lastSyncCmdFreq = trxStatus.VFO[trxStatus.activeVFOIndex].frequency;
+                sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                sprintf(cmd, "MD%u;", trxStatus.VFO[trxStatus.activeVFOIndex].mode);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_SET_FREQUENCY:
                 tmpCmdUint64Value = syncCmd.getUIntValue();
@@ -97,6 +107,12 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     sprintf(cmd, "FA%011llu;", lastSyncCmdFreq);
                     strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 }
+                break;
+            case TSCT_TOGGLE_VFO_MODE:
+                hasSyncCmds = true;
+                manualModeSet = true;
+                sprintf(cmd, "MD%u;", trxStatus.VFO[trxStatus.activeVFOIndex].mode);
+                strncat(str, cmd, sizeof(str) - strlen(str) - 1);
                 break;
             case TSCT_SET_AF_GAIN:
                 tmpCmdUint64Value = syncCmd.getUIntValue();
@@ -143,7 +159,11 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
             {
                 strncat(str, "AG;", sizeof(str) - strlen(str) - 1);
             }
-            strncat(str, "MD;SH;SL;MU;SM0;", sizeof(str) - strlen(str) - 1);
+            if (!manualModeSet)
+            {
+                strncat(str, "MD;", sizeof(str) - strlen(str) - 1);
+            }
+            strncat(str, "SH;SL;MU;SM0;", sizeof(str) - strlen(str) - 1);
             this->send(str);
         }
         else if (millis() - this->lastTXActivity > MILLISECONDS_BETWEEN_LOOP)

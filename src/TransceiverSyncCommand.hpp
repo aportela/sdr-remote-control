@@ -13,7 +13,8 @@ enum TransceiverSyncCommandType
     TSCT_SET_AF_GAIN,
     TSCT_INCREASE_AF_GAIN,
     TSCT_DECREASE_AF_GAIN,
-    TSCT_ACTIVE_VFO_INDEX_CHANGED
+    TSCT_ACTIVE_VFO_INDEX_CHANGED,
+    TSCT_TOGGLE_VFO_MODE
 };
 
 class TransceiverSyncCommand
