@@ -58,6 +58,13 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
             char cmd[32] = {'\0'};
             switch (syncCmd.getCommandType())
             {
+            case TSCT_ACTIVE_VFO_INDEX_CHANGED:
+                // reset previous "current" values on vfo changes
+                this->lastFrequency = 0;
+                this->lastMode = TRX_VFO_MODE_ERROR;
+                this->lastLFFilter = 0;
+                this->lastHFFilter = 0;
+                break;
             case TSCT_SET_FREQUENCY:
                 tmpCmdUint64Value = syncCmd.getUIntValue();
                 if (tmpCmdUint64Value >= MIN_FREQUENCY && tmpCmdUint64Value <= MAX_FREQUENCY)

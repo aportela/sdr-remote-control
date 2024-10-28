@@ -12,7 +12,8 @@ enum TransceiverSyncCommandType
     TSCT_DECREASE_FREQUENCY,
     TSCT_SET_AF_GAIN,
     TSCT_INCREASE_AF_GAIN,
-    TSCT_DECREASE_AF_GAIN
+    TSCT_DECREASE_AF_GAIN,
+    TSCT_ACTIVE_VFO_INDEX_CHANGED
 };
 
 class TransceiverSyncCommand
@@ -25,6 +26,7 @@ private:
 
 public:
     TransceiverSyncCommand();
+    TransceiverSyncCommand(TransceiverSyncCommandType cmd);
     TransceiverSyncCommand(TransceiverSyncCommandType cmd, bool value);
     TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint8_t value);
     TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint64_t value);

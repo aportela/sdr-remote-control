@@ -305,6 +305,7 @@ void onKP8Loop(uint8_t pressedMask = 0)
     {
     case 1: // VFO A/B
       menu->click(4);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_ACTIVE_VFO_INDEX_CHANGED), true);
       trx->toggleActiveVFO(false);
       break;
     }

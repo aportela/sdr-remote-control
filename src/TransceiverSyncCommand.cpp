@@ -4,6 +4,11 @@ TransceiverSyncCommand::TransceiverSyncCommand()
 {
 }
 
+TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd)
+{
+    this->cmdType = cmd;
+}
+
 TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd, bool value)
 {
     this->cmdType = cmd;
