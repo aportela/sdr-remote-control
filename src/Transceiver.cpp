@@ -791,6 +791,7 @@ bool Transceiver::enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fr
 {
   if (this->syncQueue != nullptr && trxSyncCmd != nullptr)
   {
+    // TODO: remove first element if queueSend returns errQUEUE_FULL
     if (!fromISR)
     {
       return (xQueueSend(this->syncQueue, trxSyncCmd, portMAX_DELAY) != pdPASS);
@@ -818,12 +819,12 @@ bool Transceiver::dequeueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fr
   {
     if (!fromISR)
     {
-      return (xQueueReceive(this->syncQueue, trxSyncCmd, 1) != pdPASS);
+      return (xQueueReceive(this->syncQueue, trxSyncCmd, 1) == pdPASS);
     }
     else
     {
       BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-      bool result = xQueueReceiveFromISR(this->syncQueue, trxSyncCmd, &xHigherPriorityTaskWoken) != pdPASS;
+      bool result = xQueueReceiveFromISR(this->syncQueue, trxSyncCmd, &xHigherPriorityTaskWoken) == pdPASS;
       if (xHigherPriorityTaskWoken == pdTRUE)
       {
         portYIELD_FROM_ISR();
