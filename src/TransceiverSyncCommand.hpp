@@ -23,6 +23,7 @@ private:
 public:
     TransceiverSyncCommand();
     TransceiverSyncCommand(TransceiverSyncCommandType cmd, bool value);
+    TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint8_t value);
     TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint64_t value);
 
     ~TransceiverSyncCommand();

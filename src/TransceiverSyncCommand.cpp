@@ -10,6 +10,12 @@ TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd, b
     this->booleanValue = value;
 }
 
+TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint8_t value)
+{
+    this->cmdType = cmd;
+    this->uIntValue = value;
+}
+
 TransceiverSyncCommand::TransceiverSyncCommand(TransceiverSyncCommandType cmd, uint64_t value)
 {
     this->cmdType = cmd;
