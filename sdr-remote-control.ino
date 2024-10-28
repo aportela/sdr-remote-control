@@ -93,20 +93,23 @@ SDRRadioTS2KSerialConnection *connection;
 
 void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
-  lastEncoderMillis = millis();
-  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  uint64_t currentMillis = millis();
+  // ignore changes that occur at very high speeds of rotary encoder (serial communication buffer is not sufficient to handle them)
+  if (currentMillis - lastEncoderMillis > 15)
   {
+    if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+    {
 
-    // TODO: send command to serial connection
+      // TODO: send command to serial connection
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, acceleratedDelta), true);
+      trx->incrementActiveVFOFrequency(acceleratedDelta, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, acceleratedDelta), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, acceleratedDelta), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
@@ -114,57 +117,62 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->incrementActiveVFOFrequency(1, true);
+      trx->incrementActiveVFOFrequency(1, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, 1), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_FREQUENCY, 1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
 #endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
-  {
+    }
+    else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+    {
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->incrementAFGain(1, true);
+      trx->incrementAFGain(1, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_AF_GAIN, (uint8_t)1), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_AF_GAIN, (uint8_t)1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
-  {
+    }
+    else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+    {
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    /*
-    trx->VFO[trx->activeVFOIndex].filter.LF += acceleratedDelta;
-    trx->VFO[trx->activeVFOIndex].filter.HF += acceleratedDelta;
-    */
+      /*
+      trx->VFO[trx->activeVFOIndex].filter.LF += acceleratedDelta;
+      trx->VFO[trx->activeVFOIndex].filter.HF += acceleratedDelta;
+      */
 
 #endif // DEBUG_DUMMY_CONNECTION
+    }
+    lastEncoderMillis = currentMillis;
   }
 }
 
 void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
-  lastEncoderMillis = millis();
-  if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+  uint64_t currentMillis = millis();
+  // ignore changes that occur at very high speeds of rotary encoder (serial communication buffer is not sufficient to handle them)
+  if (currentMillis - lastEncoderMillis > 15)
   {
+    if (encoderChangeBitmask & ENCODER_CHANGE_TUNE)
+    {
 #ifdef USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->decrementActiveVFOFrequency(acceleratedDelta, true);
+      trx->decrementActiveVFOFrequency(acceleratedDelta, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, acceleratedDelta), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, acceleratedDelta), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
@@ -172,40 +180,42 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->decrementActiveVFOFrequency(1, true);
+      trx->decrementActiveVFOFrequency(1, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, 1), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_FREQUENCY, 1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
 
 #endif // USE_ENCODER_ACCELERATION_ON_VFO_FREQUENCY_CHANGE
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
-  {
+    }
+    else if (encoderChangeBitmask & ENCODER_CHANGE_VOLUME)
+    {
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    trx->decrementAFGain(1, true);
+      trx->decrementAFGain(1, true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_AF_GAIN, (uint8_t)1), true);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_AF_GAIN, (uint8_t)1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
-  }
-  else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
-  {
+    }
+    else if (encoderChangeBitmask & ENCODER_CHANGE_FILTER_BOTH)
+    {
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-    /*
-    trx->VFO[trx->activeVFOIndex].filter.LF -= acceleratedDelta;
-    trx->VFO[trx->activeVFOIndex].filter.HF -= acceleratedDelta;
-    */
+      /*
+      trx->VFO[trx->activeVFOIndex].filter.LF -= acceleratedDelta;
+      trx->VFO[trx->activeVFOIndex].filter.HF -= acceleratedDelta;
+      */
 
 #endif // DEBUG_DUMMY_CONNECTION
+    }
+    lastEncoderMillis = currentMillis;
   }
 }
 
