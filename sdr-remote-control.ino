@@ -133,8 +133,7 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    uint8_t v = 1;
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_AF_GAIN, v), true);
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_AF_GAIN, (uint8_t)1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
   }
@@ -192,8 +191,7 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 #else // DEBUG_DUMMY_CONNECTION
 
-    uint8_t v = 1;
-    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_AF_GAIN, v), true);
+    trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_AF_GAIN, (uint8_t)1), true);
 
 #endif // DEBUG_DUMMY_CONNECTION
   }
