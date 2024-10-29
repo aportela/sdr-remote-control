@@ -66,7 +66,6 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                 this->lastMode = TRX_VFO_MODE_ERROR;
                 this->lastLFFilter = 0;
                 this->lastHFFilter = 0;
-                // TODO: send current active VFO values
                 hasSyncCmds = true;
                 manualFreqSet = true;
                 manualModeSet = true;
@@ -146,6 +145,44 @@ void SDRRadioTS2KSerialConnection::loop(Transceiver *trx)
                     lastSyncCmdAFGain -= tmpCmdUint64Value;
                     sprintf(cmd, "AG%03d;", lastSyncCmdAFGain);
                     strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                }
+                break;
+            case TSCT_DECREASE_BAND:
+                if (trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex > 1)
+                {
+                    // reset previous "current" values on vfo changes
+                    this->lastFrequency = 0;
+                    this->lastMode = TRX_VFO_MODE_ERROR;
+                    this->lastLFFilter = 0;
+                    this->lastHFFilter = 0;
+                    hasSyncCmds = true;
+                    manualFreqSet = true;
+                    manualModeSet = true;
+                    lastSyncCmdFreq = RadioBands[trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex - 1].minFrequency;
+                    sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                    sprintf(cmd, "MD%u;", RadioBands[trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex - 1].modulationMode);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                    break;
+                }
+                break;
+            case TSCT_INCREASE_BAND:
+                if (trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex < RADIO_BANDS_SIZE)
+                {
+                    // reset previous "current" values on vfo changes
+                    this->lastFrequency = 0;
+                    this->lastMode = TRX_VFO_MODE_ERROR;
+                    this->lastLFFilter = 0;
+                    this->lastHFFilter = 0;
+                    hasSyncCmds = true;
+                    manualFreqSet = true;
+                    manualModeSet = true;
+                    lastSyncCmdFreq = RadioBands[trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex + 1].minFrequency;
+                    sprintf(cmd, "FA%011" PRIu64 ";", lastSyncCmdFreq);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                    sprintf(cmd, "MD%u;", RadioBands[trxStatus.VFO[trxStatus.activeVFOIndex].currentBandIndex + 1].modulationMode);
+                    strncat(str, cmd, sizeof(str) - strlen(str) - 1);
+                    break;
                 }
                 break;
             }
