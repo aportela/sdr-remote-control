@@ -829,14 +829,50 @@ bool Transceiver::setAudioUnMuted(bool fromISR)
 
 bool Transceiver::increaseActiveVFOBand(bool fromISR)
 {
-  // TODO
-  return (false);
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex < RADIO_BANDS_SIZE && RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex + 1].minFrequency <= MAX_FREQUENCY)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex++;
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency = RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex].minFrequency;
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex].modulationMode;
+      // TODO: filter
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 bool Transceiver::decreaseActiveVFOBand(bool fromISR)
 {
-  // TODO
-  return (false);
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    if (currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex > 1 && RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex - 1].minFrequency >= MIN_FREQUENCY)
+    {
+      currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex--;
+      currentStatus.VFO[currentStatus.activeVFOIndex].frequency = RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex].minFrequency;
+      currentStatus.VFO[currentStatus.activeVFOIndex].mode = RadioBands[currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex].modulationMode;
+      // TODO: filter
+      return (this->setCurrentStatus(&currentStatus, fromISR));
+    }
+    else
+    {
+      return (false);
+    }
+  }
+  else
+  {
+    return (false);
+  }
 }
 
 bool Transceiver::enqueueSyncCommand(TransceiverSyncCommand *trxSyncCmd, bool fromISR)
