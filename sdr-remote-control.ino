@@ -277,9 +277,19 @@ void onKP8Loop(uint8_t pressedMask = 0)
       }
       menu->setActive(2, true, true);
       break;
-    case 2: // +++ BAND
+    case 2: // --- BAND
       menu->click(10);
-      trx->increaseActiveVFOBand(false);
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
+      trx->decreaseActiveVFOBand(false);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_BAND), false);
+
+#endif
+
       break;
     }
   }
@@ -292,16 +302,16 @@ void onKP8Loop(uint8_t pressedMask = 0)
       menu->click(3);
       // TODO: show settings screen
       break;
-    case 2: // --- BAND
+    case 2: // +++ BAND
       menu->click(11);
 
 #ifdef DEBUG_DUMMY_CONNECTION
 
-      trx->decreaseActiveVFOBand(false);
+      trx->increaseActiveVFOBand(false);
 
 #else // DEBUG_DUMMY_CONNECTION
 
-      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_BAND), false);
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_INCREASE_BAND), false);
 
 #endif
 
@@ -380,8 +390,8 @@ const char *menuLabels[TOTAL_MENU_ITEMS] = {
     ">>>>>>>>", // F8 / PAGE 1 (BUTTON INDEX 7)
     "VFO A=>B", // F1 / PAGE 2 (BUTTON INDEX 8)
     "VFO B=>A", // F2 / PAGE 2 (BUTTON INDEX 9)
-    "+++ BAND", // F3 / PAGE 2 (BUTTON INDEX 10)
-    "--- BAND", // F4 / PAGE 2 (BUTTON INDEX 11)
+    "--- BAND", // F3 / PAGE 2 (BUTTON INDEX 10)
+    "+++ BAND", // F4 / PAGE 2 (BUTTON INDEX 11)
     "        ", // F5 / PAGE 2 (BUTTON INDEX 12)
     "        ", // F6 / PAGE 2 (BUTTON INDEX 13)
     "        ", // F7 / PAGE 2 (BUTTON INDEX 14)
@@ -399,8 +409,8 @@ const availableMenuActions menuActions[TOTAL_MENU_ITEMS] = {
     MENU_ACTION_NEXT_PAGE,              // F8 / PAGE 1 (BUTTON INDEX 7)
     MENU_ACTION_COPY_VFO_A_B,           // F1 / PAGE 2 (BUTTON INDEX 8)
     MENU_ACTION_COPY_VFO_B_A,           // F2 / PAGE 2 (BUTTON INDEX 9)
-    MENU_ACTION_INCREASE_BAND,          // F3 / PAGE 2 (BUTTON INDEX 10)
-    MENU_ACTION_DECREASE_BAND,          // F4 / PAGE 2 (BUTTON INDEX 11)
+    MENU_ACTION_DECREASE_BAND,          // F3 / PAGE 2 (BUTTON INDEX 10)
+    MENU_ACTION_INCREASE_BAND,          // F4 / PAGE 2 (BUTTON INDEX 11)
     MENU_ACTION_NONE,                   // F5 / PAGE 2 (BUTTON INDEX 12)
     MENU_ACTION_NONE,                   // F6 / PAGE 2 (BUTTON INDEX 13)
     MENU_ACTION_NONE,                   // F7 / PAGE 2 (BUTTON INDEX 14)
