@@ -28,12 +28,12 @@ bool LGFXMenuButton::refresh(bool force)
     {
         if (!this->active)
         {
-            this->parentDisplayPtr->fillRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, BUTTON_NOT_ACTIVE_BACKGROUND_COLOR);
-            this->parentDisplayPtr->drawRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, BUTTON_ACTIVE_BACKGROUND_COLOR);
+            this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, _MENU_BUTTON_WIDGET_ROUND_BORDER_RADIUS, BUTTON_NOT_ACTIVE_BACKGROUND_COLOR);
+            this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, _MENU_BUTTON_WIDGET_ROUND_BORDER_RADIUS, BUTTON_ACTIVE_BACKGROUND_COLOR);
         }
         else
         {
-            this->parentDisplayPtr->fillRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, BUTTON_ACTIVE_BACKGROUND_COLOR);
+            this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, _MENU_BUTTON_WIDGET_ROUND_BORDER_RADIUS, BUTTON_ACTIVE_BACKGROUND_COLOR);
         }
         this->parentDisplayPtr->setTextSize(2);
         if (!this->active)
