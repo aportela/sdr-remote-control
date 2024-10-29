@@ -74,6 +74,8 @@ enum TRXSMeterUnitType
   SIGNAL_METER_DB_UNITS = 2
 };
 
+#define USE_SMOOTH_SIGNAL_METER
+
 struct TransceiverStatus
 {
 
@@ -82,6 +84,10 @@ struct TransceiverStatus
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
   int8_t signalMeterdBLevel = -54;
+#ifdef USE_SMOOTH_SIGNAL_METER
+  int8_t smoothedSignalMeterdBLevel = -54;
+  uint64_t lastSmoothSignalMeterdBTimer = 0;
+#endif
   uint8_t AFGain = 0;
   uint8_t squelch = 0;
   bool audioMuted = false;
@@ -89,6 +95,43 @@ struct TransceiverStatus
   uint64_t lastVolumeChangedByUser = 0;
   TransceiverStatus() = default;
 };
+
+enum RadioBandType
+{
+  RBT_AMATEUR,
+  RBT_BROADCAST
+};
+
+// https://www.iaru-r1.org/about-us/organisation-and-history/regions/
+enum RadioBandRegion
+{
+  RBR_REGION_NONE, //
+  RBR_REGION_1,    // Africa, Europe, Middle East, and northern Asia
+  RBR_REGION_2,    // America
+  RBR_REGION_3,    // The rest of Asia and the Pacific
+};
+
+struct RadioBand
+{
+  RadioBandRegion region;
+  RadioBandType type;
+  char label[32];
+  uint64_t minFrequency;
+  uint64_t maxFrequency;
+  TrxVFOMode modulationMode;
+};
+
+// https://www.iaru-r1.org/wp-content/uploads/2021/06/hf_r1_bandplan.pdf
+const RadioBand RadioBands[] = {
+    {RBR_REGION_1, RBT_AMATEUR, "160m", 1810, 2000, TRX_VFO_MD_LSB},
+    {RBR_REGION_1, RBT_AMATEUR, "80m", 3500, 4000, TRX_VFO_MD_LSB},
+    {RBR_REGION_1, RBT_AMATEUR, "40m", 7000, 7300, TRX_VFO_MD_LSB},
+    {RBR_REGION_1, RBT_AMATEUR, "20m", 14000, 14350, TRX_VFO_MD_LSB},
+    {RBR_REGION_1, RBT_AMATEUR, "15m", 21000, 21450, TRX_VFO_MD_LSB},
+    {RBR_REGION_1, RBT_AMATEUR, "10m", 28000, 29700, TRX_VFO_MD_LSB},
+};
+
+#define RADIO_BANDS_SIZE (sizeof(RadioBands) / sizeof(RadioBands[0]))
 
 class Transceiver
 {
