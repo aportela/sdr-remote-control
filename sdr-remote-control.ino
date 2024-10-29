@@ -14,7 +14,7 @@
 #include "src/MenuConfiguration.hpp"
 #include "src/Menu.hpp"
 
-// #define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
+#define DEBUG_DUMMY_CONNECTION // this define is for screen test/debuggint purposes only, ignore cat serial data & uses random values
 
 #ifdef DEBUG_FPS
 
@@ -430,11 +430,13 @@ void setup()
   trxStatus->AFGain = 50;
   trxStatus->activeVFOIndex = 0;
   trxStatus->VFO[0].frequency = 7084152;
+  trxStatus->VFO[0].currentBandIndex = 3;
   trxStatus->VFO[0].frequencyStep = 10;
   trxStatus->VFO[0].mode = TRX_VFO_MD_LSB;
   trxStatus->VFO[0].filter.LF = 0;
   trxStatus->VFO[0].filter.HF = 2000;
   trxStatus->VFO[1].frequency = 145625000;
+  trxStatus->VFO[1].currentBandIndex = 8;
   trxStatus->VFO[1].frequencyStep = 10000;
   trxStatus->VFO[1].mode = TRX_VFO_MD_FM;
   trxStatus->VFO[1].filter.LF = 6000;
