@@ -294,7 +294,17 @@ void onKP8Loop(uint8_t pressedMask = 0)
       break;
     case 2: // --- BAND
       menu->click(11);
+
+#ifdef DEBUG_DUMMY_CONNECTION
+
       trx->decreaseActiveVFOBand(false);
+
+#else // DEBUG_DUMMY_CONNECTION
+
+      trx->enqueueSyncCommand(new TransceiverSyncCommand(TSCT_DECREASE_BAND), false);
+
+#endif
+
       break;
     }
   }
