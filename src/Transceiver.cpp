@@ -19,6 +19,37 @@ Transceiver::~Transceiver()
   vQueueDelete(this->statusQueue);
 }
 
+uint16_t Transceiver::getBandIndex(uint64_t currentFrequency, uint16_t currentBandIndex)
+{
+  uint16_t newBandIndex = 0;
+  if (currentFrequency >= MIN_FREQUENCY && currentFrequency <= MAX_FREQUENCY && !(currentFrequency >= RadioBands[currentBandIndex].minFrequency && currentFrequency <= RadioBands[currentBandIndex].maxFrequency))
+  {
+    if (currentFrequency < RadioBands[currentBandIndex].maxFrequency)
+    {
+      // band is lower
+      for (uint16_t i = currentBandIndex; i > 0 && newBandIndex == 0; i--)
+      {
+        if (currentFrequency <= RadioBands[i].minFrequency)
+        {
+          newBandIndex = i;
+        }
+      }
+    }
+    else
+    {
+      // band is upper
+      for (uint16_t i = currentBandIndex; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
+      {
+        if (currentFrequency >= RadioBands[i].minFrequency)
+        {
+          newBandIndex = i;
+        }
+      }
+    }
+  }
+  return (newBandIndex);
+}
+
 bool Transceiver::getCurrentStatus(TransceiverStatus *status, bool fromISR)
 {
   if (this->statusQueue != nullptr && status != nullptr)
@@ -153,6 +184,7 @@ bool Transceiver::setVFOFrequency(uint8_t VFOIndex, uint64_t frequency, bool fro
         if (currentStatus.VFO[VFOIndex].frequency != frequency)
         {
           currentStatus.VFO[VFOIndex].frequency = frequency;
+          currentStatus.VFO[VFOIndex].currentBandIndex = this->getBandIndex(currentStatus.VFO[VFOIndex].frequency, currentStatus.VFO[VFOIndex].currentBandIndex);
           return (this->setCurrentStatus(&currentStatus, fromISR));
         }
         else
@@ -186,6 +218,7 @@ bool Transceiver::setActiveVFOFrequency(uint64_t frequency, bool fromISR)
       if (currentStatus.VFO[currentStatus.activeVFOIndex].frequency != frequency)
       {
         currentStatus.VFO[currentStatus.activeVFOIndex].frequency = frequency;
+        currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex = this->getBandIndex(currentStatus.VFO[currentStatus.activeVFOIndex].frequency, currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex);
         return (this->setCurrentStatus(&currentStatus, fromISR));
       }
       else
@@ -217,6 +250,7 @@ bool Transceiver::incrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool ch
         currentStatus.lastFrequencyChangedByLocalControl = millis();
       }
       currentStatus.VFO[currentStatus.activeVFOIndex].frequency += hzIncrement;
+      currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex = this->getBandIndex(currentStatus.VFO[currentStatus.activeVFOIndex].frequency, currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex);
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else
@@ -243,6 +277,7 @@ bool Transceiver::decrementActiveVFOFrequency(uint64_t hz, bool fromISR, bool ch
         currentStatus.lastFrequencyChangedByLocalControl = millis();
       }
       currentStatus.VFO[currentStatus.activeVFOIndex].frequency -= hzDecrement;
+      currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex = this->getBandIndex(currentStatus.VFO[currentStatus.activeVFOIndex].frequency, currentStatus.VFO[currentStatus.activeVFOIndex].currentBandIndex);
       return (this->setCurrentStatus(&currentStatus, fromISR));
     }
     else

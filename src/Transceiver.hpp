@@ -61,6 +61,7 @@ struct TrxVFOFilter
 
 struct TrxVFO
 {
+  uint16_t currentBandIndex = 0;
   uint64_t frequency = 0;
   TrxVFOMode mode = TRX_VFO_MODE_ERROR;
   uint64_t frequencyStep = 1; // hz
@@ -138,6 +139,8 @@ class Transceiver
 private:
   QueueHandle_t statusQueue;
   QueueHandle_t syncQueue;
+
+  uint16_t getBandIndex(uint64_t currentFrequency, uint16_t currentBandIndex);
 
 public:
   Transceiver();
