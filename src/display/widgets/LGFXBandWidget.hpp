@@ -8,9 +8,11 @@
 class LGFXBandWidget : public LGFXTransceiverStatusWidget
 {
 private:
+  lgfx::LGFX_Sprite *buttonBackgroundSprite;
   uint16_t oldBandIndex = 0;
 
-  void refreshLabels(bool force, uint16_t currentBandIndex);
+  void createBackgroundButton(void);
+  void refreshLabels(uint16_t currentBandIndex);
 
 public:
   LGFXBandWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr = nullptr);
