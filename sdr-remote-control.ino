@@ -443,7 +443,7 @@ void setup()
   trxStatus->VFO[0].currentBandIndex = 3;
   trxStatus->VFO[0].frequencyStep = 10;
   trxStatus->VFO[0].mode = TRX_VFO_MD_LSB;
-  trxStatus->VFO[0].filter.LF = 0;
+  trxStatus->VFO[0].filter.LF = 200;
   trxStatus->VFO[0].filter.HF = 2000;
   trxStatus->VFO[1].frequency = 145625000;
   trxStatus->VFO[1].currentBandIndex = 8;
