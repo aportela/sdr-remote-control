@@ -13,7 +13,6 @@ LGFXBandWidget::LGFXBandWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t h
 
     this->buttonBackgroundSprite->fillRoundRect(0, 0, this->width, this->height, _BAND_WIDGET_BACKGROUND_RECT_RADIUS, TEXT_COLOR_NOT_ACTIVE);
     this->buttonBackgroundSprite->drawRoundRect(0, 0, this->width, this->height, _BAND_WIDGET_BACKGROUND_RECT_RADIUS, TEXT_COLOR_ACTIVE);
-    this->buttonBackgroundSprite->pushSprite(this->xOffset + this->padding, this->yOffset + this->padding);
     if (currentTransceiverStatusPtr != nullptr)
     {
       this->refresh(true);
@@ -32,27 +31,30 @@ void LGFXBandWidget::createBackgroundButton(void)
 }
 void LGFXBandWidget::refreshLabels(uint16_t currentBandIndex)
 {
-  // this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, _BAND_WIDGET_BACKGROUND_RECT_RADIUS, TEXT_COLOR_NOT_ACTIVE);
-  // this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, this->width, this->height, _BAND_WIDGET_BACKGROUND_RECT_RADIUS, TEXT_COLOR_ACTIVE);
   this->buttonBackgroundSprite->pushSprite(this->xOffset + this->padding, this->yOffset + this->padding);
 
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_COLOR_NOT_ACTIVE);
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE);
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 20, this->yOffset + this->padding + 4);
+
+  uint16_t centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth(RadioBands[currentBandIndex].label)) / 2;
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 6);
   this->parentDisplayPtr->print(RadioBands[currentBandIndex].label);
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
   switch (RadioBands[currentBandIndex].type)
   {
   case RBT_AMATEUR:
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 16, this->yOffset + this->padding + 30);
+    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Amateur")) / 2;
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
     this->parentDisplayPtr->print("Amateur");
     break;
   case RBT_BROADCAST:
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 12, this->yOffset + this->padding + 30);
+    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Broadcast")) / 2;
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
     this->parentDisplayPtr->print("Broadcast");
     break;
   default:
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + 24, this->yOffset + this->padding + 30);
+    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Other")) / 2;
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
     this->parentDisplayPtr->print("Other");
     break;
   }
