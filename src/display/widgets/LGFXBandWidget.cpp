@@ -1,4 +1,8 @@
 #include "LGFXBandWidget.hpp"
+#include <cmath>
+#include <string>
+
+#define SPEED_OF_LIGHT 3e8
 
 #define _BAND_WIDGET_BACKGROUND_COLOR 0x19cc
 #define _BAND_WIDGET_BORDER_COLOR TEXT_COLOR_ACTIVE
@@ -27,46 +31,97 @@ LGFXBandWidget::~LGFXBandWidget()
   this->buttonBackgroundSprite = nullptr;
 }
 
+void LGFXBandWidget::getHumanWaveLength(uint64_t frequency, char *label, size_t count)
+{
+  double waveLength = SPEED_OF_LIGHT / frequency;
+  double waveLengthRemainder = std::fmod(SPEED_OF_LIGHT, frequency);
+  if (waveLength >= 1.0)
+  {
+    if (waveLengthRemainder > 0)
+    {
+      snprintf(label, count, "%.2fm", waveLength);
+    }
+    else
+    {
+      snprintf(label, count, "%um", waveLength);
+    }
+  }
+  else
+  {
+    if (waveLengthRemainder > 0)
+    {
+      snprintf(label, count, "%.2fcm", waveLength * 100);
+    }
+    else
+    {
+      snprintf(label, count, "%ucm", waveLength * 100);
+    }
+  }
+}
+
 void LGFXBandWidget::createBackgroundButton(void)
 {
 }
-void LGFXBandWidget::refreshLabels(uint16_t currentBandIndex)
+
+void LGFXBandWidget::refreshLabels(const char *mainLabel, const char *subLabel)
 {
   this->buttonBackgroundSprite->pushSprite(this->xOffset + this->padding, this->yOffset + this->padding);
-
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, _BAND_WIDGET_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE);
 
-  uint16_t centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth(RadioBands[currentBandIndex].label)) / 2;
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_MAIN_LABEL_Y_OFFSET);
-  this->parentDisplayPtr->print(RadioBands[currentBandIndex].label);
-  this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
-  switch (RadioBands[currentBandIndex].type)
+  this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE);
+  uint16_t textWidth = this->parentDisplayPtr->textWidth(mainLabel);
+  if (textWidth > (this->width - (this->padding * 2) - 8))
   {
-  case RBT_AMATEUR:
-    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Amateur")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
-    this->parentDisplayPtr->print("Amateur");
-    break;
-  case RBT_BROADCAST:
-    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Broadcast")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
-    this->parentDisplayPtr->print("Broadcast");
-    break;
-  default:
-    centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Other")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
-    this->parentDisplayPtr->print("Other");
-    break;
+    this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE - 1);
+    textWidth = this->parentDisplayPtr->textWidth(mainLabel);
   }
+  uint16_t centeredTextXOffset = (this->width - (this->padding * 2) - textWidth) / 2;
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_MAIN_LABEL_Y_OFFSET);
+  this->parentDisplayPtr->print(mainLabel);
+
+  this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
+  textWidth = this->parentDisplayPtr->textWidth(subLabel);
+  centeredTextXOffset = (this->width - (this->padding * 2) - textWidth) / 2;
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
+  this->parentDisplayPtr->print(subLabel);
 }
 
 bool LGFXBandWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || this->oldBandIndex != this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex)
+  bool bandIndexChanged = this->oldBandIndex != this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex;
+  bool frequencyChanged = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].frequency != this->oldFrequency;
+  if (force || bandIndexChanged || (this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex == 0 && frequencyChanged))
   {
-    this->refreshLabels(this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex);
+    char label[16] = {'\0'};
+    if (this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex > 0)
+    {
+      snprintf(label, sizeof(label), "%s", RadioBands[this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex].label);
+    }
+    else
+    {
+      this->getHumanWaveLength(this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].frequency, label, sizeof(label));
+    }
+    if (strcmp(label, this->oldBandLabelStr) != 0)
+    {
+      char subLabel[16] = {'\0'};
+      switch (RadioBands[this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex].type)
+      {
+      case RBT_AMATEUR:
+        snprintf(subLabel, sizeof(subLabel), "%s", "Amateur");
+        break;
+      case RBT_BROADCAST:
+        snprintf(subLabel, sizeof(subLabel), "%s", "Broadcast");
+        break;
+      default:
+        snprintf(subLabel, sizeof(subLabel), "%s", "Other");
+        break;
+      }
+      this->refreshLabels(label, subLabel);
+    }
+    strncpy(this->oldBandLabelStr, label, sizeof(label));
+    this->oldBandLabelStr[sizeof(label)] = '\0';
+    this->oldFrequency = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].frequency;
     this->oldBandIndex = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex;
     changed = true;
   }

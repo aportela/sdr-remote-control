@@ -158,6 +158,7 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 
 void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 {
+  // TODO: resetting on very fast decrements near to zero, maybe try to decrement to a negative ?
   uint64_t currentMillis = millis();
   // ignore changes that occur at very high speeds of rotary encoder (serial communication buffer is not sufficient to handle them)
   if (currentMillis - lastEncoderMillis > 15)
