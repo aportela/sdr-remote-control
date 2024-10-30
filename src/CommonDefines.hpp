@@ -11,4 +11,7 @@
 #define VFO_PRIMARY_LABEL "VFOA"
 #define VFO_SECONDARY_LABEL "VFOB"
 
+// IARU region (https://www.iaru.org/about-us/organisation-and-history/regions/)
+#define IARU_REGION 1
+
 #endif // SDR_REMOTE_CONTROL_COMMON_DEFINES_H

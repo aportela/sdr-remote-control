@@ -6,6 +6,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include "TransceiverSyncCommand.hpp"
+#include "CommonDefines.hpp"
 
 #define TRANSCEIVER_VFO_COUNT 2
 
@@ -126,6 +127,8 @@ struct RadioBand
 // https://www.iaru-r1.org/wp-content/uploads/2021/06/hf_r1_bandplan.pdf
 const RadioBand RadioBands[] = {
     {RBR_REGION_NONE, RBT_NONE, "", 0, 0, TRX_VFO_MD_RESERVED},
+#ifndef IARU_REGION
+#elif IARU_REGION == 1
     {RBR_REGION_1, RBT_AMATEUR, "160m", 1810000, 2000000, TRX_VFO_MD_LSB},
     {RBR_REGION_1, RBT_AMATEUR, "80m", 3500000, 4000000, TRX_VFO_MD_LSB},
     {RBR_REGION_1, RBT_AMATEUR, "40m", 7000000, 7300000, TRX_VFO_MD_LSB},
@@ -135,6 +138,9 @@ const RadioBand RadioBands[] = {
     {RBR_REGION_1, RBT_AMATEUR, "6m", 50000000, 52000000, TRX_VFO_MD_USB},
     {RBR_REGION_1, RBT_AMATEUR, "2m", 144000000, 146000000, TRX_VFO_MD_FM},
     {RBR_REGION_1, RBT_AMATEUR, "70cm", 430000000, 440000000, TRX_VFO_MD_FM},
+#elif IARU_REGION == 2
+#elif IARU_REGION == 3
+#endif
 };
 
 #define RADIO_BANDS_SIZE (sizeof(RadioBands) / sizeof(RadioBands[0]))
