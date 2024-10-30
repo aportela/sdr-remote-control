@@ -12,6 +12,7 @@ private:
   uint32_t oldHFValue = 0;
   uint8_t previousCurrentVFOIndex = 0;
   lgfx::LGFX_Sprite *plotSprite;
+  lgfx::LGFX_Sprite *labelValuesSprite;
 
   void refreshPlot(bool force, uint64_t minLowCut, uint64_t minHighCut, uint64_t maxLowCut, uint64_t maxHighCut, uint64_t currentLowCut, uint64_t currentHighCut);
   void refreshLabels(bool force, uint64_t lowCut, uint64_t highCut);

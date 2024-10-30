@@ -11,6 +11,9 @@ LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
     this->plotSprite = new lgfx::LGFX_Sprite(displayPtr);
     this->plotSprite->setColorDepth(8);
     this->plotSprite->createSprite(_FILTER_WIDGET_TRAPEZIUM_SPRITE_WIDTH, 46);
+    this->labelValuesSprite = new lgfx::LGFX_Sprite(displayPtr);
+    this->labelValuesSprite->setColorDepth(8);
+    this->labelValuesSprite->createSprite(_FILTER_WIDGET_LABELS_SPRITE_WIDTH, 48);
     if (currentTransceiverStatusPtr != nullptr)
     {
       this->refresh(true);
@@ -52,66 +55,64 @@ void LGFXFilterWidget::refreshPlot(bool force, uint64_t minLowCut, uint64_t minH
 
 void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highCut)
 {
-  this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setTextSize(_FILTER_WIDGET_FONT_SIZE);
+  this->labelValuesSprite->fillScreen(TFT_BLACK);
 
-  if (force)
-  {
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding);
-    this->parentDisplayPtr->print("FILTER");
-  }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding);
+  this->labelValuesSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+  this->labelValuesSprite->setTextSize(_FILTER_WIDGET_FONT_SIZE);
+
+  this->labelValuesSprite->setCursor(0, 0);
   uint64_t totalBandwith = lowCut + highCut;
   if (totalBandwith > 1000)
   {
     double remainder = std::fmod((double)totalBandwith, 1000.0);
     if (remainder == 0)
     {
-      this->parentDisplayPtr->printf("BW: %" PRIu64 "KHz         ", totalBandwith / 1000);
+      this->labelValuesSprite->printf("BW: %" PRIu64 "KHz", totalBandwith / 1000);
     }
     else
     {
-      this->parentDisplayPtr->printf("BW: %.3fKHz        ", totalBandwith / 1000.0);
+      this->labelValuesSprite->printf("BW: %.3fKHz", totalBandwith / 1000.0);
     }
   }
   else
   {
-    this->parentDisplayPtr->printf("BW: %" PRIu64 "Hz         ", totalBandwith);
+    this->labelValuesSprite->printf("BW: %" PRIu64 "Hz", totalBandwith);
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
+  this->labelValuesSprite->setCursor(0, _FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT);
   if (lowCut > 1000)
   {
     double remainder = std::fmod((double)lowCut, 1000.0);
     if (remainder == 0)
     {
-      this->parentDisplayPtr->printf("LC: %" PRIu64 "KHz         ", lowCut / 1000);
+      this->labelValuesSprite->printf("LC: %" PRIu64 "KHz", lowCut / 1000);
     }
     else
     {
-      this->parentDisplayPtr->printf("LC: %.3fKHz        ", lowCut / 1000.0);
+      this->labelValuesSprite->printf("LC: %.3fKHz", lowCut / 1000.0);
     }
   }
   else
   {
-    this->parentDisplayPtr->printf("LC: %" PRIu64 "Hz         ", lowCut);
+    this->labelValuesSprite->printf("LC: %" PRIu64 "Hz", lowCut);
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
+  this->labelValuesSprite->setCursor(0, _FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2);
   if (highCut > 1000)
   {
     double remainder = std::fmod((double)highCut, 1000.0);
     if (remainder == 0)
     {
-      this->parentDisplayPtr->printf("HC: %" PRIu64 "KHz         ", highCut / 1000);
+      this->labelValuesSprite->printf("HC: %" PRIu64 "KHz", highCut / 1000);
     }
     else
     {
-      this->parentDisplayPtr->printf("HC: %.3fKHz        ", highCut / 1000.0);
+      this->labelValuesSprite->printf("HC: %.3fKHz", highCut / 1000.0);
     }
   }
   else
   {
-    this->parentDisplayPtr->printf("HC: %" PRIu64 "Hz         ", highCut);
+    this->labelValuesSprite->printf("HC: %" PRIu64 "Hz", highCut);
   }
+  this->labelValuesSprite->pushSprite(this->xOffset + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset);
 }
 
 bool LGFXFilterWidget::refresh(bool force)

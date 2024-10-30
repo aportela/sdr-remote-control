@@ -120,6 +120,8 @@
 #define _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_Y_OFFSET 8                                      // trapezium top horizontal line y offset
 #define _FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_Y_OFFSET 45                                  // trapezium bottom horizontal line y offset
 
+#define _FILTER_WIDGET_LABELS_SPRITE_WIDTH 150 // labels sprite width
+
 #define _FILTER_WIDGET_TRAPEZIUM_LR_LINES_HORIZONTAL_OFFSET (_FILTER_WIDGET_TRAPEZIUM_BOTTOM_LINE_LENGTH - _FILTER_WIDGET_TRAPEZIUM_TOP_LINE_MAX_LENGTH) / 4 // trapecium x offsets between left/right lines on top/bottom horizontal lines
 
 #define _FILTER_WIDGET_TRAPEZIUM_CENTER_V_LINE_LENGTH 44 // trapecium "center" (low/hi cut) separator vertical line length
