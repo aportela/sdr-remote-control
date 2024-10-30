@@ -37,24 +37,24 @@ void LGFXBandWidget::refreshLabels(uint16_t currentBandIndex)
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE);
 
   uint16_t centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth(RadioBands[currentBandIndex].label)) / 2;
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 6);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_MAIN_LABEL_Y_OFFSET);
   this->parentDisplayPtr->print(RadioBands[currentBandIndex].label);
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
   switch (RadioBands[currentBandIndex].type)
   {
   case RBT_AMATEUR:
     centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Amateur")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
     this->parentDisplayPtr->print("Amateur");
     break;
   case RBT_BROADCAST:
     centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Broadcast")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
     this->parentDisplayPtr->print("Broadcast");
     break;
   default:
     centeredTextXOffset = (this->width - (this->padding * 2) - this->parentDisplayPtr->textWidth("Other")) / 2;
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + 30);
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
     this->parentDisplayPtr->print("Other");
     break;
   }
