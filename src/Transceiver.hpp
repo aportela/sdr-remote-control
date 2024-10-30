@@ -125,7 +125,7 @@ struct RadioBand
 
 // https://www.iaru-r1.org/wp-content/uploads/2021/06/hf_r1_bandplan.pdf
 const RadioBand RadioBands[] = {
-    {RBR_REGION_NONE, RBT_NONE, "???m", 0, 0, TRX_VFO_MD_RESERVED},
+    {RBR_REGION_NONE, RBT_NONE, "", 0, 0, TRX_VFO_MD_RESERVED},
     {RBR_REGION_1, RBT_AMATEUR, "160m", 1810000, 2000000, TRX_VFO_MD_LSB},
     {RBR_REGION_1, RBT_AMATEUR, "80m", 3500000, 4000000, TRX_VFO_MD_LSB},
     {RBR_REGION_1, RBT_AMATEUR, "40m", 7000000, 7300000, TRX_VFO_MD_LSB},

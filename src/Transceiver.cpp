@@ -29,7 +29,7 @@ uint16_t Transceiver::getBandIndex(uint64_t currentFrequency, uint16_t currentBa
       // band is lower
       for (uint16_t i = currentBandIndex; i > 0 && newBandIndex == 0; i--)
       {
-        if (currentFrequency <= RadioBands[i].minFrequency)
+        if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
         {
           newBandIndex = i;
         }
@@ -40,7 +40,7 @@ uint16_t Transceiver::getBandIndex(uint64_t currentFrequency, uint16_t currentBa
       // band is upper
       for (uint16_t i = currentBandIndex; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
       {
-        if (currentFrequency >= RadioBands[i].minFrequency)
+        if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
         {
           newBandIndex = i;
         }
