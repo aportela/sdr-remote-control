@@ -21,33 +21,41 @@ Transceiver::~Transceiver()
 
 uint16_t Transceiver::getBandIndex(uint64_t currentFrequency, uint16_t currentBandIndex)
 {
-  uint16_t newBandIndex = 0;
-  if (currentFrequency >= MIN_FREQUENCY && currentFrequency <= MAX_FREQUENCY && !(currentFrequency >= RadioBands[currentBandIndex].minFrequency && currentFrequency <= RadioBands[currentBandIndex].maxFrequency))
+  if (currentFrequency >= RadioBands[currentBandIndex].minFrequency && currentFrequency <= RadioBands[currentBandIndex].maxFrequency)
   {
-    if (currentFrequency < RadioBands[currentBandIndex].maxFrequency)
+    return (currentBandIndex);
+  }
+  else
+  {
+    uint16_t newBandIndex = 0;
+    // RadioBands[0] is default (with dummy values) so we ignore this first index
+    if (currentBandIndex > 1)
     {
-      // band is lower
-      for (uint16_t i = currentBandIndex; i > 0 && newBandIndex == 0; i--)
+      if (currentFrequency < RadioBands[currentBandIndex].minFrequency)
       {
-        if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+        // band is lower
+        for (uint16_t i = currentBandIndex - 1; i > 0 && newBandIndex == 0; i--)
         {
-          newBandIndex = i;
+          if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+          {
+            newBandIndex = i;
+          }
         }
       }
-    }
-    else
-    {
-      // band is upper
-      for (uint16_t i = currentBandIndex; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
+      else if (currentBandIndex < RADIO_BANDS_SIZE - 1 && currentFrequency > RadioBands[currentBandIndex].maxFrequency)
       {
-        if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+        // band is upper and there are more available RadioBands after current index
+        for (uint16_t i = currentBandIndex + 1; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
         {
-          newBandIndex = i;
+          if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+          {
+            newBandIndex = i;
+          }
         }
       }
+      return (newBandIndex);
     }
   }
-  return (newBandIndex);
 }
 
 bool Transceiver::getCurrentStatus(TransceiverStatus *status, bool fromISR)
