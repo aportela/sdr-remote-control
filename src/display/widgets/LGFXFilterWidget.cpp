@@ -9,7 +9,7 @@ LGFXFilterWidget::LGFXFilterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
   {
     this->plotSprite = new lgfx::LGFX_Sprite(displayPtr);
     this->plotSprite->setColorDepth(8);
-    this->plotSprite->createSprite(180, 46);
+    this->plotSprite->createSprite(_FILTER_WIDGET_TRAPEZIUM_SPRITE_WIDTH, 46);
     if (currentTransceiverStatusPtr != nullptr)
     {
       this->refresh(true);
@@ -59,13 +59,7 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding);
     this->parentDisplayPtr->print("FILTER");
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
-  this->parentDisplayPtr->print("PRESET");
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
-  // this->parentDisplayPtr->print(" 1/8");
-  this->parentDisplayPtr->print("CUSTOM");
-  // TODO: human units
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding);
   uint64_t totalBandwith = lowCut + highCut;
   if (totalBandwith > 1000)
   {
@@ -75,7 +69,7 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   {
     this->parentDisplayPtr->printf("BW: %" PRIu64 "Hz         ", totalBandwith);
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 1));
   if (lowCut > 1000)
   {
     this->parentDisplayPtr->printf("LC: %.3fKHz        ", lowCut / (double)1000);
@@ -84,7 +78,7 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   {
     this->parentDisplayPtr->printf("LC: %" PRIu64 "Hz         ", lowCut);
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_RIGHT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _FILTER_WIDGET_LEFT_LABELS_X_OFFSET, this->yOffset + this->padding + (_FILTER_WIDGET_LABELS_FONT_PIXEL_HEIGHT * 2));
   if (highCut > 1000)
   {
     this->parentDisplayPtr->printf("HC: %.3fKHz        ", highCut / (double)1000);

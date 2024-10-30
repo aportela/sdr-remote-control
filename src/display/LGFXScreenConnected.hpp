@@ -8,6 +8,7 @@
 #include "widgets/LGFXVFOWidget.hpp"
 #include "widgets/LGFXDigitalSMeterWidget.hpp"
 #include "widgets/LGFXVolumeSquelchWidget.hpp"
+#include "widgets/LGFXBandWidget.hpp"
 #include "widgets/LGFXFilterWidget.hpp"
 #include "widgets/LGFXMenu.hpp"
 
@@ -23,6 +24,7 @@ private:
     LGFXVFOWidget *secondaryVFOWidget = nullptr;
     LGFXDigitalSMeterWidget *digitalSMeterWidget = nullptr;
     LGFXVolumeSquelchWidget *volumeSquelchWidget = nullptr;
+    LGFXBandWidget *bandWidget = nullptr;
     LGFXFilterWidget *filterWidget = nullptr;
     LGFXMenu *menuWidget = nullptr;
 
