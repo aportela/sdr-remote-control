@@ -121,9 +121,9 @@ bool LGFXBandWidget::refresh(bool force)
     }
     strncpy(this->oldBandLabelStr, label, sizeof(label));
     this->oldBandLabelStr[sizeof(label)] = '\0';
-    this->oldFrequency = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].frequency;
-    this->oldBandIndex = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex;
     changed = true;
   }
+  this->oldFrequency = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].frequency;
+  this->oldBandIndex = this->currentTransceiverStatusPtr->VFO[this->currentTransceiverStatusPtr->activeVFOIndex].currentBandIndex;
   return (changed);
 }
