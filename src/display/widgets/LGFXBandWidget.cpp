@@ -75,14 +75,14 @@ void LGFXBandWidget::refreshLabels(const char *mainLabel, const char *subLabel)
     this->parentDisplayPtr->setTextSize(_BAND_WIDGET_MAIN_LABEL_FONT_SIZE - 1);
     textWidth = this->parentDisplayPtr->textWidth(mainLabel);
   }
-  uint16_t centeredTextXOffset = (this->width - (this->padding * 2) - textWidth) / 2;
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_MAIN_LABEL_Y_OFFSET);
+  uint16_t centeredTextXOffset = (this->width - textWidth) / 2;
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset + 2, this->yOffset + this->padding + _BAND_WIDGET_MAIN_LABEL_Y_OFFSET);
   this->parentDisplayPtr->print(mainLabel);
 
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
   textWidth = this->parentDisplayPtr->textWidth(subLabel);
-  centeredTextXOffset = (this->width - (this->padding * 2) - textWidth) / 2;
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset + 2, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET); // TODO: +2px required ??? (BAD XOFFSET CENTER)
+  centeredTextXOffset = (this->width - textWidth) / 2;
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset + 2, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
   this->parentDisplayPtr->print(subLabel);
 }
 
