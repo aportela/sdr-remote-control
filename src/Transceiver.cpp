@@ -29,27 +29,35 @@ uint16_t Transceiver::getBandIndex(uint64_t currentFrequency, uint16_t currentBa
   {
     uint16_t newBandIndex = 0;
     // RadioBands[0] is default (with dummy values) so we ignore this first index
-    if (currentBandIndex > 1)
+    if (currentBandIndex > 0)
     {
       if (currentFrequency < RadioBands[currentBandIndex].minFrequency)
       {
         // band is lower
-        for (uint16_t i = currentBandIndex - 1; i > 0 && newBandIndex == 0; i--)
+        if (currentBandIndex > 1)
         {
-          if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+          // there are more available Radiobands below current index
+          for (uint16_t i = currentBandIndex - 1; i > 0 && newBandIndex == 0; i--)
           {
-            newBandIndex = i;
+            if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+            {
+              newBandIndex = i;
+            }
           }
         }
       }
-      else if (currentBandIndex < RADIO_BANDS_SIZE - 1 && currentFrequency > RadioBands[currentBandIndex].maxFrequency)
+      else if (currentFrequency > RadioBands[currentBandIndex].maxFrequency)
       {
-        // band is upper and there are more available RadioBands after current index
-        for (uint16_t i = currentBandIndex + 1; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
+        // band is upper
+        if (currentBandIndex < RADIO_BANDS_SIZE - 1)
         {
-          if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+          // there are more available RadioBands after current index
+          for (uint16_t i = currentBandIndex + 1; i < RADIO_BANDS_SIZE && newBandIndex == 0; i++)
           {
-            newBandIndex = i;
+            if (currentFrequency >= RadioBands[i].minFrequency && currentFrequency <= RadioBands[i].maxFrequency)
+            {
+              newBandIndex = i;
+            }
           }
         }
       }
