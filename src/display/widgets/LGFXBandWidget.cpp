@@ -82,7 +82,7 @@ void LGFXBandWidget::refreshLabels(const char *mainLabel, const char *subLabel)
   this->parentDisplayPtr->setTextSize(_BAND_WIDGET_SUB_LABEL_FONT_SIZE);
   textWidth = this->parentDisplayPtr->textWidth(subLabel);
   centeredTextXOffset = (this->width - (this->padding * 2) - textWidth) / 2;
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + centeredTextXOffset + 2, this->yOffset + this->padding + _BAND_WIDGET_SUB_LABEL_Y_OFFSET); // TODO: +2px required ??? (BAD XOFFSET CENTER)
   this->parentDisplayPtr->print(subLabel);
 }
 
