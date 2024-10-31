@@ -441,13 +441,13 @@ void setup()
   trxStatus->AFGain = 50;
   trxStatus->activeVFOIndex = 0;
   trxStatus->VFO[0].frequency = 7084152;
-  trxStatus->VFO[0].currentBandIndex = 3;
+  trxStatus->VFO[0].currentBandIndex = 10;
   trxStatus->VFO[0].frequencyStep = 10;
   trxStatus->VFO[0].mode = TRX_VFO_MD_LSB;
   trxStatus->VFO[0].filter.LF = 200;
   trxStatus->VFO[0].filter.HF = 2000;
   trxStatus->VFO[1].frequency = 145625000;
-  trxStatus->VFO[1].currentBandIndex = 8;
+  trxStatus->VFO[1].currentBandIndex = 27;
   trxStatus->VFO[1].frequencyStep = 10000;
   trxStatus->VFO[1].mode = TRX_VFO_MD_FM;
   trxStatus->VFO[1].filter.LF = 6000;
