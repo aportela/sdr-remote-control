@@ -15,26 +15,53 @@ LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t w
 {
     if (displayPtr != nullptr)
     {
+        this->templateSprite = new lgfx::LGFX_Sprite(displayPtr);
+        this->templateSprite->setColorDepth(8);
+        this->templateSprite->createSprite(this->width, this->height);
+        // this->templateSprite->fillScreen(0xFF9C);
+        this->templateSprite->fillScreen(TFT_WHITE);
         this->refresh(true);
     }
 }
 
 LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
 {
+    delete this->templateSprite;
+    this->templateSprite = nullptr;
+}
+
+void LGFXAnalogSMeterWidget::refreshAnalogBar(int8_t value)
+{
+    float angle = (BAR_START_DEGREE - (5 * BAR_INCREMENT_DEGREES));
+
+    float radian = radians(angle);
+
+    int x = this->width / 2;
+    int y = this->height + 24; // 16 px added because we use a 140 degrees (not 180 degrees)
+    int startX = x + (50 * cos(radian));
+    int startY = y - (50 * sin(radian));
+
+    int longitud_barra = 100;
+
+    int endX = x + ((50 + longitud_barra) * cos(radian));
+    int endY = y - ((50 + longitud_barra) * sin(radian));
+
+    this->parentDisplayPtr->drawLine(this->xOffset + startX, this->yOffset + startY, this->xOffset + endX, this->yOffset + endY, TFT_RED);
 }
 
 bool LGFXAnalogSMeterWidget::refresh(bool force)
 {
+    // -54 -> 60
     bool changed = force;
-    if (changed)
+    if (force)
     {
-        int x = DISPLAY_WIDTH / 2;
-        int y = 300;
+        int x = this->width / 2;
+        int y = this->height + 24; // 16 px added because we use a 140 degrees (not 180 degrees)
 
-        this->parentDisplayPtr->drawArc(x, y, RADIUS, RADIUS, ARC_START_ANGLE, ARC_END_ANGLE, TEXT_COLOR_ACTIVE);
-        this->parentDisplayPtr->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TEXT_COLOR_ACTIVE);
-        this->parentDisplayPtr->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TEXT_COLOR_ACTIVE);
-        this->parentDisplayPtr->setTextSize(1);
+        this->templateSprite->drawArc(x, y, RADIUS, RADIUS, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+        this->templateSprite->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+        this->templateSprite->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+        this->templateSprite->setTextSize(1);
         for (int i = 0; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; ++i)
         {
             float angle = (BAR_START_DEGREE - (i * BAR_INCREMENT_DEGREES));
@@ -49,16 +76,16 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
             int endX = x + ((RADIUS + longitud_barra) * cos(radian));
             int endY = y - ((RADIUS + longitud_barra) * sin(radian));
 
-            this->parentDisplayPtr->drawLine(startX, startY, endX, endY, TEXT_COLOR_ACTIVE);
+            this->templateSprite->drawLine(startX, startY, endX, endY, TFT_BLACK);
 
             bool showLabel = (i == 0 || i == 2 || i == 6 || i == 10 || i == 14 || i == 18 || i == 22 || i == 26 || i == 30 || i == _DIGITAL_SMETER_WIDGET_BAR_COUNT);
             if (showLabel)
             {
                 int labelX = endX + (20 * cos(radian)) - 5; // TODO: adjust centering
                 int labelY = endY - (20 * sin(radian));
-                this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE);
-                this->parentDisplayPtr->setTextSize(1);
-                this->parentDisplayPtr->setCursor(labelX, labelY);
+                this->templateSprite->setTextColor(TFT_BLACK);
+                this->templateSprite->setTextSize(1);
+                this->templateSprite->setCursor(labelX, labelY);
                 char label[8] = {'\0'};
                 switch (i)
                 {
@@ -94,9 +121,16 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
                     snprintf(label, sizeof(label), "+60dB");
                     break;
                 }
-                this->parentDisplayPtr->printf("%s", label);
+                this->templateSprite->printf("%s", label);
             }
         }
+    }
+    if (force || this->currentTransceiverStatusPtr->signalMeterdBLevel != this->previousDBValue)
+    {
+        this->templateSprite->pushSprite(this->xOffset, this->yOffset);
+        this->refreshAnalogBar(0);
+        this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
+        changed = true;
     }
     return (changed);
 }
