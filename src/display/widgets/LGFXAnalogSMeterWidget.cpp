@@ -5,6 +5,8 @@
 #define TOTAL_DEGREES 140.0
 #define BAR_INCREMENT_DEGREES (TOTAL_DEGREES / (float)_DIGITAL_SMETER_WIDGET_BAR_COUNT)
 #define RADIUS 100
+#define RADIUS_SMALL_END 50
+#define RADIUS_SMALL_START 10
 #define BAR_START_DEGREE 160.0
 #define ARC_ANGLE_OFFSET 20
 #define ARC_START_ANGLE 180 + ARC_ANGLE_OFFSET
@@ -32,7 +34,7 @@ LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
 
 void LGFXAnalogSMeterWidget::refreshAnalogBar(int8_t value)
 {
-    float angle = (BAR_START_DEGREE - (5 * BAR_INCREMENT_DEGREES));
+    float angle = map(value, -54, 60, BAR_START_DEGREE, (BAR_START_DEGREE - (_DIGITAL_SMETER_WIDGET_BAR_COUNT * BAR_INCREMENT_DEGREES))); // (BAR_START_DEGREE - (5 * BAR_INCREMENT_DEGREES));
 
     float radian = radians(angle);
 
@@ -61,6 +63,9 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
         this->templateSprite->drawArc(x, y, RADIUS, RADIUS, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
         this->templateSprite->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
         this->templateSprite->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+
+        this->templateSprite->fillArc(x, y, RADIUS_SMALL_END, RADIUS_SMALL_START, ARC_START_ANGLE, ARC_END_ANGLE, 0x8C93);
+
         this->templateSprite->setTextSize(1);
         for (int i = 0; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; ++i)
         {
@@ -127,8 +132,9 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
     }
     if (force || this->currentTransceiverStatusPtr->signalMeterdBLevel != this->previousDBValue)
     {
+
         this->templateSprite->pushSprite(this->xOffset, this->yOffset);
-        this->refreshAnalogBar(0);
+        this->refreshAnalogBar(this->currentTransceiverStatusPtr->signalMeterdBLevel);
         this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
         changed = true;
     }
