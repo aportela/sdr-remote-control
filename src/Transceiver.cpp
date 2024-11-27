@@ -801,6 +801,21 @@ bool Transceiver::decrementSquelch(uint8_t units, bool fromISR)
   }
 }
 
+bool Transceiver::toggleAFSquelchActiveStatus(bool fromISR)
+{
+  TransceiverStatus currentStatus;
+  if (this->getCurrentStatus(&currentStatus, fromISR))
+  {
+    currentStatus.isVolumeControlActive = !currentStatus.isVolumeControlActive;
+    currentStatus.isSquelchControlActive = !currentStatus.isSquelchControlActive;
+    return (this->setCurrentStatus(&currentStatus, fromISR));
+  }
+  else
+  {
+    return (false);
+  }
+}
+
 bool Transceiver::setAudioMuted(bool fromISR)
 {
   TransceiverStatus currentStatus;

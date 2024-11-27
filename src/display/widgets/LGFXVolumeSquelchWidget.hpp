@@ -11,9 +11,11 @@ private:
   uint8_t oldAFGainValue = 0;
   uint8_t oldSquelchValue = 0;
   bool oldAudioMutedValue = false;
+  bool oldActiveVolumeValue = false;
+  bool oldActiveSquelchValue = false;
 
-  void refreshVolume(bool force, uint8_t value, bool muted);
-  void refreshSquelch(bool force, uint8_t value);
+  void refreshVolume(bool force, bool active, uint8_t value, bool muted);
+  void refreshSquelch(bool force, bool active, uint8_t value);
   void setMuted(bool force, uint8_t value);
 
 public:

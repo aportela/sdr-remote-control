@@ -95,6 +95,8 @@ struct TransceiverStatus
   bool audioMuted = false;
   uint64_t lastFrequencyChangedByLocalControl = 0;
   uint64_t lastVolumeChangedByUser = 0;
+  bool isVolumeControlActive = true;
+  bool isSquelchControlActive = false;
   TransceiverStatus() = default;
 };
 
@@ -213,6 +215,8 @@ public:
   bool setSquelch(uint8_t value, bool fromISR = false);
   bool incrementSquelch(uint8_t units, bool fromISR = false);
   bool decrementSquelch(uint8_t units, bool fromISR = false);
+
+  bool toggleAFSquelchActiveStatus(bool fromISR = false);
 
   bool setAudioMuted(bool fromISR = false);
   bool setAudioUnMuted(bool fromISR = false);

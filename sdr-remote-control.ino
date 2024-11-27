@@ -246,6 +246,7 @@ void onKP8Loop(uint8_t pressedMask = 0)
     case 1: // VOLUME
       encoderChangeBitmask = ENCODER_CHANGE_VOLUME;
       menu->setActive(1, true, true);
+      trx->toggleAFSquelchActiveStatus(true);
       break;
     case 2: // VFO B => A
       menu->click(9);
