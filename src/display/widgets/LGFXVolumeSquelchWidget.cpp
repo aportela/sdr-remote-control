@@ -20,17 +20,17 @@ LGFXVolumeSquelchWidget::~LGFXVolumeSquelchWidget()
 void LGFXVolumeSquelchWidget::refreshVolume(bool force, bool active, uint8_t value, bool muted)
 {
   this->parentDisplayPtr->setTextSize(_VOLUME_SQUELCH_WIDGET_FONT_SIZE);
-  this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_NOT_ACTIVE, TEXT_BACKGROUND_COLOR);
+  this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   if (force)
   {
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding, this->yOffset + this->padding);
     this->parentDisplayPtr->print("VOLUME");
 
-    this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_NOT_ACTIVE);
+    this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
   }
   if (value > 0)
   {
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_NOT_ACTIVE);
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1 + value, this->yOffset + this->padding + 1, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
   else
@@ -44,7 +44,7 @@ void LGFXVolumeSquelchWidget::refreshVolume(bool force, bool active, uint8_t val
   }
   else
   {
-    this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_NOT_ACTIVE, TEXT_BACKGROUND_COLOR);
+    this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   }
   this->parentDisplayPtr->printf("%03d", value);
 }
@@ -52,17 +52,17 @@ void LGFXVolumeSquelchWidget::refreshVolume(bool force, bool active, uint8_t val
 void LGFXVolumeSquelchWidget::refreshSquelch(bool force, bool active, uint8_t value)
 {
   this->parentDisplayPtr->setTextSize(_VOLUME_SQUELCH_WIDGET_FONT_SIZE);
-  this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_NOT_ACTIVE, TEXT_BACKGROUND_COLOR);
+  this->parentDisplayPtr->setTextColor(active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
   if (force)
   {
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_SQUELCH_X_OFFSET, this->yOffset + this->padding);
     this->parentDisplayPtr->print("SQUELCH");
 
-    this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_NOT_ACTIVE);
+    this->parentDisplayPtr->drawRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET, this->yOffset + this->padding, _VOLUME_SQUELCH_WIDGET_BARS_WIDTH, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT, active ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
   }
   if (value > 0)
   {
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_SECONDARY);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_COLOR_NOT_ACTIVE);
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_SQUELCH_BAR_X_OFFSET + 1 + value, this->yOffset + this->padding + 1, 100 - value, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
   else
