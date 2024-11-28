@@ -61,7 +61,7 @@ void LGFXFilterWidget::refreshLabels(bool force, uint64_t lowCut, uint64_t highC
   this->labelValuesSprite->setTextSize(_FILTER_WIDGET_FONT_SIZE);
 
   this->labelValuesSprite->setCursor(0, 0);
-  uint64_t totalBandwith = lowCut + highCut;
+  uint64_t totalBandwith = highCut - lowCut;
   if (totalBandwith > 1000)
   {
     double remainder = std::fmod((double)totalBandwith, 1000.0);
