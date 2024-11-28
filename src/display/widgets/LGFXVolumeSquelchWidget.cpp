@@ -80,17 +80,19 @@ void LGFXVolumeSquelchWidget::setMuted(bool force, uint8_t value)
 bool LGFXVolumeSquelchWidget::refresh(bool force)
 {
   bool changed = force;
-  if (force || (this->oldAFGainValue != this->currentTransceiverStatusPtr->AFGain || this->oldAudioMutedValue != this->currentTransceiverStatusPtr->audioMuted || this->oldActiveVolumeValue != this->currentTransceiverStatusPtr->isVolumeControlActive))
+  bool activeVolumeControlChanged = this->oldActiveVolumeValue != this->currentTransceiverStatusPtr->isVolumeControlActive;
+  if (force || (this->oldAFGainValue != this->currentTransceiverStatusPtr->AFGain || this->oldAudioMutedValue != this->currentTransceiverStatusPtr->audioMuted || activeVolumeControlChanged))
   {
-    this->refreshVolume(force, this->currentTransceiverStatusPtr->isVolumeControlActive, this->currentTransceiverStatusPtr->AFGain, this->currentTransceiverStatusPtr->audioMuted);
+    this->refreshVolume(force || activeVolumeControlChanged, this->currentTransceiverStatusPtr->isVolumeControlActive, this->currentTransceiverStatusPtr->AFGain, this->currentTransceiverStatusPtr->audioMuted);
     this->oldAFGainValue = this->currentTransceiverStatusPtr->AFGain;
     this->oldAudioMutedValue = this->currentTransceiverStatusPtr->audioMuted;
     this->oldActiveVolumeValue = this->currentTransceiverStatusPtr->isVolumeControlActive;
     changed = true;
   }
-  if (force || this->oldSquelchValue != this->currentTransceiverStatusPtr->squelch || this->oldActiveSquelchValue != this->currentTransceiverStatusPtr->isSquelchControlActive)
+  bool activeSquelchControlChanged = this->oldActiveSquelchValue != this->currentTransceiverStatusPtr->isSquelchControlActive;
+  if (force || this->oldSquelchValue != this->currentTransceiverStatusPtr->squelch || activeSquelchControlChanged)
   {
-    this->refreshSquelch(force, this->currentTransceiverStatusPtr->isSquelchControlActive, this->currentTransceiverStatusPtr->squelch);
+    this->refreshSquelch(force || activeSquelchControlChanged, this->currentTransceiverStatusPtr->isSquelchControlActive, this->currentTransceiverStatusPtr->squelch);
     this->oldSquelchValue = this->currentTransceiverStatusPtr->squelch;
     this->oldActiveSquelchValue = this->currentTransceiverStatusPtr->isSquelchControlActive;
     changed = true;
