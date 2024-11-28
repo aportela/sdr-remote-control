@@ -170,6 +170,108 @@ const RadioBand RadioBands[] = {
 
 #define RADIO_BANDS_SIZE (sizeof(RadioBands) / sizeof(RadioBands[0]))
 
+enum BandPassRadioFilterType
+{
+  BPRFT_CUSTOM,
+  BPRFT_PRESET,
+};
+
+struct BandPassRadioFilter
+{
+  BandPassRadioFilterType filterType;
+  TrxVFOMode filterMode;
+  bool simmetrical;
+  uint32_t lowCut;
+  uint32_t highCut;
+  uint32_t center; // simmetrical = 0, assimetrical = (lowcut + high cut) / 2
+  bool defaultPreset;
+};
+
+const BandPassRadioFilter RadioFilterPresets[] = {
+    // AM
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 2500, 2500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 3000, 3000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 3500, 3500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 4000, 4000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 4500, 4500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 5000, 5000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 5500, 5500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 6000, 6000, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 7000, 7000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_SAM, true, 8000, 8000, 0, false},
+    // Narrow FM
+    {BPRFT_PRESET, TRX_VFO_MD_FM, true, 8000, 8000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_FM, true, 10000, 10000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_FM, true, 12000, 12000, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_FM, true, 14000, 14000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_FM, true, 16000, 16000, 0, false},
+    // Wide FM
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 8000, 8000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 10000, 10000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 12000, 12000, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 24000, 24000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 30000, 30000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_WFM, true, 40000, 40000, 0, true},
+    // Broadcast FM
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 100000, 100000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 125000, 125000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 150000, 150000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 175000, 175000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 192000, 192000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 200000, 200000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 225000, 225000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 250000, 250000, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 275000, 275000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 300000, 300000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 325000, 325000, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_BFM, true, 350000, 350000, 0, false},
+    // CW Lower Side Band
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 475, 525, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 450, 550, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 400, 600, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 300, 700, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 200, 800, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 100, 900, 500, true},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_L, false, 0, 1000, 500, false},
+    // CW Upper Side Band
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 475, 525, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 450, 550, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 400, 600, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 300, 700, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 200, 800, 500, false},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 100, 900, 500, true},
+    {BPRFT_PRESET, TRX_VFO_MD_CW_U, false, 0, 1000, 500, false},
+    // LSB Lower Side Band
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 200, 2400, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 200, 2600, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 2700, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 2900, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 3100, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 3300, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 3500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_LSB, false, 100, 3700, 0, false},
+    // USB Upper Side Band
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 200, 2400, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 200, 2600, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 2700, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 2900, 0, true},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 3100, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 3300, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 3500, 0, false},
+    {BPRFT_PRESET, TRX_VFO_MD_USB, false, 100, 3700, 0, false},
+    // DSB Double Side Band
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 2400, 1200, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 2600, 1300, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 2700, 1350, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 2900, 1450, true},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 3100, 1550, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 3300, 1650, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 3500, 1750, false},
+    {BPRFT_PRESET, TRX_VFO_MD_DSB, true, 0, 3700, 1850, false},
+};
+
+#define RADIO_FILTER_PRESETS_SIZE (sizeof(BandPassRadioFilter) / sizeof(BandPassRadioFilter[0]))
+
 class Transceiver
 {
 private:
