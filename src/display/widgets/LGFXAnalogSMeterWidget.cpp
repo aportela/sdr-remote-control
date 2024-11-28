@@ -1,10 +1,10 @@
 #include "LGFXAnalogSMeterWidget.hpp"
 
-#define SHORT_BAR_LENGTH 8
-#define LONG_BAR_LENGTH 16
+#define SHORT_BAR_LENGTH 5
+#define LONG_BAR_LENGTH 10
 #define TOTAL_DEGREES 140.0
 #define BAR_INCREMENT_DEGREES (TOTAL_DEGREES / (float)_DIGITAL_SMETER_WIDGET_BAR_COUNT)
-#define RADIUS 100
+#define RADIUS 300
 #define RADIUS_SMALL_END 50
 #define RADIUS_SMALL_START 10
 #define BAR_START_DEGREE 160.0
@@ -57,14 +57,15 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
     bool changed = force;
     if (force)
     {
+        // circle center coordinates
         int x = this->width / 2;
-        int y = this->height + 24; // 16 px added because we use a 140 degrees (not 180 degrees)
+        int y = this->height + 250;
 
         this->templateSprite->drawArc(x, y, RADIUS, RADIUS, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
-        this->templateSprite->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
-        this->templateSprite->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+        // this->templateSprite->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
+        // this->templateSprite->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
 
-        this->templateSprite->fillArc(x, y, RADIUS_SMALL_END, RADIUS_SMALL_START, ARC_START_ANGLE, ARC_END_ANGLE, 0x8C93);
+        // this->templateSprite->fillArc(x, y, RADIUS_SMALL_END, RADIUS_SMALL_START, ARC_START_ANGLE, ARC_END_ANGLE, 0x8C93);
 
         this->templateSprite->setTextSize(1);
         for (int i = 0; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; ++i)
@@ -134,7 +135,7 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
     {
 
         this->templateSprite->pushSprite(this->xOffset, this->yOffset);
-        this->refreshAnalogBar(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+        // this->refreshAnalogBar(this->currentTransceiverStatusPtr->signalMeterdBLevel);
         this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
         changed = true;
     }
