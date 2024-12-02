@@ -4,8 +4,6 @@
 #define MAX_DB 60      // S9+60
 #define DB_BAR_STEPS 3 // 3 db between each bar
 
-#define BAR_DISABLED_BACKGROUND_COLOR 0x8410
-
 LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr)
     : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
@@ -28,6 +26,8 @@ LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
     delete this->templateSprite;
     this->templateSprite = nullptr;
 }
+
+#ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
 
 uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
 {
@@ -78,6 +78,8 @@ uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
     return (color);
 }
 
+#endif
+
 void LGFXAnalogSMeterWidget::createSMeter(void)
 {
     this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, 0xF75B); // 0xE6F9
@@ -87,15 +89,15 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
     this->parentDisplayPtr->print("1     3     5     7     9     +15     +30            +60");
 
-    // no gradient
-    // this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 154, 5, TFT_GREEN);
-    // this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
-
-    // gradient
+#ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
     for (uint16_t i = 0; i < ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH; i++)
     {
         this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + i, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 1, 5, getGradientColor(i));
     }
+#else
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 154, 5, TFT_GREEN);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
+#endif
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, TEXT_COLOR_NOT_ACTIVE);
 
     for (int i = 1; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)

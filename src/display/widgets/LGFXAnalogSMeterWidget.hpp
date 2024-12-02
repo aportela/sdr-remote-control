@@ -11,7 +11,9 @@ private:
     lgfx::LGFX_Sprite *expSprite;
     lgfx::LGFX_Sprite *templateSprite;
     void refreshSMeterDBLabel(bool force, int8_t dB);
+#ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
     uint32_t getGradientColor(int index);
+#endif
     void createSMeter(void);
     void refreshSMeter(int8_t dB);
 
