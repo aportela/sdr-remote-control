@@ -4,6 +4,10 @@
 #define MAX_DB 60      // S9+60
 #define DB_BAR_STEPS 3 // 3 db between each bar
 
+#define ANALOG_SMETER_BACKGROUND_COLOR 0xF75B // // 0xE6F9
+#define ANALOG_SMETER_TEXT_COLOR TEXT_COLOR_NOT_ACTIVE
+#define ANALOG_SMETER_INDICATOR_COLOR 0xF388
+
 LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr)
     : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
@@ -82,10 +86,10 @@ uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
 
 void LGFXAnalogSMeterWidget::createSMeter(void)
 {
-    this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, 0xF75B); // 0xE6F9
+    this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, ANALOG_SMETER_BACKGROUND_COLOR);
 
     this->parentDisplayPtr->setTextSize(1);
-    this->parentDisplayPtr->setTextColor(TEXT_COLOR_NOT_ACTIVE);
+    this->parentDisplayPtr->setTextColor(ANALOG_SMETER_TEXT_COLOR);
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
     this->parentDisplayPtr->print("1     3     5     7     9     +15     +30            +60");
 
@@ -98,7 +102,7 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 154, 5, TFT_GREEN);
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
 #endif
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, TEXT_COLOR_NOT_ACTIVE);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, ANALOG_SMETER_TEXT_COLOR);
 
     for (int i = 1; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
     {
@@ -106,7 +110,7 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
 #define B_MARGIN 6
         uint16_t x = this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + (i * (B_WIDTH + B_MARGIN));
         bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
-        this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 16 : ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 8), B_WIDTH, isCurrentLongBar ? 16 : 8, TEXT_COLOR_NOT_ACTIVE);
+        this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 16 : ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 8), B_WIDTH, isCurrentLongBar ? 16 : 8, ANALOG_SMETER_TEXT_COLOR);
     }
 }
 
@@ -184,10 +188,10 @@ void LGFXAnalogSMeterWidget::refreshSMeter(int8_t dB)
 {
     uint16_t xof = map(this->previousDBValue, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH);
     // clear previous value
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, 0xF75B);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
     // draw current value
     xof = map(dB, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH);
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, 0xF388);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
 }
 
 bool LGFXAnalogSMeterWidget::refresh(bool force)
