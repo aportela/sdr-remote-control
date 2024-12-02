@@ -29,6 +29,55 @@ LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
     this->templateSprite = nullptr;
 }
 
+uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
+{
+    uint32_t TFT_GREEN = 0x00FF00; // RGB: (0, 255, 0)
+    uint32_t ORANGE = 0xFFA500;    // RGB: (255, 165, 0)
+    uint32_t TFT_RED = 0xFF0000;   // RGB: (255, 0, 0)
+
+    int greenR = (TFT_GREEN >> 16) & 0xFF;
+    int greenG = (TFT_GREEN >> 8) & 0xFF;
+    int greenB = TFT_GREEN & 0xFF;
+
+    int orange_R = (ORANGE >> 16) & 0xFF;
+    int orange_G = (ORANGE >> 8) & 0xFF;
+    int orange_B = ORANGE & 0xFF;
+
+    int redR = (TFT_RED >> 16) & 0xFF;
+    int redG = (TFT_RED >> 8) & 0xFF;
+    int redB = TFT_RED & 0xFF;
+
+    const int num_steps = 342;
+
+    if (index < 0 || index >= num_steps)
+    {
+        return 0;
+    }
+
+    uint32_t color;
+
+    if (index <= 120)
+    {
+        int R = greenR + ((orange_R - greenR) * index) / 120;
+        int G = greenG + ((orange_G - greenG) * index) / 120;
+        int B = greenB + ((orange_B - greenB) * index) / 120;
+
+        color = (R << 16) | (G << 8) | B;
+    }
+    else
+    {
+        int i = index - 120;
+
+        int R = orange_R + ((redR - orange_R) * i) / 222;
+        int G = orange_G + ((redG - orange_G) * i) / 222;
+        int B = orange_B + ((redB - orange_B) * i) / 222;
+
+        color = (R << 16) | (G << 8) | B;
+    }
+
+    return (color);
+}
+
 void LGFXAnalogSMeterWidget::createSMeter(void)
 {
     this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, 0xF75B); // 0xE6F9
@@ -38,8 +87,15 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
     this->parentDisplayPtr->print("1     3     5     7     9     +15     +30            +60");
 
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 154, 5, TFT_GREEN);
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
+    // no gradient
+    // this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 154, 5, TFT_GREEN);
+    // this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
+
+    // gradient
+    for (uint16_t i = 0; i < ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH; i++)
+    {
+        this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + i, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 1, 5, getGradientColor(i));
+    }
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, TEXT_COLOR_NOT_ACTIVE);
 
     for (int i = 1; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
