@@ -1,22 +1,19 @@
 #include "LGFXAnalogSMeterWidget.hpp"
 
-#define SHORT_BAR_LENGTH 5
-#define LONG_BAR_LENGTH 10
-#define TOTAL_DEGREES 140.0
-#define BAR_INCREMENT_DEGREES (TOTAL_DEGREES / (float)_DIGITAL_SMETER_WIDGET_BAR_COUNT)
-#define RADIUS 300
-#define RADIUS_SMALL_END 50
-#define RADIUS_SMALL_START 10
-#define BAR_START_DEGREE 160.0
-#define ARC_ANGLE_OFFSET 20
-#define ARC_START_ANGLE 180 + ARC_ANGLE_OFFSET
-#define ARC_END_ANGLE -ARC_ANGLE_OFFSET
+#define MIN_DB -54     // S0
+#define MAX_DB 60      // S9+60
+#define DB_BAR_STEPS 3 // 3 db between each bar
+
+#define BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
 LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr)
     : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
     if (displayPtr != nullptr)
     {
+        this->expSprite = new lgfx::LGFX_Sprite(displayPtr);
+        this->expSprite->setColorDepth(8);
+        this->expSprite->createSprite(60, 28);
         this->templateSprite = new lgfx::LGFX_Sprite(displayPtr);
         this->templateSprite->setColorDepth(8);
         this->templateSprite->createSprite(this->width, this->height);
@@ -32,110 +29,113 @@ LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
     this->templateSprite = nullptr;
 }
 
-void LGFXAnalogSMeterWidget::refreshAnalogBar(int8_t value)
+void LGFXAnalogSMeterWidget::createSMeter(void)
 {
-    float angle = map(value, -54, 60, BAR_START_DEGREE, (BAR_START_DEGREE - (_DIGITAL_SMETER_WIDGET_BAR_COUNT * BAR_INCREMENT_DEGREES))); // (BAR_START_DEGREE - (5 * BAR_INCREMENT_DEGREES));
+    this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, 0xF75B); // 0xE6F9
+    this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, TFT_BLACK);
+    this->parentDisplayPtr->drawFastHLine(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET + 1, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, TFT_BLACK);
 
-    float radian = radians(angle);
+    for (int i = 0; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
+    {
+#define B_WIDTH 3
+#define B_MARGIN 6
+        uint16_t x = this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + (i * (B_WIDTH + B_MARGIN));
+        bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
+        this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 16 : ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 8), B_WIDTH, isCurrentLongBar ? 16 : 8, TFT_BLACK);
+    }
+}
 
-    int x = this->width / 2;
-    int y = this->height + 24; // 16 px added because we use a 140 degrees (not 180 degrees)
-    int startX = x + (50 * cos(radian));
-    int startY = y - (50 * sin(radian));
+void LGFXAnalogSMeterWidget::refreshSMeterDBLabel(bool force, int8_t dB)
+{
+    this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
+    this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+    if (force)
+    {
+        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+        this->parentDisplayPtr->print("S");
+    }
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+    bool showDBExp = dB > 0;
+    if (dB < -48)
+    {
+        this->parentDisplayPtr->print("0");
+    }
+    else if (dB < -42)
+    {
+        this->parentDisplayPtr->print("1");
+    }
+    else if (dB < -36)
+    {
+        this->parentDisplayPtr->print("2");
+    }
+    else if (dB < -30)
+    {
+        this->parentDisplayPtr->print("3");
+    }
+    else if (dB < -24)
+    {
+        this->parentDisplayPtr->print("4");
+    }
+    else if (dB < -18)
+    {
+        this->parentDisplayPtr->print("5");
+    }
+    else if (dB < -12)
+    {
+        this->parentDisplayPtr->print("6");
+    }
+    else if (dB < -6)
+    {
+        this->parentDisplayPtr->print("7");
+    }
+    else if (dB < 0)
+    {
+        this->parentDisplayPtr->print("8");
+    }
+    else
+    {
+        this->parentDisplayPtr->print("9");
+    }
+    if (!showDBExp)
+    {
+        // only refresh base dB label if previous value has exp label
+        if (force || this->previousDBValue >= 0)
+        {
+            this->parentDisplayPtr->print("dB ");
+        }
+    }
+    else
+    {
+        this->expSprite->fillScreen(TFT_BLACK);
+        this->expSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+        this->expSprite->setTextSize(_DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE);
+        this->expSprite->setCursor(0, 0);
+        this->expSprite->printf("+%ddB", dB);
+        this->expSprite->pushSprite(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+    }
+}
 
-    int longitud_barra = 100;
-
-    int endX = x + ((50 + longitud_barra) * cos(radian));
-    int endY = y - ((50 + longitud_barra) * sin(radian));
-
-    this->parentDisplayPtr->drawLine(this->xOffset + startX, this->yOffset + startY, this->xOffset + endX, this->yOffset + endY, TFT_RED);
+void LGFXAnalogSMeterWidget::refreshSMeter(int8_t dB)
+{
+    uint16_t xof = map(this->previousDBValue, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH);
+    // clear previous value
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, 0xF75B);
+    // draw current value
+    xof = map(dB, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, TFT_BLUE);
 }
 
 bool LGFXAnalogSMeterWidget::refresh(bool force)
 {
-    // -54 -> 60
     bool changed = force;
     if (force)
     {
-        // circle center coordinates
-        int x = this->width / 2;
-        int y = this->height + 250;
-
-        this->templateSprite->drawArc(x, y, RADIUS, RADIUS, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
-        // this->templateSprite->drawArc(x, y, RADIUS - 1, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
-        // this->templateSprite->drawArc(x, y, RADIUS - 2, RADIUS - 1, ARC_START_ANGLE, ARC_END_ANGLE, TFT_BLACK);
-
-        // this->templateSprite->fillArc(x, y, RADIUS_SMALL_END, RADIUS_SMALL_START, ARC_START_ANGLE, ARC_END_ANGLE, 0x8C93);
-
-        this->templateSprite->setTextSize(1);
-        for (int i = 0; i <= _DIGITAL_SMETER_WIDGET_BAR_COUNT; ++i)
-        {
-            float angle = (BAR_START_DEGREE - (i * BAR_INCREMENT_DEGREES));
-
-            float radian = radians(angle);
-
-            int startX = x + (RADIUS * cos(radian));
-            int startY = y - (RADIUS * sin(radian));
-
-            int longitud_barra = (i % 2 == 0) ? LONG_BAR_LENGTH : SHORT_BAR_LENGTH;
-
-            int endX = x + ((RADIUS + longitud_barra) * cos(radian));
-            int endY = y - ((RADIUS + longitud_barra) * sin(radian));
-
-            this->templateSprite->drawLine(startX, startY, endX, endY, TFT_BLACK);
-
-            bool showLabel = (i == 0 || i == 2 || i == 6 || i == 10 || i == 14 || i == 18 || i == 22 || i == 26 || i == 30 || i == _DIGITAL_SMETER_WIDGET_BAR_COUNT);
-            if (showLabel)
-            {
-                int labelX = endX + (20 * cos(radian)) - 5; // TODO: adjust centering
-                int labelY = endY - (20 * sin(radian));
-                this->templateSprite->setTextColor(TFT_BLACK);
-                this->templateSprite->setTextSize(1);
-                this->templateSprite->setCursor(labelX, labelY);
-                char label[8] = {'\0'};
-                switch (i)
-                {
-                case 0:
-                    snprintf(label, sizeof(label), "S");
-                    break;
-                case 2:
-                    snprintf(label, sizeof(label), "1");
-                    break;
-                case 6:
-                    snprintf(label, sizeof(label), "3");
-                    break;
-                case 10:
-                    snprintf(label, sizeof(label), "5");
-                    break;
-
-                case 14:
-                    snprintf(label, sizeof(label), "7");
-                    break;
-                case 18:
-                    snprintf(label, sizeof(label), "9");
-                    break;
-                case 22:
-                    snprintf(label, sizeof(label), "+15dB");
-                    break;
-                case 26:
-                    snprintf(label, sizeof(label), "+30dB");
-                    break;
-                case 30:
-                    snprintf(label, sizeof(label), "+45dB");
-                    break;
-                case _DIGITAL_SMETER_WIDGET_BAR_COUNT:
-                    snprintf(label, sizeof(label), "+60dB");
-                    break;
-                }
-                this->templateSprite->printf("%s", label);
-            }
-        }
+        this->createSMeter();
     }
-    if (force || this->currentTransceiverStatusPtr->signalMeterdBLevel != this->previousDBValue)
+    if (force || this->previousDBValue != this->currentTransceiverStatusPtr->signalMeterdBLevel)
     {
-
-        this->templateSprite->pushSprite(this->xOffset, this->yOffset);
-        // this->refreshAnalogBar(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+        this->refreshSMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+        this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel);
         this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
         changed = true;
     }
