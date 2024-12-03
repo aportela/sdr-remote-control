@@ -90,7 +90,7 @@ uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
 void LGFXAnalogSMeterWidget::createSMeter(void)
 {
     this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, ANALOG_SMETER_BACKGROUND_COLOR);
-
+    this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, TEXT_COLOR_SECONDARY);
     this->parentDisplayPtr->setTextSize(2);
     this->parentDisplayPtr->setTextColor(ANALOG_SMETER_TEXT_COLOR);
     this->parentDisplayPtr->setCursor(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
