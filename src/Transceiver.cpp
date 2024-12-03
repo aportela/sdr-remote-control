@@ -616,25 +616,8 @@ bool Transceiver::setSignalMeter(TRXSMeterUnitType unitType, int8_t units, bool 
     }
     if (changed)
     {
-#ifdef USE_SMOOTH_SIGNAL_METER
-      uint64_t currentMillis = millis();
-      if (newLevel > currentStatus.smoothedSignalMeterdBLevel)
-      {
-        currentStatus.smoothedSignalMeterdBLevel = newLevel;
-        currentStatus.lastSmoothSignalMeterdBTimer = currentMillis;
-        return (this->setCurrentStatus(&currentStatus, fromISR));
-      }
-      else if (newLevel < currentStatus.smoothedSignalMeterdBLevel && currentMillis - currentStatus.lastSmoothSignalMeterdBTimer > 5)
-      {
-        currentStatus.smoothedSignalMeterdBLevel -= 2;
-        currentStatus.signalMeterdBLevel = currentStatus.smoothedSignalMeterdBLevel;
-        currentStatus.lastSmoothSignalMeterdBTimer = currentMillis;
-        return (this->setCurrentStatus(&currentStatus, fromISR));
-      }
-#else // USE_SMOOTH_SIGNAL_METER
       currentStatus.signalMeterdBLevel = newLevel;
       return (this->setCurrentStatus(&currentStatus, fromISR));
-#endif
     }
     else
     {

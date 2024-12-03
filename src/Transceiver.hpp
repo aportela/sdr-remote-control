@@ -76,8 +76,6 @@ enum TRXSMeterUnitType
   SIGNAL_METER_DB_UNITS = 2
 };
 
-#define USE_SMOOTH_SIGNAL_METER
-
 struct TransceiverStatus
 {
 
@@ -86,10 +84,6 @@ struct TransceiverStatus
   uint8_t activeVFOIndex = 0;
   TrxVFO VFO[TRANSCEIVER_VFO_COUNT];
   int8_t signalMeterdBLevel = -54;
-#ifdef USE_SMOOTH_SIGNAL_METER
-  int8_t smoothedSignalMeterdBLevel = -54;
-  uint64_t lastSmoothSignalMeterdBTimer = 0;
-#endif
   uint8_t AFGain = 0;
   uint8_t squelch = 0;
   bool audioMuted = false;
