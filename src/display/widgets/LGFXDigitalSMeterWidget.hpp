@@ -3,11 +3,12 @@
 
 #include <LovyanGFX.hpp>
 #include "LGFXTransceiverStatusWidget.hpp"
-#include "../../Transceiver.hpp"
+#include "../../SMeter.hpp"
 
 class LGFXDigitalSMeterWidget : public LGFXTransceiverStatusWidget
 {
 private:
+  SMeter *smeter = nullptr;
   lgfx::LGFX_Sprite *expSprite;
   int8_t previousDBValue = -57;
   void drawBars(int8_t dB);

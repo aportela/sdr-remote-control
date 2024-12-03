@@ -37,6 +37,7 @@
 
 LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
+  this->smeter = new SMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
   if (displayPtr != nullptr)
   {
     this->expSprite = new lgfx::LGFX_Sprite(displayPtr);
@@ -51,6 +52,8 @@ LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t
 
 LGFXDigitalSMeterWidget::~LGFXDigitalSMeterWidget()
 {
+  delete this->smeter;
+  this->smeter = nullptr;
   delete this->expSprite;
   this->expSprite = nullptr;
 }
@@ -179,11 +182,13 @@ bool LGFXDigitalSMeterWidget::refresh(bool force)
   {
     this->createSMeter();
   }
-  if (force || this->previousDBValue != this->currentTransceiverStatusPtr->signalMeterdBLevel)
+  this->smeter->set(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+  int8_t dBSmooth = this->smeter->get(true);
+  if (force || this->previousDBValue != dBSmooth)
   {
-    this->refreshSMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
-    this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel);
-    this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
+    this->refreshSMeter(dBSmooth);
+    this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel); // "digital" label always show real (not "smooth")
+    this->previousDBValue = dBSmooth;
     changed = true;
   }
   return (changed);

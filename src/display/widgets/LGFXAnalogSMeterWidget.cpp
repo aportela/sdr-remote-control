@@ -208,7 +208,6 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
     int8_t dBSmooth = this->smeter->get(true);
     if (force || this->previousDBValue != dBSmooth)
     {
-
         this->refreshSMeter(dBSmooth);
         this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel); // "digital" label always show real (not "smooth")
         this->previousDBValue = dBSmooth;
