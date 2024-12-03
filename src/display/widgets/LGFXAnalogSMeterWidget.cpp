@@ -112,7 +112,7 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
 #define B_WIDTH 3
 #define B_MARGIN 6
         uint16_t x = this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + (i * (B_WIDTH + B_MARGIN));
-        bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 37);
+        bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 32 || i == 37);
         this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 10 : ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 3), B_WIDTH, isCurrentLongBar ? 10 : 3, ANALOG_SMETER_TEXT_COLOR);
     }
 }
