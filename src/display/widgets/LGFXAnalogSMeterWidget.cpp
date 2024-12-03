@@ -204,11 +204,14 @@ bool LGFXAnalogSMeterWidget::refresh(bool force)
     {
         this->createSMeter();
     }
-    if (force || this->previousDBValue != this->currentTransceiverStatusPtr->signalMeterdBLevel)
+    this->smeter->set(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+    int8_t dBSmooth = this->smeter->get(true);
+    if (force || this->previousDBValue != dBSmooth)
     {
-        this->refreshSMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
-        this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel);
-        this->previousDBValue = this->currentTransceiverStatusPtr->signalMeterdBLevel;
+
+        this->refreshSMeter(dBSmooth);
+        this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel); // "digital" label always show real (not "smooth")
+        this->previousDBValue = dBSmooth;
         changed = true;
     }
     return (changed);
