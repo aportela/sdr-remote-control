@@ -11,6 +11,7 @@
 LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr)
     : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
+    this->smeter = new SMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
     if (displayPtr != nullptr)
     {
         this->expSprite = new lgfx::LGFX_Sprite(displayPtr);
@@ -27,6 +28,8 @@ LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t w
 
 LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
 {
+    delete this->smeter;
+    this->smeter = nullptr;
     delete this->templateSprite;
     this->templateSprite = nullptr;
 }

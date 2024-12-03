@@ -3,10 +3,12 @@
 
 #include <LovyanGFX.hpp>
 #include "LGFXTransceiverStatusWidget.hpp"
+#include "../../SMeter.hpp"
 
 class LGFXAnalogSMeterWidget : public LGFXTransceiverStatusWidget
 {
 private:
+    SMeter *smeter = nullptr;
     int8_t previousDBValue = -57;
     lgfx::LGFX_Sprite *expSprite;
     lgfx::LGFX_Sprite *templateSprite;
