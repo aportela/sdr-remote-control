@@ -10,7 +10,7 @@ LGFXDigitalSMeterWidget::LGFXDigitalSMeterWidget(LovyanGFX *displayPtr, uint16_t
 {
   if (displayPtr != nullptr && currentTransceiverStatusPtr != nullptr)
   {
-    // this->refresh(true);
+    this->refresh(true);
   }
 }
 
