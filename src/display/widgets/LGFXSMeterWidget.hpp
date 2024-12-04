@@ -9,12 +9,13 @@ class LGFXSMeterWidget : public LGFXTransceiverStatusWidget
 {
 private:
   SMeter *smeter = nullptr;
-  int8_t previousDBValue = SMETER_MIN_DB;
-  int8_t previousDBSmoothedValue = SMETER_MIN_DB;
   lgfx::LGFX_Sprite *dbLabelExpSprite;
   void refreshLabel(bool force, int8_t dB);
 
 protected:
+  int8_t previousDBValue = SMETER_MIN_DB;
+  int8_t previousDBSmoothedValue = SMETER_MIN_DB;
+
   virtual void init(void) = 0;
   virtual void update(int8_t dB) = 0;
 
