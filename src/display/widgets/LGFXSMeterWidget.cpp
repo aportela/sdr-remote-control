@@ -14,8 +14,11 @@ LGFXSMeterWidget::LGFXSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
 
 LGFXSMeterWidget::~LGFXSMeterWidget()
 {
-  delete this->smeter;
-  this->smeter = nullptr;
+  if (this->smeter != nullptr)
+  {
+    delete this->smeter;
+    this->smeter = nullptr;
+  }
   if (this->dbLabelExpSprite != nullptr)
   {
     delete this->dbLabelExpSprite;
