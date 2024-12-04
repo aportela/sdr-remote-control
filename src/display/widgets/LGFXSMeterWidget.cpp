@@ -7,7 +7,6 @@ LGFXSMeterWidget::LGFXSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
   if (displayPtr != nullptr)
   {
     this->dbLabelExpSprite = new lgfx::LGFX_Sprite(displayPtr);
-
     this->dbLabelExpSprite->setColorDepth(8);
     this->dbLabelExpSprite->createSprite(60, 28);
   }
@@ -35,6 +34,33 @@ void LGFXSMeterWidget::refreshLabel(bool force, int8_t dB)
   }
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
   bool showDBExp = dB > 0;
+  /*
+    SMeter ranges
+    S0     -54 dB
+           -51 dB
+    S1     –48 dB
+           -45 dB
+    S2     –42 dB
+           -39 dB
+    S3 	   –36 dB
+           -33 dB
+    S4 	   –30 dB
+           -27 dB
+    S5 	   –24 dB
+           -21 dB
+    S6 	   –18 dB
+           -15 dB
+    S7 	   –12 dB
+            -9 dB
+    S8 	    –6 dB
+            -3 dB
+    S9 	     0 dB
+    S9+10   10 dB
+    ...
+    S9+30 	30 dB
+    ...
+    S9+60 	60 dB
+  */
   if (dB < -48)
   {
     this->parentDisplayPtr->print("0");
@@ -101,13 +127,23 @@ bool LGFXSMeterWidget::refresh(bool force)
   {
     this->init();
   }
-  this->smeter->set(this->currentTransceiverStatusPtr->signalMeterdBLevel);
+  int dB = this->currentTransceiverStatusPtr->signalMeterdBLevel;
+  this->smeter->set(dB);
   int8_t dBSmooth = this->smeter->get(true);
-  if (force || this->previousDBValue != dBSmooth)
+  bool labelUpdateRequired = this->previousDBValue != dB;
+  bool smeterUpdateRequired = this->previousDBSmoothedValue != dBSmooth;
+  if (force || smeterUpdateRequired || labelUpdateRequired)
   {
-    this->update(dBSmooth);
-    this->refreshLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel); // "digital" label always show real (not "smooth")
-    this->previousDBValue = dBSmooth;
+    if (smeterUpdateRequired)
+    {
+      this->update(dBSmooth);
+    }
+    if (labelUpdateRequired)
+    {
+      this->refreshLabel(force, dB); // "digital" label always show real (not "smooth")
+    }
+    this->previousDBValue = dB;
+    this->previousDBSmoothedValue = dBSmooth;
     changed = true;
   }
   return (changed);
