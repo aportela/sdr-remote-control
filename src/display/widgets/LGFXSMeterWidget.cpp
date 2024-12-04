@@ -141,7 +141,7 @@ bool LGFXSMeterWidget::refresh(bool force)
     {
       this->update(dBSmooth);
     }
-    if (labelUpdateRequired)
+    if (force || labelUpdateRequired)
     {
       this->refreshLabel(force, dB); // "digital" label always show real (not "smooth")
     }
