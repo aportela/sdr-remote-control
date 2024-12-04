@@ -8,30 +8,16 @@
 #define ANALOG_SMETER_TEXT_COLOR TEXT_COLOR_NOT_ACTIVE
 #define ANALOG_SMETER_INDICATOR_COLOR 0xF388
 
-LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr)
-    : LGFXTransceiverStatusWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
+LGFXAnalogSMeterWidget::LGFXAnalogSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, const TransceiverStatus *currentTransceiverStatusPtr) : LGFXSMeterWidget(displayPtr, width, height, xOffset, yOffset, padding, currentTransceiverStatusPtr)
 {
-    this->smeter = new SMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
-    if (displayPtr != nullptr)
+    if (displayPtr != nullptr && currentTransceiverStatusPtr != nullptr)
     {
-        this->expSprite = new lgfx::LGFX_Sprite(displayPtr);
-        this->expSprite->setColorDepth(8);
-        this->expSprite->createSprite(60, 28);
-        this->templateSprite = new lgfx::LGFX_Sprite(displayPtr);
-        this->templateSprite->setColorDepth(8);
-        this->templateSprite->createSprite(this->width, this->height);
-        // this->templateSprite->fillScreen(0xFF9C);
-        this->templateSprite->fillScreen(TFT_WHITE);
         this->refresh(true);
     }
 }
 
 LGFXAnalogSMeterWidget::~LGFXAnalogSMeterWidget()
 {
-    delete this->smeter;
-    this->smeter = nullptr;
-    delete this->templateSprite;
-    this->templateSprite = nullptr;
 }
 
 #ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
@@ -87,7 +73,7 @@ uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
 
 #endif
 
-void LGFXAnalogSMeterWidget::createSMeter(void)
+void LGFXAnalogSMeterWidget::init(void)
 {
     this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, ANALOG_SMETER_BACKGROUND_COLOR);
     this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, TEXT_COLOR_SECONDARY);
@@ -117,101 +103,12 @@ void LGFXAnalogSMeterWidget::createSMeter(void)
     }
 }
 
-void LGFXAnalogSMeterWidget::refreshSMeterDBLabel(bool force, int8_t dB)
+void LGFXAnalogSMeterWidget::update(int8_t dB)
 {
-    this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
-    this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
-    if (force)
-    {
-        this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-        this->parentDisplayPtr->print("S");
-    }
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-    bool showDBExp = dB > 0;
-    if (dB < -48)
-    {
-        this->parentDisplayPtr->print("0");
-    }
-    else if (dB < -42)
-    {
-        this->parentDisplayPtr->print("1");
-    }
-    else if (dB < -36)
-    {
-        this->parentDisplayPtr->print("2");
-    }
-    else if (dB < -30)
-    {
-        this->parentDisplayPtr->print("3");
-    }
-    else if (dB < -24)
-    {
-        this->parentDisplayPtr->print("4");
-    }
-    else if (dB < -18)
-    {
-        this->parentDisplayPtr->print("5");
-    }
-    else if (dB < -12)
-    {
-        this->parentDisplayPtr->print("6");
-    }
-    else if (dB < -6)
-    {
-        this->parentDisplayPtr->print("7");
-    }
-    else if (dB < 0)
-    {
-        this->parentDisplayPtr->print("8");
-    }
-    else
-    {
-        this->parentDisplayPtr->print("9");
-    }
-    if (!showDBExp)
-    {
-        // only refresh base dB label if previous value has exp label
-        if (force || this->previousDBValue >= 0)
-        {
-            this->parentDisplayPtr->print("dB ");
-        }
-    }
-    else
-    {
-        this->expSprite->fillScreen(TFT_BLACK);
-        this->expSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
-        this->expSprite->setTextSize(_DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE);
-        this->expSprite->setCursor(0, 0);
-        this->expSprite->printf("+%ddB", dB);
-        this->expSprite->pushSprite(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
-    }
-}
-
-void LGFXAnalogSMeterWidget::refreshSMeter(int8_t dB)
-{
-    uint16_t xof = map(this->previousDBValue, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
+    uint16_t xof = map(this->previousDBSmoothedValue, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
     // clear previous value
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
     // draw current value
     xof = map(dB, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
-}
-
-bool LGFXAnalogSMeterWidget::refresh(bool force)
-{
-    bool changed = force;
-    if (force)
-    {
-        this->createSMeter();
-    }
-    this->smeter->set(this->currentTransceiverStatusPtr->signalMeterdBLevel);
-    int8_t dBSmooth = this->smeter->get(true);
-    if (force || this->previousDBValue != dBSmooth)
-    {
-        this->refreshSMeter(dBSmooth);
-        this->refreshSMeterDBLabel(force, this->currentTransceiverStatusPtr->signalMeterdBLevel); // "digital" label always show real (not "smooth")
-        this->previousDBValue = dBSmooth;
-        changed = true;
-    }
-    return (changed);
 }
