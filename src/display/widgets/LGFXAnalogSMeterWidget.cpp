@@ -71,40 +71,40 @@ uint32_t LGFXAnalogSMeterWidget::getGradientColor(int index)
 
 void LGFXAnalogSMeterWidget::init(void)
 {
-    this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, ANALOG_SMETER_BACKGROUND_COLOR);
-    this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, TEXT_COLOR_SECONDARY);
+    this->parentDisplayPtr->fillRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, _ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, _ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, ANALOG_SMETER_BACKGROUND_COLOR);
+    this->parentDisplayPtr->drawRoundRect(this->xOffset + this->padding, this->yOffset + this->padding, _ANALOG_SMETER_WIDGET_BACKGROUND_WIDTH, _ANALOG_SMETER_WIDGET_BACKGROUND_HEIGHT, 4, TEXT_COLOR_SECONDARY);
     this->parentDisplayPtr->setTextSize(2);
     this->parentDisplayPtr->setTextColor(ANALOG_SMETER_TEXT_COLOR);
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_NUMBERS_X_OFFSET, this->yOffset + this->padding + 2);
     this->parentDisplayPtr->print("1  3  5  7  9 +15 +30    +60");
 
 #ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
-    for (uint16_t i = 0; i < ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH; i++)
+    for (uint16_t i = 0; i < _ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH; i++)
     {
-        this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + i, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 1, 5, getGradientColor(i));
+        this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + i, this->yOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 1, 5, getGradientColor(i));
     }
 #else
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + 7 + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 155, 5, TFT_GREEN);
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + 7 + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + 7 + _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, 155, 5, TFT_GREEN);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + 159, this->yOffset + this->padding + 7 + _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 5, _ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH - 155, 5, TFT_RED);
 #endif
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, ANALOG_SMETER_TEXT_COLOR);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, this->yOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH, 2, ANALOG_SMETER_TEXT_COLOR);
 
     for (int i = 1; i < _DIGITAL_SMETER_WIDGET_BAR_COUNT; i++)
     {
 #define B_WIDTH 3
 #define B_MARGIN 6
-        uint16_t x = this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + (i * (B_WIDTH + B_MARGIN));
+        uint16_t x = this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET + (i * (B_WIDTH + B_MARGIN));
         bool isCurrentLongBar = (i == 1 || i == 3 || i == 5 || i == 7 || i == 9 || i == 11 || i == 13 || i == 15 || i == 17 || i == 22 || i == 27 || i == 32 || i == 37);
-        this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 10 : ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 3), B_WIDTH, isCurrentLongBar ? 10 : 3, ANALOG_SMETER_TEXT_COLOR);
+        this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + (isCurrentLongBar ? _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 10 : _ANALOG_SMETER_WIDGET_CENTER_HLINE_Y_OFFSET - 3), B_WIDTH, isCurrentLongBar ? 10 : 3, ANALOG_SMETER_TEXT_COLOR);
     }
 }
 
 void LGFXAnalogSMeterWidget::update(int8_t dB)
 {
-    uint16_t xof = map(this->previousDBSmoothedValue, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
+    uint16_t xof = map(this->previousDBSmoothedValue, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
     // clear previous value
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
     // draw current value
-    xof = map(dB, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
-    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
+    xof = map(dB, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
 }

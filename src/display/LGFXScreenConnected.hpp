@@ -6,7 +6,11 @@
 #include "../Transceiver.hpp"
 #include "../Menu.hpp"
 #include "widgets/LGFXVFOWidget.hpp"
+#ifdef USE_ANALOG_SMETER_WIDGET
+#include "widgets/LGFXAnalogSMeterWidget.hpp"
+#else
 #include "widgets/LGFXDigitalSMeterWidget.hpp"
+#endif
 #include "widgets/LGFXVolumeSquelchWidget.hpp"
 #include "widgets/LGFXBandWidget.hpp"
 #include "widgets/LGFXFilterWidget.hpp"
@@ -15,21 +19,17 @@
 class LGFXScreenConnected : public LGFXScreen
 {
 private:
-    // Transceiver *trx;
-    uint8_t oldSignal;
-    uint8_t currentSignal = 0;
-    uint8_t peakSignal = 0;
-    long lastPeakChange;
     LGFXVFOWidget *primaryVFOWidget = nullptr;
     LGFXVFOWidget *secondaryVFOWidget = nullptr;
+#ifdef USE_ANALOG_SMETER_WIDGET
+    LGFXAnalogSMeterWidget *analogSMeterWidget = nullptr;
+#else
     LGFXDigitalSMeterWidget *digitalSMeterWidget = nullptr;
+#endif
     LGFXVolumeSquelchWidget *volumeSquelchWidget = nullptr;
     LGFXBandWidget *bandWidget = nullptr;
     LGFXFilterWidget *filterWidget = nullptr;
     LGFXMenu *menuWidget = nullptr;
-
-    void createDigitalSMeter();
-    void refreshDigitalSMeter(uint8_t newSignal);
 
 public:
     LGFXScreenConnected(LovyanGFX *display, const TransceiverStatus *currentTransceiverStatusPtr, Menu *menuPtr = nullptr);
