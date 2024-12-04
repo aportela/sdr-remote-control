@@ -1,10 +1,6 @@
 #include "LGFXAnalogSMeterWidget.hpp"
 
-#define MIN_DB -54     // S0
-#define MAX_DB 60      // S9+60
-#define DB_BAR_STEPS 3 // 3 db between each bar
-
-#define ANALOG_SMETER_BACKGROUND_COLOR 0xF75B // // 0xE6F9
+#define ANALOG_SMETER_BACKGROUND_COLOR 0xF75B // 0xE6F9
 #define ANALOG_SMETER_TEXT_COLOR TEXT_COLOR_NOT_ACTIVE
 #define ANALOG_SMETER_INDICATOR_COLOR 0xF388
 
@@ -105,10 +101,10 @@ void LGFXAnalogSMeterWidget::init(void)
 
 void LGFXAnalogSMeterWidget::update(int8_t dB)
 {
-    uint16_t xof = map(this->previousDBSmoothedValue, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
+    uint16_t xof = map(this->previousDBSmoothedValue, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
     // clear previous value
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
     // draw current value
-    xof = map(dB, MIN_DB, MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
+    xof = map(dB, SMETER_MIN_DB, SMETER_MAX_DB, this->xOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_HLINE_X_OFFSET, ANALOG_SMETER_WIDGET_CENTER_HLINE_LENGTH) - 5;
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + xof, this->yOffset + this->padding + ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
 }
