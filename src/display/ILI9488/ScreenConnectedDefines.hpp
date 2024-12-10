@@ -112,7 +112,7 @@
 #define _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET (2 + _DIGITAL_SMETER_BAR_WITH_MARGIN_WIDTH)                                                                                    // bars start x offset
 #define _DIGITAL_SMETER_WIDGET_BAR_WIDTH 5                                                                                                                                  // bar width
 #define _DIGITAL_SMETER_BAR_WITH_MARGIN_WIDTH (_DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + _DIGITAL_SMETER_WIDGET_BAR_WIDTH)                                             // bar + margin total width
-#define _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT 20                                                                                                                            // low bar height
+#define _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT 22                                                                                                                            // low bar height
 #define _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT (_DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT + 8)                                                                                  // high bar height
 #define _DIGITAL_SMETER_WIDGET_HIGH_BAR_Y_OFFSET 21                                                                                                                         // high bar y offset
 #define _DIGITAL_SMETER_WIDGET_LOW_BAR_Y_OFFSET (_DIGITAL_SMETER_WIDGET_HIGH_BAR_Y_OFFSET + _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT - _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT) // low bar y offset
