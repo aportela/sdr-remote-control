@@ -9,7 +9,7 @@ class LGFXSMeterWidget : public LGFXTransceiverStatusWidget
 {
 private:
   SMeter *smeter = nullptr;
-  lgfx::LGFX_Sprite *dbLabelExpSprite;
+  lgfx::LGFX_Sprite *dbExponentSprite; // this is for clearing (fast) exponent label
   void refreshLabel(bool force, int8_t dB);
 
 protected:

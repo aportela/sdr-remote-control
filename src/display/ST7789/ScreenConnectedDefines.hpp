@@ -41,9 +41,11 @@
 
 /* SINGLE VFO WIDGET END */
 
+#define _SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE 4
+
 /* DIGITAL SMETER BLOCK START */
 
-#define _DIGITAL_SMETER_WIDGET_FONT_SIZE 2
+#define _DIGITAL_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2
 
 // bars
 #define _DIGITAL_SMETER_WIDGET_BAR_COUNT 42                                                    // total SMeter bars
@@ -69,14 +71,14 @@
 #define _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET 0  // y offset
 
 // SMeter right label value (ex: S9+30dB)
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE 4                                                                                                           // default label value font size
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH 24                                                                                                    // total pixel width for current font size
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET + 16                                                     // "S" x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH         // base number x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_DB_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH // dB (base) label (widthout exp) x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH     // dB (exp) label x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET                                                               // label value y offset
-#define _DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE 2                                                                                                       // +xxdB exp font size
+#define _DIGITAL_SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE 4                                                                                                             // default label value font size
+#define _DIGITAL_SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE_WIDTH 24                                                                                                      // total pixel width for current font size
+#define _DIGITAL_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET + 16                                                  // "S" x offset
+#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET _DIGITAL_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET + _DIGITAL_SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE_WIDTH // base number x offset
+#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_DB_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE_WIDTH   // dB (base) label (widthout exp) x offset
+#define _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_SIGNAL_LABEL_FONT_SIZE_WIDTH       // dB (exp) label x offset
+#define _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET                                                                    // label value y offset
+#define _DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE 2                                                                                                              // +xxdB exp font size
 
 // public widget constants
 #define DIGITAL_SMETER_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
@@ -192,7 +194,7 @@
 // MAIN LABEL (Fn DESCRIPTION)
 #define _MENU_BUTTON_WIDGET_MAIN_LABEL_Y_OFFSET 26
 
-#define MENU_BUTTON_WIDGET_WIDTH 90
+#define MENU_BUTTON_WIDGET_WIDTH 74
 #define MENU_BUTTON_WIDGET_HEIGHT 24
 #define MENU_BUTTON_WIDGET_X_OFFSET _DISPLAY_PADDING
 #define MENU_BUTTON_WIDGET_Y_OFFSET DISPLAY_HEIGHT - MENU_WIDGET_HEIGHT

@@ -2,6 +2,7 @@
 #ifndef SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTED_DEFINES_H
 #define SDR_REMOTE_CONTROL_LGFX_SCREEN_CONNECTED_DEFINES_H
 
+#define DEFAULT_FONT nullptr
 /*
     NOTE:
     INTERNAL (PRIVATE) WIDGET CONSTANTS HAVE PREFIX "_"
@@ -10,6 +11,9 @@
 #define _DISPLAY_PADDING 4 // real draw starts/ends contained in this horizontal/vertical (pixel) padding
 
 #define WIDGETS_VERTICAL_MARGIN 4
+
+#define DEFAULT_FONT_SIZE_4_WIDTH 24
+#define DEFAULT_FONT_SIZE_4_HEIGHT 28
 
 /* SINGLE VFO WIDGET START */
 
@@ -20,7 +24,7 @@
 #define _VFO_WIDGET_FREQUENCY_X_OFFSET 87                                  // frequency field x offset
 #define _VFO_WIDGET_MODE_X_OFFSET 419                                      // mode field x offset
 #define _VFO_WIDGET_FREQUENCY_STEP_X_OFFSET _VFO_WIDGET_FREQUENCY_X_OFFSET // frequency step field x offset
-#define _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET _VFO_WIDGET_FONT_PIXEL_HEIGHT + _VFO_WIDGET_FREQUENCY_STEP_VERTICAL_MARGIN
+#define _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET (_VFO_WIDGET_FONT_PIXEL_HEIGHT + _VFO_WIDGET_FREQUENCY_STEP_VERTICAL_MARGIN)
 
 // frequency step field margins
 #define _VFO_WIDGET_FREQUENCY_STEP_HORIZONTAL_MARGIN 2 // frequency step indicator horizontal margin
@@ -29,61 +33,86 @@
 #define _VFO_WIDGET_FREQUENCY_STEP_HEIGHT 3            // vfo frequency step indicator height
 
 // other
-#define _VFO_WIDGET_SINGLE_LINE_HEIGHT (_VFO_WIDGET_FONT_PIXEL_HEIGHT + _VFO_WIDGET_FREQUENCY_STEP_VERTICAL_MARGIN + _VFO_WIDGET_FREQUENCY_STEP_HEIGHT + _VFO_WIDGET_FREQUENCY_STEP_VERTICAL_MARGIN) // single VFO line (frequency step indicator included) height
+#define _VFO_WIDGET_SINGLE_LINE_HEIGHT (_VFO_WIDGET_FONT_PIXEL_HEIGHT + _VFO_WIDGET_FREQUENCY_STEP_VERTICAL_MARGIN + _VFO_WIDGET_FREQUENCY_STEP_HEIGHT + 2) // single VFO line (frequency step indicator included) height
 
 // public widget constants
-#define VFO_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
+#define VFO_WIDGET_WIDTH (DISPLAY_WIDTH - (_DISPLAY_PADDING * 2))
 #define VFO_WIDGET_HEIGHT _VFO_WIDGET_SINGLE_LINE_HEIGHT
 #define VFO_WIDGET_X_OFFSET _DISPLAY_PADDING
 #define VFO_PRIMARY_WIDGET_Y_OFFSET _DISPLAY_PADDING
-#define VFO_SECONDARY_WIDGET_Y_OFFSET VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
+#define VFO_SECONDARY_WIDGET_Y_OFFSET (VFO_PRIMARY_WIDGET_Y_OFFSET + VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN)
 #define VFO_WIDGET_PADDING 1
 
 /* SINGLE VFO WIDGET END */
 
-/* DIGITAL SMETER BLOCK START */
+/* SEMETER COMMON BLOCK START */
 
-#define _DIGITAL_SMETER_WIDGET_FONT_SIZE 2
+#define _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE 4                                 // default label/value font size
+#define _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_WIDTH DEFAULT_FONT_SIZE_4_WIDTH   // total pixel width for current font size
+#define _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_HEIGHT DEFAULT_FONT_SIZE_4_HEIGHT // total pixel height for current font size
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_FONT_SIZE 2                             // default label value font size
 
-// bars
-#define _DIGITAL_SMETER_WIDGET_BAR_COUNT 38                                                    // total SMeter bars
-#define _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN 4                                         // horizontal margin (separation) between bars
-#define _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + 1  // bars start x offset
-#define _DIGITAL_SMETER_WIDGET_BAR_WIDTH 5                                                     // bar width
-#define _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT 24                                               // low bar height
-#define _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT + 4       // high bar height
-#define _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET 94                                           // high bar y offset
-#define _DIGITAL_SMETER_WIDGET_LOW_BARS_Y_OFFSET _DIGITAL_SMETER_WIDGET_HIGH_BARS_Y_OFFSET + 4 // low bar y offset
+// signal meter exponent value "xy" (Sn+xydB) sprite
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH 60
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT 28
 
-// smeter container lines
-#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH 32                                                                                                                                                                               // vertical line length
-#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET 22                                                                                                                                                                             // vertical lines y offset
-#define _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET 0                                                                                                                                                                          // left vertical line x offset
-#define _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET 1 + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + (_DIGITAL_SMETER_WIDGET_BAR_COUNT * (_DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + _DIGITAL_SMETER_WIDGET_BAR_WIDTH)) // right vertical line y offset
-#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET                                                                                                                            // horizontal line x offset
-#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH                                                                                 // horizontal line y offset
-#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_LENGTH _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET                                                                                                                             // horizontal line length
+// field offsets
 
-// top value labels (numeric S units)
-#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_X_OFFSET 10 // x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_LABELS_Y_OFFSET 0  // y offset
+#define _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET SMETER_WIDGET_HEIGHT - _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_HEIGHT - 4 // signal meter value label (Snn+xydB) y offset
 
-// SMeter right label value (ex: S9+30dB)
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE 4                                                                                                           // default label value font size
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH 24                                                                                                    // total pixel width for current font size
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET + 16                                                     // "S" x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH         // base number x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_DB_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH // dB (base) label (widthout exp) x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET + _DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE_WIDTH     // dB (exp) label x offset
-#define _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET                                                               // label value y offset
-#define _DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE 2                                                                                                       // +xxdB exp font size
+// signal meter "S" (Sn) label x/y offsets
+#define _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET + 16
+#define _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET
+
+// signal meter "n" (Sn) value x/y offsets
+#define _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_X_OFFSET (_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET + _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_WIDTH) // base number x offset
+#define _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_Y_OFFSET _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET                                               // label value y offset
+
+// signal meter exponent value "xy" (Sn+xydB) x/y offsets
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_VALUE_BASE_X_OFFSET (_SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_X_OFFSET + _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_WIDTH) // base number x offset
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_VALUE_BASE_Y_OFFSET _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET                                                    // label value y offset
 
 // public widget constants
-#define DIGITAL_SMETER_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
-#define DIGITAL_SMETER_WIDGET_HEIGHT 57
-#define DIGITAL_SMETER_WIDGET_X_OFFSET _DISPLAY_PADDING
-#define DIGITAL_SMETER_WIDGET_Y_OFFSET VFO_SECONDARY_WIDGET_Y_OFFSET + VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
-#define DIGITAL_SMETER_WIDGET_PADDING 1
+#define SMETER_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
+#define SMETER_WIDGET_HEIGHT 57
+#define SMETER_WIDGET_X_OFFSET _DISPLAY_PADDING
+#define SMETER_WIDGET_Y_OFFSET (VFO_SECONDARY_WIDGET_Y_OFFSET + VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN)
+#define SMETER_WIDGET_PADDING 1
+
+/* SEMETER COMMON BLOCK END */
+
+/* DIGITAL SMETER BLOCK START */
+
+#define _DIGITAL_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2
+
+// bars
+#define _DIGITAL_SMETER_WIDGET_BAR_COUNT 38                                                     // total smeter bars
+#define _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN 4                                          // horizontal margin (separation) between bars
+#define _DIGITAL_SMETER_WIDGET_BARS_X_OFFSET (1 + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN) // bars start x offset
+#define _DIGITAL_SMETER_WIDGET_BAR_WIDTH 5                                                      // bar width
+#define _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT 24                                                // low bar height
+#define _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT (_DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT + 8)      // high bar height
+
+// bars container lines (|_____________|)
+#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH 32      // vertical line length
+#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET 22    // vertical lines y offset
+#define _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET 0 // left vertical line x offset
+#define _DIGITAL_SMETER_BAR_WITH_MARGIN_WIDTH (_DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + _DIGITAL_SMETER_WIDGET_BAR_WIDTH)
+#define _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET (_DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET + _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN + (_DIGITAL_SMETER_WIDGET_BAR_COUNT * _DIGITAL_SMETER_BAR_WITH_MARGIN_WIDTH) + 1) // right vertical line y offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET                                                                                                                                       // horizontal line x offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET (_DIGITAL_SMETER_WIDGET_VERTICAL_LINES_Y_OFFSET + _DIGITAL_SMETER_WIDGET_VERTICAL_LINES_LENGTH)                                                                                          // horizontal line y offset
+#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_LENGTH (_DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET + 1)                                                                                                                                  // horizontal line length
+
+// top value range-labels (numeric S units)
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S1_X_OFFSET 6          // "S1" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S3_X_OFFSET 46         // "S3" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S5_X_OFFSET 83         // "S5" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S7_X_OFFSET 119        // "S7" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_X_OFFSET 154        // "S9" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS15_X_OFFSET 185 // "S9+15" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS30_X_OFFSET 230 // "S9+30" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS60_X_OFFSET 320 // "S9+60" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_Y_OFFSET 0             // y offset
 
 /* DIGITAL SMETER BLOCK END */
 
@@ -129,7 +158,7 @@
 #define VOLUME_SQUELCH_WIDGET_WIDTH DISPLAY_WIDTH - (_DISPLAY_PADDING * 2)
 #define VOLUME_SQUELCH_WIDGET_HEIGHT 16
 #define VOLUME_SQUELCH_WIDGET_X_OFFSET _DISPLAY_PADDING
-#define VOLUME_SQUELCH_WIDGET_Y_OFFSET DIGITAL_SMETER_WIDGET_Y_OFFSET + DIGITAL_SMETER_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
+#define VOLUME_SQUELCH_WIDGET_Y_OFFSET SMETER_WIDGET_Y_OFFSET + SMETER_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN
 #define VOLUME_SQUELCH_WIDGET_PADDING 1
 
 /* VOLUME & SQUELCH END */

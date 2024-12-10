@@ -6,9 +6,9 @@ LGFXSMeterWidget::LGFXSMeterWidget(LovyanGFX *displayPtr, uint16_t width, uint16
   this->smeter = new SMeter(this->currentTransceiverStatusPtr->signalMeterdBLevel);
   if (displayPtr != nullptr)
   {
-    this->dbLabelExpSprite = new lgfx::LGFX_Sprite(displayPtr);
-    this->dbLabelExpSprite->setColorDepth(8);
-    this->dbLabelExpSprite->createSprite(60, 28);
+    this->dbExponentSprite = new lgfx::LGFX_Sprite(displayPtr);
+    this->dbExponentSprite->setColorDepth(8);
+    this->dbExponentSprite->createSprite(_SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH, _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT);
   }
 }
 
@@ -19,23 +19,23 @@ LGFXSMeterWidget::~LGFXSMeterWidget()
     delete this->smeter;
     this->smeter = nullptr;
   }
-  if (this->dbLabelExpSprite != nullptr)
+  if (this->dbExponentSprite != nullptr)
   {
-    delete this->dbLabelExpSprite;
-    this->dbLabelExpSprite = nullptr;
+    delete this->dbExponentSprite;
+    this->dbExponentSprite = nullptr;
   }
 }
 
 void LGFXSMeterWidget::refreshLabel(bool force, int8_t dB)
 {
-  this->parentDisplayPtr->setTextSize(_DIGITAL_SMETER_WIDGET_S_LABEL_FONT_SIZE);
+  this->parentDisplayPtr->setTextSize(_SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE);
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   if (force)
   {
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET, this->yOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET);
     this->parentDisplayPtr->print("S");
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_BASE_NUMBER_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_X_OFFSET, this->yOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_Y_OFFSET);
   bool showDBExp = dB > 0;
   /*
     SMeter ranges
@@ -109,17 +109,19 @@ void LGFXSMeterWidget::refreshLabel(bool force, int8_t dB)
     // only refresh base dB label if previous value has exp label
     if (force || this->previousDBValue >= 0)
     {
-      this->parentDisplayPtr->print("dB ");
+      // no exponent label, only show "dB" label
+      this->parentDisplayPtr->print("dB "); // trailing whitespace is required for "full clearing" previous exponent label
     }
   }
   else
   {
-    this->dbLabelExpSprite->fillScreen(TFT_BLACK);
-    this->dbLabelExpSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
-    this->dbLabelExpSprite->setTextSize(_DIGITAL_SMETER_WIDGET_S_SUB_LABEL_FONT_SIZE);
-    this->dbLabelExpSprite->setCursor(0, 0);
-    this->dbLabelExpSprite->printf("+%ddB", dB);
-    this->dbLabelExpSprite->pushSprite(this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_EXP_X_OFFSET, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_S_LABEL_Y_OFFSET);
+    // show exponent label
+    this->dbExponentSprite->fillScreen(TFT_BLACK);
+    this->dbExponentSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
+    this->dbExponentSprite->setTextSize(_SMETER_WIDGET_SIGNAL_EXPONENT_FONT_SIZE);
+    this->dbExponentSprite->setCursor(0, 0);
+    this->dbExponentSprite->printf("+%ddB", dB);
+    this->dbExponentSprite->pushSprite(this->xOffset + this->padding + _SMETER_WIDGET_SIGNAL_EXPONENT_VALUE_BASE_X_OFFSET, this->yOffset + this->padding + _SMETER_WIDGET_SIGNAL_EXPONENT_VALUE_BASE_Y_OFFSET);
   }
 }
 

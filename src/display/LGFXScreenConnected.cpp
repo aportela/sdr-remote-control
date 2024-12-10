@@ -39,9 +39,9 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
             this->secondaryVFOWidget = new LGFXVFOWidget(display, VFO_WIDGET_WIDTH, VFO_WIDGET_HEIGHT, VFO_WIDGET_X_OFFSET, VFO_SECONDARY_WIDGET_Y_OFFSET, VFO_WIDGET_PADDING, 1, currentTransceiverStatusPtr);
 
 #ifdef USE_ANALOG_SMETER_WIDGET
-            this->analogSMeterWidget = new LGFXAnalogSMeterWidget(display, ANALOG_SMETER_WIDGET_WIDTH, ANALOG_SMETER_WIDGET_HEIGHT, ANALOG_SMETER_WIDGET_X_OFFSET, ANALOG_SMETER_WIDGET_Y_OFFSET, ANALOG_SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
+            this->analogSMeterWidget = new LGFXAnalogSMeterWidget(display, SMETER_WIDGET_WIDTH, SMETER_WIDGET_HEIGHT, SMETER_WIDGET_X_OFFSET, SMETER_WIDGET_Y_OFFSET, SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
 #else
-            this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, DIGITAL_SMETER_WIDGET_WIDTH, DIGITAL_SMETER_WIDGET_HEIGHT, DIGITAL_SMETER_WIDGET_X_OFFSET, DIGITAL_SMETER_WIDGET_Y_OFFSET, DIGITAL_SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
+            this->digitalSMeterWidget = new LGFXDigitalSMeterWidget(display, SMETER_WIDGET_WIDTH, SMETER_WIDGET_HEIGHT, SMETER_WIDGET_X_OFFSET, SMETER_WIDGET_Y_OFFSET, SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
 #endif
             this->volumeSquelchWidget = new LGFXVolumeSquelchWidget(display, VOLUME_SQUELCH_WIDGET_WIDTH, VOLUME_SQUELCH_WIDGET_HEIGHT, VOLUME_SQUELCH_WIDGET_X_OFFSET, VOLUME_SQUELCH_WIDGET_Y_OFFSET, VOLUME_SQUELCH_WIDGET_PADDING, currentTransceiverStatusPtr);
             this->filterWidget = new LGFXFilterWidget(display, FILTER_WIDGET_WIDTH, FILTER_WIDGET_HEIGHT, FILTER_WIDGET_X_OFFSET, FILTER_WIDGET_Y_OFFSET, FILTER_WIDGET_PADDING, currentTransceiverStatusPtr);
