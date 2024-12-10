@@ -73,7 +73,9 @@ void LGFXMenu::initMenu(void)
             MENU_BUTTON_WIDGET_PADDING,                                                                                 // padding
             i,                                                                                                          // index
             topLabel,                                                                                                   // top label
+            true,                                                                                                       // is top label visible ?
             mainLabel,                                                                                                  // bottom label
+            true,                                                                                                       // is bottom label visible ?
             this->menuPtr->isActive(i),                                                                                 // active
             buttonCallbacks[i]                                                                                          // callback
         );

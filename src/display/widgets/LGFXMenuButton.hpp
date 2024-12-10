@@ -18,9 +18,11 @@ private:
     bool active = false;
     ButtonCallback onClick;
     bool changed = true;
+    bool topLabelVisible = true;
+    bool bottomLabelVisible = true;
 
 public:
-    LGFXMenuButton(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const char *topLabel, const char *bottomLabel, bool active, ButtonCallback onClick);
+    LGFXMenuButton(LovyanGFX *displayPtr, uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding, uint8_t index, const char *topLabel, bool topLabelVisible, const char *bottomLabel, bool bottomLabelVisible, bool active, ButtonCallback onClick);
     ~LGFXMenuButton();
     bool refresh(bool force = false) override;
     void onChange(void);
