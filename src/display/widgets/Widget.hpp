@@ -13,6 +13,8 @@ protected:
     uint16_t xOffset = 0;
     uint16_t yOffset = 0;
     uint8_t padding = 0;
+    uint16_t xOffsetWithPadding = 0;
+    uint16_t yOffsetWithPadding = 0;
 
 public:
     Widget(uint16_t width, uint16_t height, uint16_t xOffset, uint16_t yOffset, uint8_t padding = 0);
