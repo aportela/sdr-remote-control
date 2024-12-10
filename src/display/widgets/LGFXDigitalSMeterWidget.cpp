@@ -42,6 +42,7 @@ void LGFXDigitalSMeterWidget::init(void)
 {
   uint16_t x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET;
   // left vertical container line
+  // TODO: LINES
   this->parentDisplayPtr->fillRect(x, this->yOffset + this->padding + _DIGITAL_SMETER_WIDGET_HIGH_BAR_Y_OFFSET, _DIGITAL_SMETER_WIDGET_VERTICAL_LINE_WIDTH, _DIGITAL_SMETER_WIDGET_VERTICAL_LINE_HEIGHT, DIGITAL_SMETER_CONTAINER_LINES_TEXT_COLOR);
   x = this->xOffset + this->padding + _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET;
   // bottom horizontal container line
