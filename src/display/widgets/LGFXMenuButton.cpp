@@ -81,7 +81,7 @@ bool LGFXMenuButton::refresh(bool force)
             this->parentDisplayPtr->print(this->bottomLabel);
         }
         this->changed = false;
-        this->parentDisplayPtr->setTextColor(DEFAULT_TEXT_COLOR, DEFAULT_TEXT_BACKGROUND_COLOR);
+        this->parentDisplayPtr->setTextColor(DEFAULT_TEXT_COLOR, DEFAULT_BACKGROUND_COLOR);
     }
     return (changed);
 }
