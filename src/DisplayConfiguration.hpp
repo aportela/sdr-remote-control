@@ -25,8 +25,8 @@
 #define DEFAULT_FONT_SIZE_5_WIDTH 30
 #define DEFAULT_FONT_SIZE_5_HEIGHT 35
 
-#define DISPLAY_LOVYANGFX_ILI9488_480x320
-// #define DISPLAY_LOVYANGFX_ST7789_240x320
+// #define DISPLAY_LOVYANGFX_ILI9488_480x320
+#define DISPLAY_LOVYANGFX_ST7789_240x320
 
 #ifdef DISPLAY_LOVYANGFX_ILI9488_480x320
 
@@ -75,7 +75,7 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
 
-#include "display/ST7789/ScreenConnectedDefines240x320.hpp.hpp"
+#include "display/ST7789/ScreenConnectedDefines240x320.hpp"
 
 // ST7789 native resolution is 240x320 so we need (for LovyanGFX driver) to invert width/height values & rotate
 #define DISPLAY_DRIVER_LOVYANGFX_WIDTH DISPLAY_HEIGHT
