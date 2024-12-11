@@ -47,12 +47,27 @@ bool LGFXWidget::printAtCursor(uint16_t x, uint16_t y, const char *str)
     }
 }
 
-bool LGFXWidget::drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color)
+bool LGFXWidget::printAtCursorWithColorAndSize(uint16_t x, uint16_t y, const char *str, int textColor, int backgroundColor, uint8_t fontSize)
+{
+    this->parentDisplayPtr->setTextColor(textColor, backgroundColor);
+    this->parentDisplayPtr->setTextSize(fontSize);
+    if (this->setCursor(x, y))
+    {
+        this->parentDisplayPtr->print(str);
+        return (true);
+    }
+    else
+    {
+        return (false);
+    }
+}
+
+bool LGFXWidget::drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
 #ifdef LGFXWIDGET_ALLOW_OVERFLOWS
-        this->parentDisplayPtr->drawRoundRect(this->xOffsetWithPadding + x, this->yOffsetWithPadding + y, width, height, color);
+        this->parentDisplayPtr->drawRect(this->xOffsetWithPadding + x, this->yOffsetWithPadding + y, width, height, color);
         return (true);
 #else
 #error TODO
@@ -64,12 +79,12 @@ bool LGFXWidget::drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t heigh
     }
 }
 
-bool LGFXWidget::fillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color)
+bool LGFXWidget::fillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
 #ifdef LGFXWIDGET_ALLOW_OVERFLOWS
-        this->parentDisplayPtr->fillRoundRect(this->xOffsetWithPadding + x, this->yOffsetWithPadding + y, width, height, color);
+        this->parentDisplayPtr->fillRect(this->xOffsetWithPadding + x, this->yOffsetWithPadding + y, width, height, color);
         return (true);
 #else
 #error TODO
@@ -81,7 +96,7 @@ bool LGFXWidget::fillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t heigh
     }
 }
 
-bool LGFXWidget::drawRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t radius, uint32_t color)
+bool LGFXWidget::drawRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t radius, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
@@ -98,7 +113,7 @@ bool LGFXWidget::drawRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t 
     }
 }
 
-bool LGFXWidget::fillRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t radius, uint32_t color)
+bool LGFXWidget::fillRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t radius, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
@@ -115,7 +130,7 @@ bool LGFXWidget::fillRoundRect(uint16_t x, uint16_t y, uint16_t width, uint16_t 
     }
 }
 
-bool LGFXWidget::drawFastHLine(uint16_t x, uint16_t y, uint16_t width, uint32_t color)
+bool LGFXWidget::drawFastHLine(uint16_t x, uint16_t y, uint16_t width, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
@@ -132,7 +147,7 @@ bool LGFXWidget::drawFastHLine(uint16_t x, uint16_t y, uint16_t width, uint32_t 
     }
 }
 
-bool LGFXWidget::drawFastVLine(uint16_t x, uint16_t y, uint16_t height, uint32_t color)
+bool LGFXWidget::drawFastVLine(uint16_t x, uint16_t y, uint16_t height, int color)
 {
     if (x <= (this->width - this->padding) && y <= (this->height - this->padding))
     {
@@ -149,7 +164,7 @@ bool LGFXWidget::drawFastVLine(uint16_t x, uint16_t y, uint16_t height, uint32_t
     }
 }
 
-bool LGFXWidget::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t color)
+bool LGFXWidget::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, int color)
 {
     if (x0 <= (this->width - this->padding) && y0 <= (this->height - this->padding))
     {
