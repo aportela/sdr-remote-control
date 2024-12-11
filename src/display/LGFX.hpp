@@ -12,13 +12,13 @@
 class LGFX : public lgfx::LGFX_Device
 {
 private:
-#ifdef DISPLAY_LOVYANN_ILI9488_480x320
+#ifdef DISPLAY_LOVYANGFX_ILI9488_480x320
     lgfx::Panel_ILI9488 _panel_instance;
-#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
+#elif defined(DISPLAY_LOVYANGFX_ST7789_240x320)
     lgfx::Panel_ST7789 _panel_instance;
 #else
 #error NO DISPLAY DEFINED
-#endif // DISPLAY_LOVYANN_ILI9488_480x320
+#endif // DISPLAY_LOVYANGFX_ILI9488_480x320
     lgfx::Bus_SPI _bus_instance;
 
     SCREEN_TYPE currentScreenType = SCREEN_TYPE_NONE;

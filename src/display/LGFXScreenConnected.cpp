@@ -9,11 +9,11 @@
 
 #endif // DEBUG_FPS
 
-#ifdef DISPLAY_LOVYANN_ILI9488_480x320
+#ifdef DISPLAY_LOVYANGFX_ILI9488_480x320
 
 #include "ILI9488/ScreenConnectedDefines.hpp"
 
-#elif defined(DISPLAY_LOVYANN_ST7789_240x320)
+#elif defined(DISPLAY_LOVYANGFX_ST7789_240x320)
 
 #include "ST7789/ScreenConnectedDefines.hpp"
 
@@ -21,7 +21,7 @@
 
 #error NO DISPLAY DEFINED
 
-#endif // DISPLAY_LOVYANN_ILI9488_480x320
+#endif // DISPLAY_LOVYANGFX_ILI9488_480x320
 
 #define _DIGITAL_SMETER_WIDGET_BAR_DISABLED_BACKGROUND_COLOR 0x8410
 
@@ -37,6 +37,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
 
             this->primaryVFOWidget = new LGFXVFOWidget(display, VFO_WIDGET_WIDTH, VFO_WIDGET_HEIGHT, VFO_WIDGET_X_OFFSET, VFO_PRIMARY_WIDGET_Y_OFFSET, VFO_WIDGET_PADDING, 0, currentTransceiverStatusPtr);
             this->secondaryVFOWidget = new LGFXVFOWidget(display, VFO_WIDGET_WIDTH, VFO_WIDGET_HEIGHT, VFO_WIDGET_X_OFFSET, VFO_SECONDARY_WIDGET_Y_OFFSET, VFO_WIDGET_PADDING, 1, currentTransceiverStatusPtr);
+            /*
 
 #ifdef USE_ANALOG_SMETER_WIDGET
             this->analogSMeterWidget = new LGFXAnalogSMeterWidget(display, SMETER_WIDGET_WIDTH, SMETER_WIDGET_HEIGHT, SMETER_WIDGET_X_OFFSET, SMETER_WIDGET_Y_OFFSET, SMETER_WIDGET_PADDING, currentTransceiverStatusPtr);
@@ -51,6 +52,7 @@ LGFXScreenConnected::LGFXScreenConnected(LovyanGFX *display, const TransceiverSt
             this->parentDisplay->setTextSize(1);
             this->parentDisplay->setCursor(CONNECTED_SCREEN_BOTTOM_INFO_X_OFFSET, CONNECTED_SCREEN_BOTTOM_INFO_Y_OFFSET);
             this->parentDisplay->printf("SDR-REMOTE-CONTROL v%s (%s) - CAT speed: %d baud - FPS: ", SDR_REMOTE_CONTROL_CURRENT_VERSION, SDR_REMOTE_CONTROL_CURRENT_VERSION_DATE, SERIAL_DEFAULT_BAUD_RATE);
+            */
             this->Refresh(true);
         }
     }
@@ -94,6 +96,7 @@ bool LGFXScreenConnected::Refresh(bool force)
         {
             changed = true;
         }
+        /*
 #ifdef USE_ANALOG_SMETER_WIDGET
         if (this->analogSMeterWidget->refresh(force))
         {
@@ -132,8 +135,8 @@ bool LGFXScreenConnected::Refresh(bool force)
             this->parentDisplay->drawString(str, CONNECTED_SCREEN_BOTTOM_INFO_LABEL_FPS_X_OFFSET, CONNECTED_SCREEN_BOTTOM_INFO_Y_OFFSET);
             changed = true;
         }
-
 #endif // DEBUG_FPS
+        */
         return (changed);
     }
     else

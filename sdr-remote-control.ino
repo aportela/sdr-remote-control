@@ -36,7 +36,7 @@ using namespace aportela::microcontroller::utils;
 
 #include "src/display/ScreenType.hpp"
 
-#ifdef DISPLAY_DRIVER_LOVYANN
+#ifdef DISPLAY_DRIVER_LOVYANGFX
 
 #include "src/display/LGFX.hpp"
 LGFX *screen = nullptr;
@@ -45,7 +45,7 @@ LGFX *screen = nullptr;
 
 #error NO DISPLAY DRIVER DEFINED
 
-#endif // DISPLAY_DRIVER_LOVYANN
+#endif // DISPLAY_DRIVER_LOVYANGFX
 
 Transceiver *trx = nullptr;
 TransceiverStatus *trxStatus = nullptr;
@@ -460,16 +460,16 @@ void setup()
   menu = new Menu(menuLabels, menuActions);
   menu->setActive(0, true, false);
 
-#ifdef DISPLAY_DRIVER_LOVYANN
+#ifdef DISPLAY_DRIVER_LOVYANGFX
 
-  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANN_WIDTH, DISPLAY_DRIVER_LOVYANN_HEIGHT, DISPLAY_DRIVER_LOVYANN_ROTATION, DISPLAY_DRIVER_LOVYANN_INVERT_COLORS, trxStatus, menu);
+  screen = new LGFX(DISPLAY_PIN_SDA, DISPLAY_PIN_SCL, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_DRIVER_LOVYANGFX_WIDTH, DISPLAY_DRIVER_LOVYANGFX_HEIGHT, DISPLAY_DRIVER_LOVYANGFX_ROTATION, DISPLAY_DRIVER_LOVYANGFX_INVERT_COLORS, trxStatus, menu);
   screen->InitScreen(SCREEN_TYPE_NOT_CONNECTED);
 
 #else
 
 #error NO DISPLAY DRIVER DEFINED
 
-#endif // DISPLAY_DRIVER_LOVYANN
+#endif // DISPLAY_DRIVER_LOVYANGFX
 }
 
 void loop()
@@ -506,7 +506,7 @@ void loop()
 #endif // DEBUG_DUMMY_CONNECTION
     }
   }
-#ifdef DISPLAY_DRIVER_LOVYANN
+#ifdef DISPLAY_DRIVER_LOVYANGFX
 
   screen->Refresh(false);
 
@@ -520,5 +520,5 @@ void loop()
 
 #error NO DISPLAY DRIVER DEFINED
 
-#endif // DISPLAY_DRIVER_LOVYANN
+#endif // DISPLAY_DRIVER_LOVYANGFX
 }
