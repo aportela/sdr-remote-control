@@ -116,7 +116,8 @@ void LGFXSMeterWidget::refreshLabel(bool force, int8_t dB)
   else
   {
     // show exponent label
-    this->dbExponentSprite->fillScreen(TFT_BLACK);
+    // TODO: ignore this fill/clear if previous value also have exponent
+    this->dbExponentSprite->fillScreen(DEFAULT_BACKGROUND_COLOR);
     this->dbExponentSprite->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
     this->dbExponentSprite->setTextSize(_SMETER_WIDGET_SIGNAL_EXPONENT_FONT_SIZE);
     this->dbExponentSprite->setCursor(0, 0);
