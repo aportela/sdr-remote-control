@@ -3,15 +3,30 @@
 #ifndef SDR_REMOTE_CONTROL_DISPLAY_CONFIGURATION_H
 #define SDR_REMOTE_CONTROL_DISPLAY_CONFIGURATION_H
 
-// #define DEBUG_SCREEN_BOUNDS
-// #define DEBUG_SCREEN_WIDGETS_BOUNDS
 #define DEBUG_SCREEN_WIDGETS_BOUNDS_BORDER_COLOR TFT_WHITE
+// #define DEBUG_SCREEN_BOUNDS
+#define DEBUG_SCREEN_WIDGETS_BOUNDS
 #define DEBUG_FPS
 
 #define DISPLAY_DRIVER_LOVYANN
 
-#define DISPLAY_LOVYANN_ILI9488_480x320
-// #define DISPLAY_LOVYANN_ST7789_240x320
+#define DEFAULT_FONT_SIZE_1_WIDTH 6
+#define DEFAULT_FONT_SIZE_1_HEIGHT 7
+
+#define DEFAULT_FONT_SIZE_2_WIDTH 12
+#define DEFAULT_FONT_SIZE_2_HEIGHT 14
+
+#define DEFAULT_FONT_SIZE_3_WIDTH 18
+#define DEFAULT_FONT_SIZE_3_HEIGHT 21
+
+#define DEFAULT_FONT_SIZE_4_WIDTH 24
+#define DEFAULT_FONT_SIZE_4_HEIGHT 28
+
+#define DEFAULT_FONT_SIZE_5_WIDTH 30
+#define DEFAULT_FONT_SIZE_5_HEIGHT 35
+
+// #define DISPLAY_LOVYANN_ILI9488_480x320
+#define DISPLAY_LOVYANN_ST7789_240x320
 
 #ifdef DISPLAY_LOVYANN_ILI9488_480x320
 
@@ -23,6 +38,7 @@
 
 #define DISPLAY_WIDTH 480
 #define DISPLAY_HEIGHT 320
+#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding
 
 #define DEFAULT_TEXT_COLOR TFT_WHITE
 #define DEFAULT_TEXT_BACKGROUND_COLOR TFT_BLACK
@@ -31,6 +47,7 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR DEFAULT_TEXT_BACKGROUND_COLOR // TODO: remove ?
 
+// TODO: refactor to ScreenConnectedDefines480x320.hpp
 #include "display/ILI9488/ScreenConnectedDefines.hpp"
 
 // ILI9488 native resolution is 320x480 so we need (for LovyAnn driver) to invert width/height values & rotate
@@ -50,6 +67,7 @@
 
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 240
+#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding
 
 #define DEFAULT_TEXT_COLOR TFT_WHITE
 #define DEFAULT_TEXT_BACKGROUND_COLOR TFT_BLACK
