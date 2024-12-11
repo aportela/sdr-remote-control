@@ -46,7 +46,7 @@ void LGFXVFOWidget::printFrequency(uint64_t frequency)
     }
   }
   formattedFrequency[resultIndex] = '\0';
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VFO_WIDGET_FREQUENCY_X_OFFSET, this->yOffset + this->padding);
+  this->setCursor(_VFO_WIDGET_FREQUENCY_X_OFFSET, _VFO_WIDGET_MAIN_LABELS_Y_OFFSET);
   this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
   if (this->isActive)
   {
