@@ -21,11 +21,13 @@ LGFXVFOWidget::~LGFXVFOWidget()
 
 void LGFXVFOWidget::printIndex()
 {
-  this->parentDisplayPtr->setTextColor(this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
-  // this->parentDisplayPtr->setCursor(this->xOffset + this->padding, this->yOffset + this->padding);
-  // this->parentDisplayPtr->print(this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL);
-  this->printAtCursor(0, _VFO_WIDGET_MAIN_LABELS_Y_OFFSET, this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL);
+  this->printAtCursorWithColorAndSize(
+      _VFO_WIDGET_VFO_INDEX_X_OFFSET,
+      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,
+      this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL,
+      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY,
+      TEXT_BACKGROUND_COLOR,
+      _VFO_WIDGET_FONT_SIZE);
 }
 
 void LGFXVFOWidget::printFrequency(uint64_t frequency)
@@ -128,19 +130,20 @@ void LGFXVFOWidget::printMode(TrxVFOMode mode)
 {
   char label[4] = {'\0'};
   this->getModeLabel(mode, label, sizeof(label));
-  this->parentDisplayPtr->setTextColor(this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, TEXT_BACKGROUND_COLOR);
-  this->parentDisplayPtr->setTextSize(_VFO_WIDGET_FONT_SIZE);
-  // this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VFO_WIDGET_MODE_X_OFFSET, this->yOffset + this->padding);
-  //  this->parentDisplayPtr->print(label);
-  this->printAtCursor(_VFO_WIDGET_MODE_X_OFFSET, _VFO_WIDGET_MAIN_LABELS_Y_OFFSET, label);
+  this->printAtCursorWithColorAndSize(
+      _VFO_WIDGET_MODE_X_OFFSET,
+      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,
+      label,
+      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY,
+      TEXT_BACKGROUND_COLOR,
+      _VFO_WIDGET_FONT_SIZE);
 }
 
 void LGFXVFOWidget::printFrequencyStep(uint64_t step)
 {
-  uint16_t x = this->xOffset + this->padding + _VFO_WIDGET_FREQUENCY_STEP_X_OFFSET;
-  uint16_t y = (this->yOffset + this->padding) + _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET;
+  uint16_t x = _VFO_WIDGET_FREQUENCY_STEP_X_OFFSET;
   // clear previous frequency step
-  this->parentDisplayPtr->fillRect(x, y, 15 * _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, TFT_BLACK);
+  this->fillRect(x, _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET, 15 * _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, DEFAULT_BACKGROUND_COLOR);
   bool hideStep = false;
   if (step > 0)
   {
@@ -187,7 +190,7 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
     }
     if (!hideStep)
     {
-      this->parentDisplayPtr->fillRect(x, y, _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
+      this->fillRect(x, _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET, _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
     }
   }
 }
