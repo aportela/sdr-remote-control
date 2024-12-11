@@ -22,12 +22,13 @@ LGFXVFOWidget::~LGFXVFOWidget()
 void LGFXVFOWidget::printIndex()
 {
   this->printAtCursorWithColorAndSize(
-      _VFO_WIDGET_VFO_INDEX_X_OFFSET,
-      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,
-      this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL,
-      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY,
-      TEXT_BACKGROUND_COLOR,
-      _VFO_WIDGET_FONT_SIZE);
+      _VFO_WIDGET_VFO_INDEX_X_OFFSET,                             // x
+      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,                           // y
+      this->index == 0 ? VFO_PRIMARY_LABEL : VFO_SECONDARY_LABEL, // label
+      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY,  // text color
+      TEXT_BACKGROUND_COLOR,                                      // background color
+      _VFO_WIDGET_FONT_SIZE                                       // font size
+  );
 }
 
 void LGFXVFOWidget::printFrequency(uint64_t frequency)
@@ -131,12 +132,13 @@ void LGFXVFOWidget::printMode(TrxVFOMode mode)
   char label[4] = {'\0'};
   this->getModeLabel(mode, label, sizeof(label));
   this->printAtCursorWithColorAndSize(
-      _VFO_WIDGET_MODE_X_OFFSET,
-      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,
-      label,
-      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY,
-      TEXT_BACKGROUND_COLOR,
-      _VFO_WIDGET_FONT_SIZE);
+      _VFO_WIDGET_MODE_X_OFFSET,                                 // x
+      _VFO_WIDGET_MAIN_LABELS_Y_OFFSET,                          // y
+      label,                                                     // label
+      this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY, // text color
+      TEXT_BACKGROUND_COLOR,                                     // background color
+      _VFO_WIDGET_FONT_SIZE                                      // font size
+  );
 }
 
 void LGFXVFOWidget::printFrequencyStep(uint64_t step)
@@ -190,7 +192,13 @@ void LGFXVFOWidget::printFrequencyStep(uint64_t step)
     }
     if (!hideStep)
     {
-      this->fillRect(x, _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET, _VFO_WIDGET_FREQUENCY_STEP_WIDTH, _VFO_WIDGET_FREQUENCY_STEP_HEIGHT, this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY);
+      this->fillRect(
+          x,                                                        // x
+          _VFO_WIDGET_FREQUENCY_STEP_Y_OFFSET,                      // y
+          _VFO_WIDGET_FREQUENCY_STEP_WIDTH,                         // width
+          _VFO_WIDGET_FREQUENCY_STEP_HEIGHT,                        // height
+          this->isActive ? TEXT_COLOR_ACTIVE : TEXT_COLOR_SECONDARY // color
+      );
     }
   }
 }
