@@ -95,14 +95,12 @@
 #define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_Y_OFFSET 0             // y offset
 
 // bars container lines (|_____________|)
-#define _DIGITAL_SMETER_WIDGET_VERTICAL_LINE_WIDTH 1 // vertical line width
 #define _DIGITAL_SMETER_WIDGET_VERTICAL_LINE_HEIGHT (_DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT + 2)
 #define _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET (_DIGITAL_SMETER_WIDGET_BARS_X_OFFSET - _DIGITAL_SMETER_WIDGET_BAR_HORIZONTAL_MARGIN - 2)                                                    // left vertical line x offset
 #define _DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET (_DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET + ((_DIGITAL_SMETER_WIDGET_BAR_COUNT + 1) * _DIGITAL_SMETER_BAR_WITH_MARGIN_WIDTH) - 2) // right vertical line y offset
 #define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_X_OFFSET _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET                                                                                              // horizontal line x offset
 #define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_Y_OFFSET (_DIGITAL_SMETER_WIDGET_HIGH_BAR_Y_OFFSET + _DIGITAL_SMETER_WIDGET_VERTICAL_LINE_HEIGHT)                                                        // horizontal line y offset
 #define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_WIDTH (_DIGITAL_SMETER_WIDGET_RIGHT_VERTICAL_LINE_X_OFFSET - _DIGITAL_SMETER_WIDGET_LEFT_VERTICAL_LINE_X_OFFSET + 1)                                     // horizontal line width
-#define _DIGITAL_SMETER_WIDGET_HORIZONTAL_LINE_HEIGHT 1                                                                                                                                                 // horizontal line height
 
 // bars
 #define _DIGITAL_SMETER_WIDGET_BAR_COUNT 38                                                                                                                                 // total smeter bars
