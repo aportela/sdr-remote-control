@@ -37,6 +37,14 @@ void LGFXVolumeSquelchWidget::refreshVolume(bool force, bool active, uint8_t val
   {
     this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, 100, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
   }
+  /*
+  this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 1, this->yOffset + this->padding + 1, 100, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, TEXT_BACKGROUND_COLOR);
+  uint8_t activeBar = map(value, 0, 100, 0, 20);
+  for (uint8_t i = 0; i < 20; i++)
+  {
+    this->parentDisplayPtr->fillRect(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_VOLUME_BAR_X_OFFSET + 2 + (i * 5), this->yOffset + this->padding + 1, 4, _VOLUME_SQUELCH_WIDGET_BARS_HEIGHT - 2, activeBar == i ? TFT_RED : TEXT_COLOR_SECONDARY);
+  }
+  */
   this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _VOLUME_SQUELCH_WIDGET_LABEL_VOLUME_VALUE_X_OFFSET, this->yOffset + this->padding);
   if (muted)
   {
