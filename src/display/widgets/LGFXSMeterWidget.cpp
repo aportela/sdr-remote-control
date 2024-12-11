@@ -32,10 +32,9 @@ void LGFXSMeterWidget::refreshLabel(bool force, int8_t dB)
   this->parentDisplayPtr->setTextColor(TEXT_COLOR_ACTIVE, TEXT_BACKGROUND_COLOR);
   if (force)
   {
-    this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET, this->yOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET);
-    this->parentDisplayPtr->print("S");
+    this->printAtCursor(_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET, _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET, "S");
   }
-  this->parentDisplayPtr->setCursor(this->xOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_X_OFFSET, this->yOffset + this->padding + _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_Y_OFFSET);
+  this->setCursor(_SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_X_OFFSET, _SMETER_WIDGET_SIGNAL_BASE_VALUE_BASE_Y_OFFSET);
   bool showDBExp = dB > 0;
   /*
     SMeter ranges
