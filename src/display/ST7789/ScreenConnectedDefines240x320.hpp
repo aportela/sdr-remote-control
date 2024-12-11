@@ -53,15 +53,15 @@
 #define _SMETER_WIDGET_SIGNAL_EXPONENT_FONT_SIZE 1                             // default label value font size
 
 // signal meter exponent value "xy" (Sn+xydB) sprite
-#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH 60 // TODO resize
-#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT 16
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH (5 * DEFAULT_FONT_SIZE_1_WIDTH) // max 5 chars ("+xxdB")
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT DEFAULT_FONT_SIZE_2_HEIGHT     // needs to be equal to base font size to "clear" possible previous base "dB" label
 
 // field offsets
 
-#define _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET SMETER_WIDGET_HEIGHT - _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_HEIGHT - 9 // signal meter value label (Snn+xydB) y offset
+#define _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET (SMETER_WIDGET_HEIGHT - _SMETER_WIDGET_SIGNAL_BASE_FONT_SIZE_HEIGHT - 4) // signal meter value label (Snn+xydB) y offset
 
 // signal meter "S" (Sn) label x/y offsets
-#define _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET SMETER_WIDGET_WIDTH - 55
+#define _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET (SMETER_WIDGET_WIDTH - 55)
 #define _SMETER_WIDGET_SIGNAL_BASE_LABEL_Y_OFFSET _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET
 
 // signal meter "n" (Sn) value x/y offsets
@@ -73,7 +73,7 @@
 #define _SMETER_WIDGET_SIGNAL_EXPONENT_VALUE_BASE_Y_OFFSET _SMETER_WIDGET_SIGNAL_VALUE_LABEL_Y_OFFSET                                                    // label value y offset
 
 // public widget constants
-#define SMETER_WIDGET_WIDTH DISPLAY_WIDTH - (DISPLAY_PADDING * 2)
+#define SMETER_WIDGET_WIDTH (DISPLAY_WIDTH - (DISPLAY_PADDING * 2))
 #define SMETER_WIDGET_HEIGHT 37
 #define SMETER_WIDGET_X_OFFSET DISPLAY_PADDING
 #define SMETER_WIDGET_Y_OFFSET (VFO_SECONDARY_WIDGET_Y_OFFSET + VFO_WIDGET_HEIGHT + WIDGETS_VERTICAL_MARGIN)
