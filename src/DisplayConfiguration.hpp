@@ -47,8 +47,7 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
 
-// TODO: refactor to ScreenConnectedDefines480x320.hpp
-#include "display/ILI9488/ScreenConnectedDefines.hpp"
+#include "display/ILI9488/ScreenConnectedDefines480x320.hpp"
 
 // ILI9488 native resolution is 320x480 so we need (for LovyanGFX driver) to invert width/height values & rotate
 #define DISPLAY_DRIVER_LOVYANGFX_WIDTH DISPLAY_HEIGHT
@@ -76,7 +75,7 @@
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
 
-#include "display/ST7789/ScreenConnectedDefines.hpp"
+#include "display/ST7789/ScreenConnectedDefines240x320.hpp.hpp"
 
 // ST7789 native resolution is 240x320 so we need (for LovyanGFX driver) to invert width/height values & rotate
 #define DISPLAY_DRIVER_LOVYANGFX_WIDTH DISPLAY_HEIGHT
