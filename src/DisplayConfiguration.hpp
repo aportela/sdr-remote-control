@@ -5,7 +5,7 @@
 
 #define DEBUG_SCREEN_WIDGETS_BOUNDS_BORDER_COLOR TFT_WHITE
 // #define DEBUG_SCREEN_BOUNDS
-#define DEBUG_SCREEN_WIDGETS_BOUNDS
+// #define DEBUG_SCREEN_WIDGETS_BOUNDS
 #define DEBUG_FPS
 
 #define DISPLAY_DRIVER_LOVYANGFX // at this time only LovyanGFX driver is supported
@@ -28,6 +28,8 @@
 #define TEXT_COLOR_SECONDARY 0x528A
 #define TEXT_COLOR_NOT_ACTIVE 0x18C3
 #define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
+#define COLOR_GREEN TFT_GREEN
+#define COLOR_RED TFT_RED
 
 #define DISPLAY_LOVYANGFX_ILI9488_480x320 // uncomment this for using a ILI9488 screen with 480x320 resolution
 // #define DISPLAY_LOVYANGFX_ST7789_240x320 // uncomment this for using a ST7789 screen with 240x320 resolution
