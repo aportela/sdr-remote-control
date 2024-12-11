@@ -53,8 +53,8 @@
 #define _SMETER_WIDGET_SIGNAL_EXPONENT_FONT_SIZE 2                             // default label value font size
 
 // signal meter exponent value "xy" (Sn+xydB) sprite
-#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH 60
-#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT 28
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_WIDTH (5 * DEFAULT_FONT_SIZE_2_WIDTH) // max 5 chars ("+xxdB")
+#define _SMETER_WIDGET_SIGNAL_EXPONENT_SPRITE_HEIGHT DEFAULT_FONT_SIZE_4_HEIGHT     // needs to be equal to base font size to "clear" possible previous base "dB" label
 
 // field offsets
 
