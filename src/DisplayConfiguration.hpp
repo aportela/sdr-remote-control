@@ -8,25 +8,29 @@
 #define DEBUG_SCREEN_WIDGETS_BOUNDS
 #define DEBUG_FPS
 
-#define DISPLAY_DRIVER_LOVYANGFX
+#define DISPLAY_DRIVER_LOVYANGFX // at this time only LovyanGFX driver is supported
 
+#define DEFAULT_FONT nullptr
 #define DEFAULT_FONT_SIZE_1_WIDTH 6
 #define DEFAULT_FONT_SIZE_1_HEIGHT 7
-
 #define DEFAULT_FONT_SIZE_2_WIDTH 12
 #define DEFAULT_FONT_SIZE_2_HEIGHT 14
-
 #define DEFAULT_FONT_SIZE_3_WIDTH 18
 #define DEFAULT_FONT_SIZE_3_HEIGHT 21
-
 #define DEFAULT_FONT_SIZE_4_WIDTH 24
 #define DEFAULT_FONT_SIZE_4_HEIGHT 28
-
 #define DEFAULT_FONT_SIZE_5_WIDTH 30
 #define DEFAULT_FONT_SIZE_5_HEIGHT 35
 
-// #define DISPLAY_LOVYANGFX_ILI9488_480x320
-#define DISPLAY_LOVYANGFX_ST7789_240x320
+#define DEFAULT_TEXT_COLOR TFT_WHITE
+#define DEFAULT_BACKGROUND_COLOR TFT_BLACK
+#define TEXT_COLOR_ACTIVE DEFAULT_TEXT_COLOR
+#define TEXT_COLOR_SECONDARY 0x528A
+#define TEXT_COLOR_NOT_ACTIVE 0x18C3
+#define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
+
+#define DISPLAY_LOVYANGFX_ILI9488_480x320 // uncomment this for using a ILI9488 screen with 480x320 resolution
+// #define DISPLAY_LOVYANGFX_ST7789_240x320 // uncomment this for using a ST7789 screen with 240x320 resolution
 
 #ifdef DISPLAY_LOVYANGFX_ILI9488_480x320
 
@@ -38,14 +42,7 @@
 
 #define DISPLAY_WIDTH 480
 #define DISPLAY_HEIGHT 320
-#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding
-
-#define DEFAULT_TEXT_COLOR TFT_WHITE
-#define DEFAULT_BACKGROUND_COLOR TFT_BLACK
-#define TEXT_COLOR_ACTIVE DEFAULT_TEXT_COLOR
-#define TEXT_COLOR_SECONDARY 0x528A
-#define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
+#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding (TODO: WORKING?)
 
 #include "display/ILI9488/ScreenConnectedDefines480x320.hpp"
 
@@ -66,14 +63,7 @@
 
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 240
-#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding
-
-#define DEFAULT_TEXT_COLOR TFT_WHITE
-#define DEFAULT_BACKGROUND_COLOR TFT_BLACK
-#define TEXT_COLOR_ACTIVE DEFAULT_TEXT_COLOR
-#define TEXT_COLOR_SECONDARY 0x528A
-#define TEXT_COLOR_NOT_ACTIVE 0x18C3
-#define TEXT_BACKGROUND_COLOR DEFAULT_BACKGROUND_COLOR // TODO: remove ?
+#define DISPLAY_PADDING 1 // real draw starts/ends contained in this horizontal/vertical (pixel) padding (TODO: WORKING?)
 
 #include "display/ST7789/ScreenConnectedDefines240x320.hpp"
 
