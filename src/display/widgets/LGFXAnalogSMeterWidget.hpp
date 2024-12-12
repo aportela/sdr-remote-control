@@ -8,9 +8,7 @@ class LGFXAnalogSMeterWidget : public LGFXSMeterWidget
 {
 private:
     lgfx::LGFX_Sprite *templateSprite;
-#ifdef USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
-    uint32_t getGradientColor(int index);
-#endif
+    int16_t getVLineValueXOffset(int8_t dB);
 
 protected:
     void init(void) override;

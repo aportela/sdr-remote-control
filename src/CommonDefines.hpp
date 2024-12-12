@@ -14,8 +14,6 @@
 // IARU region (https://www.iaru.org/about-us/organisation-and-history/regions/)
 #define IARU_REGION 1
 
-// #define USE_HORIZONTAL_GRADIENT_ON_ANALOG_SMETER_WIDGET
-
 // #define USE_ANALOG_SMETER_WIDGET
 
 #endif // SDR_REMOTE_CONTROL_COMMON_DEFINES_H
