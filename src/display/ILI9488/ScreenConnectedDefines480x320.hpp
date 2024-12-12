@@ -81,17 +81,19 @@
 
 /* DIGITAL SMETER BLOCK START */
 
+#define _DIGITAL_SMETER_WIDGET_SUNITS_RANGE_FONT_FAMILY &fonts::TomThumb // font family for labels of "1 3 4 7 9  +15  +30    +60db"
+#define _DIGITAL_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2                  // font size for labels of "1 3 4 7 9  +15  +30    +60db"
+
 // top value range-labels (numeric S units)
-#define _DIGITAL_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2                // font size for labels of "S 1 3 4 7 9  +15  +30    +60dB"
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S_X_OFFSET 0           // "S" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S1_X_OFFSET 17         // "S1" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S3_X_OFFSET 53         // "S3" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S5_X_OFFSET 90         // "S5" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S7_X_OFFSET 125        // "S7" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_X_OFFSET 162        // "S9" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS15_X_OFFSET 187 // "S9+15" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS30_X_OFFSET 235 // "S9+30" x offset
-#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS60_X_OFFSET 319 // "S9+60" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S_X_OFFSET 2           // "S" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S1_X_OFFSET 19         // "S1" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S3_X_OFFSET 55         // "S3" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S5_X_OFFSET 91         // "S5" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S7_X_OFFSET 127        // "S7" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_X_OFFSET 163        // "S9" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS15_X_OFFSET 198 // "+15" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS30_X_OFFSET 243 // "+30" x offset
+#define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS60_X_OFFSET 314 // "+60dB" x offset
 #define _DIGITAL_SMETER_WIDGET_TOP_RANGE_LABELS_Y_OFFSET 0             // y offset
 
 // bars container lines (|_____________|)
@@ -122,8 +124,8 @@
 #define _ANALOG_SMETER_WIDGET_BACKGROUND_X_OFFSET 0
 #define _ANALOG_SMETER_WIDGET_BACKGROUND_Y_OFFSET 0
 
-#define _ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_FAMILY &fonts::TomThumb // font family for labels of "1 3 4 7 9  +15  +30    +60"
-#define _ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2                  // font size for labels of "1 3 4 7 9  +15  +30    +60"
+#define _ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_FAMILY &fonts::TomThumb // font family for labels of "1 3 4 7 9  +15  +30    +60db"
+#define _ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE 2                  // font size for labels of "1 3 4 7 9  +15  +30    +60db"
 
 #define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S_X_OFFSET 4           // "S" x offset
 #define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S1_X_OFFSET 21         // "S1" x offset
@@ -131,10 +133,10 @@
 #define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S5_X_OFFSET 93         // "S5" x offset
 #define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S7_X_OFFSET 129        // "S7" x offset
 #define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_X_OFFSET 165        // "S9" x offset
-#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS15_X_OFFSET 200 // "S9+15" x offset
-#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS30_X_OFFSET 242 // "S9+30" x offset
-#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS60_X_OFFSET 314 // "S9+60" x offset
-#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_Y_OFFSET 2             // y offset for labels of "1 3 4 7 9  +15  +30    +60"
+#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS15_X_OFFSET 200 // "+15" x offset
+#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS30_X_OFFSET 242 // "+30" x offset
+#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_S9_PLUS60_X_OFFSET 314 // "+60dB" x offset
+#define _ANALOG_SMETER_WIDGET_TOP_RANGE_LABELS_Y_OFFSET 2             // y offset for labels of "1 3 4 7 9  +15  +30    +60db"
 
 #define _ANALOG_SMETER_WIDGET_VLINES_WIDTH 3
 #define _ANALOG_SMETER_WIDGET_VLINES_MARGIN 6
