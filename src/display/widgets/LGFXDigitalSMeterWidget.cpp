@@ -41,6 +41,15 @@ void LGFXDigitalSMeterWidget::drawBars(int8_t dB)
         isCurrentLongBar ? _DIGITAL_SMETER_WIDGET_HIGH_BAR_HEIGHT : _DIGITAL_SMETER_WIDGET_LOW_BAR_HEIGHT,       // height
         barColor                                                                                                 // color
     );
+
+    uint16_t x2 = _SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET + (i * (3));
+    this->fillRect(
+        x2,      // x
+        6,       // y
+        2,       // width
+        10,      // height
+        barColor // color
+    );
   }
 }
 
