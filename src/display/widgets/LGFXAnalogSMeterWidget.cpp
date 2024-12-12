@@ -4,6 +4,7 @@
 #define ANALOG_SMETER_BACKGROUND_BORDER_COLOR TEXT_COLOR_SECONDARY
 #define ANALOG_SMETER_TEXT_COLOR TEXT_COLOR_NOT_ACTIVE
 #define ANALOG_SMETER_INDICATOR_COLOR 0xF388
+#define ANALOG_SMETER_MINI_INDICATOR_COLOR 0xFE0C
 #define ANALOG_SMETER_BAR_LOW_VALUE_BAR_COLOR COLOR_GREEN
 #define ANALOG_SMETER_BAR_HIGH_VALUE_BAR_COLOR COLOR_RED
 
@@ -41,7 +42,7 @@ void LGFXAnalogSMeterWidget::init(void)
         ANALOG_SMETER_BACKGROUND_BORDER_COLOR      // color
     );
 
-    // "S 1 3 4 7 9  +15  +30    +60" container labels
+    // "S 1 3 4 7 9  +15  +30    +60dB" container labels
     this->parentDisplayPtr->setFont(_ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_FAMILY);
     this->parentDisplayPtr->setTextSize(_ANALOG_SMETER_WIDGET_SUNITS_RANGE_FONT_SIZE);
     // WARNING: if text background color is set (ANALOG_SMETER_BACKGROUND_COLOR) on second parameter, this custom font overflows adding extra white space filled with bg color
@@ -102,7 +103,7 @@ void LGFXAnalogSMeterWidget::init(void)
 int16_t LGFXAnalogSMeterWidget::getVLineValueXOffset(int8_t dB)
 {
     int16_t xOffset = 0;
-    if (dB >= -54 && dB <= 60)
+    if (dB >= SMETER_MIN_DB && dB <= SMETER_MAX_DB)
     {
         const int16_t baseValue = _ANALOG_SMETER_WIDGET_VLINES_WIDTH + _ANALOG_SMETER_WIDGET_VLINES_MARGIN;
         xOffset = baseValue * (dB + 54) / _ANALOG_SMETER_WIDGET_VLINES_WIDTH;
@@ -116,4 +117,10 @@ void LGFXAnalogSMeterWidget::update(int8_t dB)
     this->fillRect(this->getVLineValueXOffset(this->previousDBSmoothedValue), _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_BACKGROUND_COLOR);
     // draw current value
     this->fillRect(this->getVLineValueXOffset(dB), _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_OFFSET, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_WIDTH, _ANALOG_SMETER_WIDGET_CENTER_METER_VLINE_Y_HEIGHT, ANALOG_SMETER_INDICATOR_COLOR);
+
+    this->drawFastVLine(_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET + ((this->previousDBSmoothedValue + 54)), 4, 16, DEFAULT_BACKGROUND_COLOR);
+
+    this->drawFastHLine(_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET, 12, 100, TEXT_COLOR_ACTIVE);
+
+    this->drawFastVLine(_SMETER_WIDGET_SIGNAL_BASE_LABEL_X_OFFSET + ((dB + 54)), 4, 16, ANALOG_SMETER_MINI_INDICATOR_COLOR);
 }
