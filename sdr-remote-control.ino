@@ -106,6 +106,7 @@ void onEncoderIncrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
       trx->incrementActiveVFOFrequency(acceleratedDelta, true);
+      trx->increaseSignalMeter(true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
@@ -170,6 +171,7 @@ void onEncoderDecrement(uint8_t acceleratedDelta = 1, uint64_t lastMillis = 0)
 #ifdef DEBUG_DUMMY_CONNECTION
 
       trx->decrementActiveVFOFrequency(acceleratedDelta, true);
+      trx->decreaseSignalMeter(true);
 
 #else // DEBUG_DUMMY_CONNECTION
 
@@ -419,6 +421,9 @@ const availableMenuActions menuActions[TOTAL_MENU_ITEMS] = {
     MENU_ACTION_PREVIOUS_PAGE,          // F8 / PAGE 2 (BUTTON INDEX 15)
 };
 
+RotaryControl *encoder1 = nullptr;
+RotaryControl *encoder2 = nullptr;
+
 void setup()
 {
 #ifdef DEBUG_DUMMY_CONNECTION
@@ -431,8 +436,9 @@ void setup()
 
 #endif // DEBUG_DUMMY_CONNECTION
 
-  RotaryControl::init(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
-  Keypad8::init({KP8_F1_PIN, KP8_F2_PIN, KP8_F3_PIN, KP8_F4_PIN, KP8_F5_PIN, KP8_F6_PIN, KP8_F7_PIN, KP8_F8_PIN});
+  encoder1 = new RotaryControl(ENC1_A, ENC1_B, onEncoderIncrement, onEncoderDecrement);
+  encoder2 = new RotaryControl(25, 26, onEncoderIncrement, onEncoderDecrement);
+  //   Keypad8::init({KP8_F1_PIN, KP8_F2_PIN, KP8_F3_PIN, KP8_F4_PIN, KP8_F5_PIN, KP8_F6_PIN, KP8_F7_PIN, KP8_F8_PIN});
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
@@ -472,9 +478,10 @@ void setup()
 #endif // DISPLAY_DRIVER_LOVYANGFX
 }
 
+long oldPosition = 0;
 void loop()
 {
-  onKP8Loop(Keypad8::loop());
+  // onKP8Loop(Keypad8::loop());
   if (trx->getCurrentStatus(trxStatus))
   {
     if (!trxStatus->poweredOn)
