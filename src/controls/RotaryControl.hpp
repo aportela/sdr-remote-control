@@ -16,6 +16,7 @@ class RotaryControl
 private:
     uint8_t pinA;
     uint8_t pinB;
+    bool enableAcceleration;
     RotaryControlCallback RCCallbacks[2];
     volatile bool ccw1_fall;
     volatile bool cw1_fall;
@@ -26,7 +27,7 @@ private:
     void handleInterrupt(RotaryControlChange rcChange);
 
 public:
-    RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback);
+    RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration = true);
     ~RotaryControl();
 };
 

@@ -1,8 +1,8 @@
 #include "RotaryControl.hpp"
 #include <Arduino.h>
 
-RotaryControl::RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback)
-    : pinA(pinA), pinB(pinB), ccw1_fall(false), cw1_fall(false), lastEncoderMillis(0)
+RotaryControl::RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration)
+    : pinA(pinA), pinB(pinB), ccw1_fall(false), cw1_fall(false), lastEncoderMillis(0), enableAcceleration(enableAcceleration)
 {
     RCCallbacks[RCC_CLOCKWISE] = clockWiseCallback;
     RCCallbacks[RCC_COUNTERCLOCKWISE] = counterClockWiseCallback;
@@ -68,6 +68,6 @@ void RotaryControl::handleInterrupt(RotaryControlChange rcChange)
 
     if (RCCallbacks[rcChange])
     {
-        RCCallbacks[rcChange](acceleratedDelta, currentMillis);
+        RCCallbacks[rcChange](this->enableAcceleration ? acceleratedDelta : 1, currentMillis);
     }
 }
