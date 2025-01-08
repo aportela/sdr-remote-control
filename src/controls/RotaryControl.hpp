@@ -21,13 +21,15 @@ private:
     volatile bool ccw1_fall;
     volatile bool cw1_fall;
     volatile uint64_t lastEncoderMillis;
+    volatile uint16_t debounceMillis;
+    volatile uint64_t lastDebounceMillis;
 
     static void globalInterruptHandler(void *arg);
 
     void handleInterrupt(RotaryControlChange rcChange);
 
 public:
-    RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration = true);
+    RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration = true, uint16_t debounceMillis = 0);
     ~RotaryControl();
 };
 

@@ -1,8 +1,8 @@
 #include "RotaryControl.hpp"
 #include <Arduino.h>
 
-RotaryControl::RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration)
-    : pinA(pinA), pinB(pinB), ccw1_fall(false), cw1_fall(false), lastEncoderMillis(0), enableAcceleration(enableAcceleration)
+RotaryControl::RotaryControl(uint8_t pinA, uint8_t pinB, RotaryControlCallback clockWiseCallback, RotaryControlCallback counterClockWiseCallback, bool enableAcceleration, uint16_t debounceMillis)
+    : pinA(pinA), pinB(pinB), ccw1_fall(false), cw1_fall(false), lastEncoderMillis(0), enableAcceleration(enableAcceleration), debounceMillis(debounceMillis)
 {
     RCCallbacks[RCC_CLOCKWISE] = clockWiseCallback;
     RCCallbacks[RCC_COUNTERCLOCKWISE] = counterClockWiseCallback;
@@ -23,7 +23,6 @@ RotaryControl::~RotaryControl()
 void RotaryControl::globalInterruptHandler(void *arg)
 {
     RotaryControl *instance = static_cast<RotaryControl *>(arg);
-
     uint8_t enc_value_A = digitalRead(instance->pinA);
     uint8_t enc_value_B = digitalRead(instance->pinB);
     uint8_t enc_value = (enc_value_A << 1) | enc_value_B;
@@ -48,26 +47,30 @@ void RotaryControl::globalInterruptHandler(void *arg)
 
 void RotaryControl::handleInterrupt(RotaryControlChange rcChange)
 {
-    this->cw1_fall = false;
-    this->ccw1_fall = false;
     uint64_t currentMillis = millis();
-    uint8_t acceleratedDelta = 0;
-
-    if (currentMillis - this->lastEncoderMillis < 5)
-        acceleratedDelta = 20;
-    else if (currentMillis - this->lastEncoderMillis < 10)
-        acceleratedDelta = 10;
-    else if (currentMillis - this->lastEncoderMillis < 20)
-        acceleratedDelta = 5;
-    else if (currentMillis - this->lastEncoderMillis < 50)
-        acceleratedDelta = 2;
-    else
-        acceleratedDelta = 1;
-
-    this->lastEncoderMillis = currentMillis;
-
-    if (RCCallbacks[rcChange])
+    if (currentMillis - this->lastDebounceMillis > this->debounceMillis)
     {
-        RCCallbacks[rcChange](this->enableAcceleration ? acceleratedDelta : 1, currentMillis);
+        this->cw1_fall = false;
+        this->ccw1_fall = false;
+        uint8_t acceleratedDelta = 0;
+
+        if (currentMillis - this->lastEncoderMillis < 5)
+            acceleratedDelta = 20;
+        else if (currentMillis - this->lastEncoderMillis < 10)
+            acceleratedDelta = 10;
+        else if (currentMillis - this->lastEncoderMillis < 20)
+            acceleratedDelta = 5;
+        else if (currentMillis - this->lastEncoderMillis < 50)
+            acceleratedDelta = 2;
+        else
+            acceleratedDelta = 1;
+
+        this->lastEncoderMillis = currentMillis;
+        this->lastDebounceMillis = currentMillis;
+
+        if (RCCallbacks[rcChange])
+        {
+            RCCallbacks[rcChange](this->enableAcceleration ? acceleratedDelta : 1, currentMillis);
+        }
     }
 }
