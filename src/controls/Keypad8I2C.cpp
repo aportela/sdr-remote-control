@@ -40,7 +40,7 @@ Keypad8I2C::~Keypad8I2C()
 uint8_t Keypad8I2C::loop(void)
 {
     uint8_t pressedButtonsMask = 0;
-    if (this->pins == nullptr || this->pinCount == 0)
+    if (this->pins == nullptr || this->pinCount == 0 || this->lastPinsDebounceMillisecsPtr == nullptr)
     {
         return pressedButtonsMask;
     }
