@@ -10,6 +10,7 @@
 #include "src/CommonDefines.hpp"
 #include "src/controls/RotaryControl.hpp"
 #include "src/controls/Keypad8.hpp"
+#include "src/controls/Keypad8I2C.hpp"
 #include "src/Transceiver.hpp"
 #include "src/MenuConfiguration.hpp"
 #include "src/Menu.hpp"
@@ -419,6 +420,10 @@ RotaryControl *encoder1 = nullptr;
 RotaryControl *encoder2 = nullptr;
 RotaryControl *encoder3 = nullptr;
 
+Keypad8I2C *kp8 = nullptr;
+
+const uint8_t KP8_I2C_PINS[] = {0, 1, 2, 3, 8, 9, 10, 11};
+
 void setup()
 {
 #ifdef DEBUG_DUMMY_CONNECTION
@@ -435,6 +440,7 @@ void setup()
   encoder2 = new RotaryControl(ENC2_A, ENC2_B, onEncoderIncrement, onEncoderDecrement, false, ENCODER_DEBOUNCE_MS_LONG);
   encoder2 = new RotaryControl(ENC3_A, ENC3_B, onEncoderIncrement, onEncoderDecrement, false, ENCODER_DEBOUNCE_MS_LONG);
   //   Keypad8::init({KP8_F1_PIN, KP8_F2_PIN, KP8_F3_PIN, KP8_F4_PIN, KP8_F5_PIN, KP8_F6_PIN, KP8_F7_PIN, KP8_F8_PIN});
+  kp8 = new Keypad8I2C(0x20, KP8_I2C_PINS, sizeof(KP8_I2C_PINS));
   encoderChangeBitmask |= ENCODER_CHANGE_TUNE;
   trx = new Transceiver();
   trxStatus = new TransceiverStatus;
@@ -477,7 +483,7 @@ void setup()
 long oldPosition = 0;
 void loop()
 {
-  // onKP8Loop(Keypad8::loop());
+  onKP8Loop(kp8->loop());
   if (trx->getCurrentStatus(trxStatus))
   {
     if (!trxStatus->poweredOn)
