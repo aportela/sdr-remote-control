@@ -4,11 +4,14 @@
 #include <stdint.h>
 #include <Adafruit_MCP23X17.h>
 
+#define DEBOUNCE_MILLIS 10
+
 class Keypad8I2C
 {
 private:
     Adafruit_MCP23X17 mcp;
     uint8_t *pins = nullptr;
+    uint64_t *lastPinsDebounceMillisecsPtr = nullptr;
     size_t pinCount = 0;
 
 public:
